@@ -1,0 +1,102 @@
+from manim.constants import *
+
+
+def get_type_of_cubie(dim, position):
+    if (position[1] == 0 or position[1] == dim - 1) and (
+        position[2] == 0 or position[2] == dim - 1
+    ):
+        return "corner"
+    elif position[1] == 0 or position[1] == dim - 1:
+        return "edge"
+    else:
+        return "center"
+
+
+# DOWN = IN
+# OUT = RIGHT
+# LEFT = UP
+# UP = OUT
+# RIGHT = DOWN
+# IN = LEFT
+def get_faces_of_cubie(dim, position):
+    dim = dim - 1
+    try:
+        faces = {
+            # Front corners
+            (0, 0, 0): [LEFT, DOWN, IN],
+            (0, 0, dim): [LEFT, DOWN, OUT],
+            (0, dim, 0): [LEFT, UP, IN],
+            (0, dim, dim): [LEFT, UP, OUT],
+            # Back corners
+            (dim, 0, 0): [RIGHT, DOWN, IN],
+            (dim, 0, dim): [RIGHT, DOWN, OUT],
+            (dim, dim, 0): [RIGHT, UP, IN],
+            (dim, dim, dim): [RIGHT, UP, OUT],
+        }
+        return faces[position]
+    except:
+        x = position[0]
+        y = position[1]
+        z = position[2]
+
+        if x == 0:
+            if y == 0:
+                return [DOWN, LEFT]
+            elif y == dim:
+                return [UP, LEFT]
+            else:
+                if z == 0:
+                    return [IN, LEFT]
+                elif z == dim:
+                    return [OUT, LEFT]
+                else:
+                    return [LEFT]
+        elif x == dim:
+            if y == 0:
+                return [DOWN, RIGHT]
+            elif y == dim:
+                return [UP, RIGHT]
+            else:
+                if z == 0:
+                    return [IN, RIGHT]
+                elif z == dim:
+                    return [OUT, RIGHT]
+                else:
+                    return [RIGHT]
+        else:
+            if y == 0:
+                if z == 0:
+                    return [IN, DOWN]
+                elif z == dim:
+                    return [OUT, DOWN]
+                else:
+                    return [DOWN]
+            elif y == dim:
+                if z == 0:
+                    return [IN, UP]
+                elif z == dim:
+                    return [OUT, UP]
+                else:
+                    return [UP]
+            else:
+                if z == 0:
+                    return [IN]
+                elif z == dim:
+                    return [OUT]
+                else:
+                    return []
+
+def parse_move(move):
+    face = move[0]
+    assert face in "FUBLRD"
+    
+    # Try parsing moves like F2 or even F8
+    try:
+        n_turns = int(move[1])
+    except (IndexError, ValueError):
+        # If the string is too short, or move[1] is not a number
+        n_turns = 1
+
+    n_turns = -n_turns if "'" in move else n_turns
+
+    return face, n_turns
