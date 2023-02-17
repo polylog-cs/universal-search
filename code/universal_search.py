@@ -77,8 +77,8 @@ class BrainfuckExecution:
     do not need to handle syntax errors.
     """
 
-    def step(self, num_of_steps=1):
-        if num_of_steps == 0 or self.is_finished():
+    def step(self):
+        if self.is_finished():
             return
         command = self.program[self.instruction_pointer]
         if command == ">":
@@ -132,7 +132,11 @@ class BrainfuckExecution:
                     self.instruction_pointer -= 1
         self.instruction_pointer += 1
 
-        self.step(num_of_steps - 1)
+    def steps(self, num_of_steps=1):
+        for _ in range(num_of_steps):
+            self.step()
+            if self.is_finished():
+                break
 
     """
     Executes the program until it is finished and returns the output.
@@ -183,9 +187,6 @@ def main():
 
     # UNIVERSAL SEARCH
 
-    sys.setrecursionlimit(
-        1000000
-    )  # V: can we set to infinity? would be great if the program does not crash after a few seconds of running...
     input_number = int(sys.argv[1])
 
     list_of_programs = []
@@ -196,7 +197,7 @@ def main():
         # simulate certain number of steps of each program in the list
         num_of_steps = 1
         for program in reversed(list_of_programs):
-            program.step(num_of_steps)
+            program.steps(num_of_steps)
             # check the output of the algorithm, we assume it is two comma separated numbers, terminate if correct
             if program.is_finished() and not program.is_checked():
                 output = program.get_output().split(",")
