@@ -170,7 +170,7 @@ def main():
 
     #print(program_collatz.run())
 
-    # UNIVERSAL SEARCH
+    # UNIVERSAL SEARCH  
 
     sys.setrecursionlimit(1000000) # V: can we set to infinity? would be great if the program does not crash after a few seconds of running...
     input_number = int(sys.argv[1])
