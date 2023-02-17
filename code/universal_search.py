@@ -172,7 +172,7 @@ def main():
 
     # UNIVERSAL SEARCH
 
-    sys.setrecursionlimit(100000)
+    sys.setrecursionlimit(1000000) # V: can we set to infinity? would be great if the program does not crash after a few seconds of running...
     input_number = int(sys.argv[1])
 
     list_of_programs = []
