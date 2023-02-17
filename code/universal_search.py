@@ -38,11 +38,14 @@ This class represents a single execution of a brainfuck program. It is initializ
 program and the input. It can be stepped through one command at a time, or it can be run
 until it is finished.
 """
+
+
 class BrainfuckExecution:
 
     """
     Initializes the execution with the program and the input.
     """
+
     def __init__(self, program, input):
         self.program = program
         self.data = {}
@@ -52,10 +55,11 @@ class BrainfuckExecution:
         self.input_pointer = 0
         self.output = []
         self.checked = False
-    
+
     """
     Returns whether the program has finished executing.
     """
+
     def is_finished(self):
         return self.instruction_pointer >= len(self.program)
 
@@ -64,33 +68,34 @@ class BrainfuckExecution:
 
     def set_checked(self):
         self.checked = True
-    
+
     def get_output(self):
-        return ''.join(self.output)
+        return "".join(self.output)
 
     """
     Executes a single step of the program. We modify the language specification slightly so that we
     do not need to handle syntax errors.
     """
-    def step(self, num_of_steps = 1):
+
+    def step(self, num_of_steps=1):
         if num_of_steps == 0 or self.is_finished():
             return
         command = self.program[self.instruction_pointer]
-        if command == '>':
+        if command == ">":
             self.data_pointer += 1
-        elif command == '<':
+        elif command == "<":
             self.data_pointer -= 1
-        elif command == '+':
+        elif command == "+":
             self.data[self.data_pointer] = self.data.get(self.data_pointer, 0) + 1
             if self.data[self.data_pointer] == 256:
                 self.data[self.data_pointer] = 0
-        elif command == '-':
+        elif command == "-":
             self.data[self.data_pointer] = self.data.get(self.data_pointer, 0) - 1
             if self.data[self.data_pointer] == -1:
                 self.data[self.data_pointer] = 255
-        elif command == '.':
+        elif command == ".":
             self.output.append(chr(self.data.get(self.data_pointer, 0)))
-        elif command == ',':
+        elif command == ",":
             # This is technically not according to the language spec, but it's
             # pretty convenient so that the program doesn't just crash when it runs
             # out of input.
@@ -99,28 +104,28 @@ class BrainfuckExecution:
             else:
                 self.data[self.data_pointer] = ord(self.input[self.input_pointer])
                 self.input_pointer += 1
-        elif command == '[':
+        elif command == "[":
             if self.data.get(self.data_pointer, 0) == 0:
                 # Jump it forward to the matching ] command.
                 # Keep track of how many nested loops we are in.
                 counter = 0
                 while self.instruction_pointer < len(self.program):
-                    if self.program[self.instruction_pointer] == '[':
+                    if self.program[self.instruction_pointer] == "[":
                         counter += 1
-                    elif self.program[self.instruction_pointer] == ']':
+                    elif self.program[self.instruction_pointer] == "]":
                         counter -= 1
                         if counter == 0:
                             break
                     self.instruction_pointer += 1
-        elif command == ']':
+        elif command == "]":
             if self.data.get(self.data_pointer, 0) != 0:
                 # Jump it back to the matching [ command.
                 # Keep track of how many nested loops we are in.
                 counter = 0
                 while self.instruction_pointer > 0:
-                    if self.program[self.instruction_pointer] == ']':
+                    if self.program[self.instruction_pointer] == "]":
                         counter += 1
-                    elif self.program[self.instruction_pointer] == '[':
+                    elif self.program[self.instruction_pointer] == "[":
                         counter -= 1
                         if counter == 0:
                             break
@@ -128,57 +133,65 @@ class BrainfuckExecution:
         self.instruction_pointer += 1
 
         self.step(num_of_steps - 1)
+
     """
     Executes the program until it is finished and returns the output.
     """
+
     def run(self):
         while not self.is_finished():
             self.step()
-        #print(self.data)
-        return ''.join(self.output)
+        # print(self.data)
+        return "".join(self.output)
 
 
 def allBrainfuckPrograms():
     def nextBrainfuckProgram(str):
-        alphabet = ['<', '>', '+', '-', '.', ',', '[', ']']
+        alphabet = ["<", ">", "+", "-", ".", ",", "[", "]"]
         i = len(str) - 1
         for i in reversed(range(0, len(str))):
-            if str[i] != ']':
-                return str[:i] + alphabet[alphabet.index(str[i])+1] + "<" * (len(str) - i - 1)
+            if str[i] != "]":
+                return (
+                    str[:i]
+                    + alphabet[alphabet.index(str[i]) + 1]
+                    + "<" * (len(str) - i - 1)
+                )
         return "<" * (len(str) + 1)
 
-    str = ''
+    str = ""
     while True:
         yield str
         str = nextBrainfuckProgram(str)
 
+
 def main():
 
     # DEBUGGING
-    #"Hello World!", wikipedia
+    # "Hello World!", wikipedia
     program_helloworld = BrainfuckExecution(
-        '++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.', 
-        ''
+        "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.",
+        "",
     )
-  
-    #number of steps until n terminates in the collatz procedure; Daniel B Cristofani (cristofdathevanetdotcom) http://www.hevanet.com/cristofd/brainfuck/]
-    program_collatz =  BrainfuckExecution(
+
+    # number of steps until n terminates in the collatz procedure; Daniel B Cristofani (cristofdathevanetdotcom) http://www.hevanet.com/cristofd/brainfuck/]
+    program_collatz = BrainfuckExecution(
         ">,[[----------[>>>[>>>>]+[[-]+<[->>>>++>>>>+[>>>>]++[->+<<<<<]]<<<]++++++[>------<-]>--[>>[->>>>]+>+[<<<<]>-],<]>]>>>++>+>>[<<[>>>>[-]+++++++++<[>-<-]+++++++++>[-[<->-]+[<<<<]]<[>+<-]>]>[>[>>>>]+[[-]<[+[->>>>]>+<]>[<+>[<<<<]]+<<<<]>>>[->>>>]+>+[<<<<]]>[[>+>>[<<<<+>>>>-]>]<<<<[-]>[-<<<<]]>>>>>>>]>>+[[-]++++++>>>>]<<<<[[<++++++++>-]<.[-]<[-]<[-]<]<,]",
-        chr(48+1)+chr(48+6)+chr(10)
+        chr(48 + 1) + chr(48 + 6) + chr(10),
     )
 
+    # print(program_collatz.run())
 
-    #print(program_collatz.run())
+    # UNIVERSAL SEARCH
 
-    # UNIVERSAL SEARCH  
-
-    sys.setrecursionlimit(1000000) # V: can we set to infinity? would be great if the program does not crash after a few seconds of running...
+    sys.setrecursionlimit(
+        1000000
+    )  # V: can we set to infinity? would be great if the program does not crash after a few seconds of running...
     input_number = int(sys.argv[1])
 
     list_of_programs = []
     for program in allBrainfuckPrograms():
         # append new program to the list
-        list_of_programs.append(BrainfuckExecution(program, str(input_number))) 
+        list_of_programs.append(BrainfuckExecution(program, str(input_number)))
         print(len(list_of_programs))
         # simulate certain number of steps of each program in the list
         num_of_steps = 1
@@ -186,8 +199,12 @@ def main():
             program.step(num_of_steps)
             # check the output of the algorithm, we assume it is two comma separated numbers, terminate if correct
             if program.is_finished() and not program.is_checked():
-                output = program.get_output().split(',')
-                if output[0].isnumeric() and output[1].isnumeric() and len(output[0]) + len(output[1]) - 1 <= len(input_number):
+                output = program.get_output().split(",")
+                if (
+                    output[0].isnumeric()
+                    and output[1].isnumeric()
+                    and len(output[0]) + len(output[1]) - 1 <= len(input_number)
+                ):
                     a, b = int(output[0]), int(output[1])
                     if a > 1 and b > 1 and a * b == input_number:
                         print(a, b)
@@ -196,6 +213,5 @@ def main():
             num_of_steps *= 2
 
 
-
-if __name__ == '__main__':
+if __name__ == "__main__":
     main()
