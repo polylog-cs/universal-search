@@ -1,4 +1,13 @@
 """
+This is an (essentially) asymptotically optimal program for factoring in the sense that whenever there is a (brainfuck)
+program that solves factoring in time f(n), our algorithm solves factoring in time
+O(f(n) + n**1.58). The term n**1.58 is the time complexity of multiplying two long numbers 
+with n digits in Python (Python uses Karatsuba's algorithm). 
+"""
+
+import sys
+
+"""
 The language consists of eight commands, listed below. A brainfuck program is a sequence
 of these commands, possibly interspersed with other characters (which are ignored).
 The commands are executed sequentially, with some exceptions: an instruction pointer begins
@@ -42,21 +51,29 @@ class BrainfuckExecution:
         self.input = input
         self.input_pointer = 0
         self.output = []
+        self.checked = False
     
     """
     Returns whether the program has finished executing.
     """
     def is_finished(self):
         return self.instruction_pointer >= len(self.program)
+
+    def is_checked(self):
+        return self.checked
+
+    def set_checked(self):
+        self.checked = True
     
+    def get_output(self):
+        return ''.join(self.output)
+
     """
-    Executes a single step of the program. There is some unspecified behavior in the language
-    specificiation or that are technically syntax errors, but we try to define these
-    in some reasonable way by slightly modifying the language specification only so that we
-    do not need to handle these errors.
+    Executes a single step of the program. We modify the language specification slightly so that we
+    do not need to handle syntax errors.
     """
-    def step(self):
-        if self.is_finished():
+    def step(self, num_of_steps = 1):
+        if num_of_steps == 0 or self.is_finished():
             return
         command = self.program[self.instruction_pointer]
         if command == '>':
@@ -110,18 +127,75 @@ class BrainfuckExecution:
                     self.instruction_pointer -= 1
         self.instruction_pointer += 1
 
+        self.step(num_of_steps - 1)
     """
     Executes the program until it is finished and returns the output.
     """
     def run(self):
         while not self.is_finished():
             self.step()
+        #print(self.data)
         return ''.join(self.output)
 
+
+def allBrainfuckPrograms():
+    def nextBrainfuckProgram(str):
+        alphabet = ['<', '>', '+', '-', '.', ',', '[', ']']
+        i = len(str) - 1
+        for i in reversed(range(0, len(str))):
+            if str[i] != ']':
+                return str[:i] + alphabet[alphabet.index(str[i])+1] + "<" * (len(str) - i - 1)
+        return "<" * (len(str) + 1)
+
+    str = ''
+    while True:
+        yield str
+        str = nextBrainfuckProgram(str)
+
 def main():
-    # Prints "Hello World!".
-    program = BrainfuckExecution('++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.', '')
-    print(program.run())
+
+    # DEBUGGING
+    #"Hello World!", wikipedia
+    program_helloworld = BrainfuckExecution(
+        '++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.', 
+        ''
+    )
+  
+    #number of steps until n terminates in the collatz procedure; Daniel B Cristofani (cristofdathevanetdotcom) http://www.hevanet.com/cristofd/brainfuck/]
+    program_collatz =  BrainfuckExecution(
+        ">,[[----------[>>>[>>>>]+[[-]+<[->>>>++>>>>+[>>>>]++[->+<<<<<]]<<<]++++++[>------<-]>--[>>[->>>>]+>+[<<<<]>-],<]>]>>>++>+>>[<<[>>>>[-]+++++++++<[>-<-]+++++++++>[-[<->-]+[<<<<]]<[>+<-]>]>[>[>>>>]+[[-]<[+[->>>>]>+<]>[<+>[<<<<]]+<<<<]>>>[->>>>]+>+[<<<<]]>[[>+>>[<<<<+>>>>-]>]<<<<[-]>[-<<<<]]>>>>>>>]>>+[[-]++++++>>>>]<<<<[[<++++++++>-]<.[-]<[-]<[-]<]<,]",
+        chr(48+1)+chr(48+6)+chr(10)
+    )
+
+
+    #print(program_collatz.run())
+
+    # UNIVERSAL SEARCH
+
+    sys.setrecursionlimit(100000)
+    input_number = int(sys.argv[1])
+
+    list_of_programs = []
+    for program in allBrainfuckPrograms():
+        # append new program to the list
+        list_of_programs.append(BrainfuckExecution(program, str(input_number))) 
+        print(len(list_of_programs))
+        # simulate certain number of steps of each program in the list
+        num_of_steps = 1
+        for program in reversed(list_of_programs):
+            program.step(num_of_steps)
+            # check the output of the algorithm, we assume it is two comma separated numbers, terminate if correct
+            if program.is_finished() and not program.is_checked():
+                output = program.get_output().split(',')
+                if output[0].isnumeric() and output[1].isnumeric() and len(output[0]) + len(output[1]) - 1 <= len(input_number):
+                    a, b = int(output[0]), int(output[1])
+                    if a > 1 and b > 1 and a * b == input_number:
+                        print(a, b)
+                        return
+                program.set_checked()
+            num_of_steps *= 2
+
+
 
 if __name__ == '__main__':
     main()
