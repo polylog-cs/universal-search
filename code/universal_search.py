@@ -183,8 +183,6 @@ def main():
         chr(48 + 1) + chr(48 + 6) + chr(10),
     )
 
-    # print(program_collatz.run())
-
     # UNIVERSAL SEARCH
 
     input_number = int(sys.argv[1])
@@ -200,16 +198,21 @@ def main():
             program.steps(num_of_steps)
             # check the output of the algorithm, we assume it is two comma separated numbers, terminate if correct
             if program.is_finished() and not program.is_checked():
-                output = program.get_output().split(",")
-                if (
-                    output[0].isnumeric()
-                    and output[1].isnumeric()
-                    and len(output[0]) + len(output[1]) - 1 <= len(input_number)
-                ):
-                    a, b = int(output[0]), int(output[1])
-                    if a > 1 and b > 1 and a * b == input_number:
+                try:
+                    str_a, str_b = program.get_output().split(",", 1)
+                    a, b = int(str_a), int(str_b)
+                    # we check that both numbers are <= input_number so that we
+                    # don't end up multiplying very large numbers and mess up
+                    # our time complexity:
+                    if (
+                        1 < a <= input_number
+                        and 1 < b <= input_number
+                        and a * b == input_number
+                    ):
                         print(a, b)
                         return
+                except:
+                    pass
                 program.set_checked()
             num_of_steps *= 2
 
