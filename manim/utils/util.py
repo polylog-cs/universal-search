@@ -1,99 +1,49 @@
-import copy
-import itertools
-import random
-import math
 from manim import *
-from utils.solarized import *
 
-############### DEFAULT OPTIONS
+def multiplication_animation(num1, num2):
+    
+    # create objects
 
-def default():
-    VMobject.set_default(color = GRAY)
-    Polygon.set_default(color = RED)
-    # SurroundingRectangle.set_default(color = RED)
-    # SurroundingRectangle.set_default(fill_color = config.background_color)
-    # SurroundingRectangle.set_default(fill_opacity = 1)
-
-############### GENERATING SOUNDS
-
-random.seed(0)
-
-def random_click_file():
-    return f"audio/click/click_{random.randint(0, 3)}.wav"
+    nums_intermediate = []
+    tmp = num2
+    while(tmp > 0):
+        digit = tmp % 10
+        tmp //= 10
+        nums_intermediate.append(digit * num1)
+    num = num1*num2
 
 
-def random_pop_file():
-    return f"audio/pop/pop_{random.randint(0, 6)}.wav"
+    num1_tex, num2_tex, num_tex = [Tex(str(n)) for n in [num1, num2, num]]
+    nums_intermediate_tex = [Tex(str(n)) for n in nums_intermediate]
+    num2_tex = Tex(r"$\times$" + str(num2))
 
+    line1 = Line(start = num2_tex.get_left(), end = num2_tex.get_right(), color = GRAY)
+    line2 = Line(
+        start = nums_intermediate_tex[-1].get_left(), 
+        end = np.array([
+            nums_intermediate_tex[-1].get_left()[0], 
+            nums_intermediate_tex[0].get_right()[1],
+            0]), 
+        color = GRAY)
+    
+    objects = Group(
+        num1_tex,
+        num2_tex,
+        line1,
+        *nums_intermediate_tex,
+        line2,
+        num_tex,
+    ).arrange(DOWN)
 
-def random_whoosh_file():
-    return f"audio/whoosh/whoosh_{random.randint(0, 3)}.wav"
+    # animations
 
+    anims1 = AnimationGroup(
+        FadeIn(objects),
+    )
 
-whoosh_gain = -8
+    anims2 = AnimationGroup(
+        FadeOut(objects),
+    )
 
+    return objects, [anims1, anims2]
 
-def random_whoops_file():
-    return f"audio/whoops/whoops{random.randint(1, 1)}.mp3"
-
-
-def random_rubik_file():
-    return f"audio/cube/r{random.randint(1, 20)}.wav"
-
-############### SOLARIZED COLORS
-
-
-# background tones (dark theme)
-
-from manim.utils.color import GRAY
-
-
-BASE03 = "#002b36"
-BASE02 = "#073642"
-BASE01 = "#586e75"
-
-# content tones
-
-BASE00 = "#657b83"
-BASE0 = "#839496"
-BASE1 = "#93a1a1"
-
-# background tones (light theme)
-
-BASE2 = "#eee8d5"
-BASE3 = "#fdf6e3"
-
-# accent tones
-
-YELLOW = "#d0b700"
-YELLOW2 = "#b58900" # The original Solarized yellow
-ORANGE = "#c1670c"
-ORANGE2 = "#cb4b16" # The original Solarized orange - too close to red
-RED = "#dc322f"
-MAGENTA = "#d33682"
-VIOLET = "#6c71c4"
-BLUE = "#268bd2"
-CYAN = "#2aa198"
-GREEN = "#859900"
-
-# Alias
-GRAY = BASE00
-GREY = BASE00
-
-text_color = GRAY
-TEXT_COLOR = GRAY
-DALLE_ORANGE = r"#%02x%02x%02x" % (254, 145, 4)
-
-# whenever more colors are needed
-rainbow = [RED, MAGENTA, VIOLET, BLUE, CYAN, GREEN]
-# [RED, ORANGE, GREEN, TEAL, BLUE, VIOLET, MAGENTA]
-# [GREEN, TEAL, BLUE, VIOLET, MAGENTA, RED, ORANGE]
-
-from manim import config
-
-config.background_color = BASE2
-BACKGROUND_COLOR_LIGHT = BASE2
-BACKGROUND_COLOR_DARK = BASE02
-BACKGROUND_COLOR = BACKGROUND_COLOR_LIGHT
-
-config.max_files_cached = 1000

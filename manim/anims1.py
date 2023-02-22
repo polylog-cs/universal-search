@@ -1,16 +1,12 @@
-from random import randrange
-from re import I
-from unittest import skip
-from manim import config as global_config
-
+from utils.utilgeneral import *
 from utils.util import *
-
+from manim import *
 
 class Polylog(Scene):
     def construct(self):
         default()
         authors = Tex(
-            r"\textbf{Filip Hlásek, Václav Rozhoň, Václav Volhejn}", 
+            r"\textbf{Richard Hladík, Filip Hlásek, Václav Rozhoň, Václav Volhejn}", 
             color=text_color,
             font_size = 40,
         ).shift(
@@ -36,8 +32,20 @@ class Polylog(Scene):
         )
         self.wait()
 
-
 class Explore(Scene):
     def construct(self):
-        pass
+        default()
+        
+        #TODO primes
+        num1 = 398473984793874
+        num2 = 398473934343344
+        mult_objects, mult_anims = multiplication_animation(num1, num2)
+
+        self.play(
+            mult_anims[0]
+        )
+        self.wait()
+        self.play(
+            mult_anims[1]
+        )
 

@@ -1,3 +1,5 @@
+
+
 def clipart_arrow():
     return ImageMobject("img/arrow.png").scale_to_fit_height(0.7)
 
