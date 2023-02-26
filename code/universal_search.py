@@ -1,4 +1,9 @@
 """
+This is an (essentially) asymptotically optimal program for factoring in the sense that whenever there is a (brainfuck)
+program that solves factoring in time f(n), our algorithm solves factoring in time
+O(f(n) + n**1.58). The term n**1.58 is the time complexity of multiplying two long numbers 
+with n digits in Python (Python uses Karatsuba's algorithm). 
+
 The language consists of eight commands, listed below. A brainfuck program is a sequence
 of these commands, possibly interspersed with other characters (which are ignored).
 The commands are executed sequentially, with some exceptions: an instruction pointer begins
@@ -129,14 +134,15 @@ class UniversalSearch:
         self.executions = [BrainfuckExecution("", input)]
         self.n = 0
 
+    # Systematically generates all possible Brainfuck programs, starting from the shortest ones.
     @staticmethod
     def all_brainfuck_programs():
         alphabet = "><+-.,[]"
         k = 1
         while True:
             # Generates all possible tuples of length k made up from characters
-            # from alphabet. Returns a generator, so the programs are only
-            # generated when they are needed.
+            # from alphabet. Returns a generator, so the next program is always
+            # generated only once it is needed.
             all_k_character_programs = itertools.combinations_with_replacement(
                 alphabet, k
             )
@@ -177,12 +183,12 @@ class UniversalSearch:
 class FactorizationSearch(UniversalSearch):
     """This class uses the universal search to find factors of a given integer."""
 
-    # Checks that the output can be splitted into more than one comma-separated
+    # Checks that the output can be split into more than one comma-separated
     # integers greater than 1 whose product is the input.
     def validate(self, output: str) -> bool:
         factors_str = output.split(",")
         # We immediately return in situations where the resulting product is
-        # definitely larger than self.input so that we don't end up multiplying
+        # definitely larger than self.input, so that we don't end up multiplying
         # very large numbers and mess up our time complexity.
         if sum(len(factor_str) - 1 for factor_str in factors_str) > len(self.input) - 1:
             return False
