@@ -93,14 +93,24 @@ class Discussion1(Scene):
         self.wait()
 
         self.play(
-            Circumscribe(Group(poly_tex, Dot().move_to(poly_tex.get_bottom() + UP)), color = RED),
+            Circumscribe(Group(poly_tex, Dot().move_to(poly_tex.get_bottom() + DOWN)), color = RED),
         )
         self.wait()
 
 
         # The asymptotic complexity often lies in the sweet spot. It is usually both quite easy to compute, and also quite informative. This makes it the right level of abstraction for many situations, like in understanding data structures or in competitive programming. 
         
-        rec = SurroundingRectangle(asymptotic_tex, buff)
+        rec = SurroundingRectangle(asymptotic_tex, Group(asymptotic_tex, Dot().move_to(asymptotic_tex.get_bottom() + DOWN), Dot().move_to(asymptotic_tex.get_top() + UP)), color = RED)
+
+        self.play(
+            Create(rec)
+        )
+        self.wait()
+
+        self.play(
+            Uncreate(rec)
+        )
+        self.wait()
         
         # Sure, we cannot apply it blindly: it doesn’t capture that some algorithms may have ridiculously large multiplicative constants in their complexity, which is the case for the universal search. But you know what, in other fields, like physics, we also work with frictionless surfaces that don’t actually exist. All models are wrong, it’s just that some of them happen to be useful. 
 
@@ -348,7 +358,7 @@ class Discussion3(Scene):
         blum_img = ImageMobject("img/blum.jpg").scale_to_fit_width(img_width)
         blum_name = Tex("Manuel Blum").next_to(blum_img, DOWN)
         blum_stuff = Group(blum_img, blum_name).to_corner(DL)
-        blum_quote_tex = Text("[These results were] very abstract and not very useful. … It didn’t do what Steve Cook’s P vs NP does, [It’s P vs NP that gives you] a real handle on the kinds of problems people are really interested in computing. ").scale(0.5).next_to(blum_img, RIGHT)
+        blum_quote_tex = Text("[These results were] very abstract and not very useful … It didn’t do what Steve Cook’s P vs NP does, [that gives you] a real handle on the kinds of problems people are really interested in computing. ").scale(0.5).next_to(blum_img, RIGHT)
 
         self.play(FadeIn(blum_stuff))
         self.play(AddTextLetterByLetter(blum_quote_tex), run_time = 10)
@@ -360,4 +370,22 @@ class Discussion3(Scene):
 
         # In any case, I hope you enjoyed this video about universal search - an explicit asymptotically optimal algorithm for many problems. The content of this video was extremely subtle, so let us know if you are confused about something and whether you appreciate this theoretical content more or less than our usual explainers. See you next time!
 
-        # TODO zopakovat pěknout trojúhelníkovou animaci
+        self.play(
+            *[FadeOut(o) for o in self.mobjects]
+        )
+
+        uni_tex = Tex(r"{{Universal search \\}}{{an explicit asymptotically optimal algorithm for many problems}}")
+        #Group(uni_tex[0], uni_tex[1]).arrange(DOWN).to_edge(DOWN)
+        uni_tex[0].scale(2).shift(0.4*UP)
+        uni_tex[1].scale(0.9)
+        uni_tex.to_edge(UP).shift(1*DOWN)   
+
+        self.play(
+            Succession(
+            Create(uni_tex),
+            #Create(uni_tex[1])            
+            )
+        )
+        self.wait(5)
+
+        # TODO zopakovat pěknout trojúhelníkovou animaci?

@@ -167,7 +167,7 @@ class UniversalSearch:
                     print(".", end="")
 
                 # Execute the i-th program for 2^(n-i) steps.
-                for _ in range(self.n - i):
+                for _ in range(1):
                     self.executions[i].step()
 
                 # If the program has finished, validate the output.
