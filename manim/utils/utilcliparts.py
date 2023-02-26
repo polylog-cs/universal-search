@@ -1,3 +1,4 @@
+from utils.utilgeneral import *
 
 
 def clipart_arrow():

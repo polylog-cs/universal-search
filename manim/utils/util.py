@@ -1,7 +1,7 @@
 from manim import *
 
-def multiplication_animation(num1, num2):
-    
+def multiplication_animation(num1, num2, obj1, obj2):
+    #TODO dá se získat text v obj1?
     # create objects
 
     nums_intermediate = []
@@ -18,13 +18,7 @@ def multiplication_animation(num1, num2):
     num2_tex = Tex(r"$\times$" + str(num2))
 
     line1 = Line(start = num2_tex.get_left(), end = num2_tex.get_right(), color = GRAY)
-    line2 = Line(
-        start = nums_intermediate_tex[-1].get_left(), 
-        end = np.array([
-            nums_intermediate_tex[-1].get_left()[0], 
-            nums_intermediate_tex[0].get_right()[1],
-            0]), 
-        color = GRAY)
+    line2 = line1.copy() 
     
     objects = Group(
         num1_tex,
@@ -33,11 +27,31 @@ def multiplication_animation(num1, num2):
         *nums_intermediate_tex,
         line2,
         num_tex,
-    ).arrange(DOWN)
+    ).arrange_in_grid(cols = 1, cell_alignment = RIGHT)
+
+    for i in range(1, len(nums_intermediate_tex)):
+        nums_intermediate_tex[i].align_to(nums_intermediate_tex[i-1][0][-2], RIGHT)
+
+    # print(line2.get_center())
+
+    objects.remove(line2)
+    objects.add(Line(
+        start = nums_intermediate_tex[-1].get_left()[0]*RIGHT
+            + line2.get_center()[1]*UP, 
+        end = nums_intermediate_tex[0].get_right()[0]*RIGHT
+            + line2.get_center()[1]*UP,
+        color = GRAY))
+    
+    # print(line2.get_center())
+
+
+
 
     # animations
 
-    anims1 = AnimationGroup(
+    anims1 = Succession(
+        ReplacementTransform(obj1, num1_tex),
+        ReplacementTransform(obj2, num2_tex),
         FadeIn(objects),
     )
 
@@ -47,3 +61,25 @@ def multiplication_animation(num1, num2):
 
     return objects, [anims1, anims2]
 
+
+
+def division_animation(num, obj):
+    num_tex = Tex(num).scale(2).to_edge(LEFT)
+    div_sign = Tex(r"/").scale(2).next_to(num_tex, RIGHT)
+    eq_sign = Tex(r"=").scale(2).next_to(num_tex, RIGHT).shift(4*RIGHT)
+
+    objects = Group(
+        num_tex
+    )
+
+    # animations
+    anims1 = Succession(
+        ReplacementTransform(obj, num_tex),
+        FadeIn(Group(div_sign, eq_sign)),
+    )
+
+    anims2 = AnimationGroup(
+        FadeOut(num_tex)
+    )
+
+    return objects, [anims1, anims2]
