@@ -1,13 +1,4 @@
 """
-This is an (essentially) asymptotically optimal program for factoring in the sense that whenever there is a (brainfuck)
-program that solves factoring in time f(n), our algorithm solves factoring in time
-O(f(n) + n**1.58). The term n**1.58 is the time complexity of multiplying two long numbers 
-with n digits in Python (Python uses Karatsuba's algorithm). 
-"""
-
-import sys
-
-"""
 The language consists of eight commands, listed below. A brainfuck program is a sequence
 of these commands, possibly interspersed with other characters (which are ignored).
 The commands are executed sequentially, with some exceptions: an instruction pointer begins
@@ -33,54 +24,40 @@ respectively, and using the ASCII character encoding).
     forward to the next command, jump it back to the command after the matching [ command.
 """
 
-"""
-This class represents a single execution of a brainfuck program. It is initialized with the
-program and the input. It can be stepped through one command at a time, or it can be run
-until it is finished.
-"""
+import itertools
+import sys
 
 
 class BrainfuckExecution:
-
     """
-    Initializes the execution with the program and the input.
+    This class represents a single execution of a brainfuck program. It is initialized with the
+    program and the input. It can be stepped through one command at a time, or it can be run
+    until it is finished.
     """
 
-    def __init__(self, program, input):
+    # Initializes the execution with the program and the input.
+    def __init__(self, program: str, input: str):
         self.program = program
+        self.program_pointer = 0
         self.data = {}
         self.data_pointer = 0
-        self.instruction_pointer = 0
         self.input = input
         self.input_pointer = 0
         self.output = []
-        self.checked = False
 
-    """
-    Returns whether the program has finished executing.
-    """
+    # Returns whether the program has finished executing.
+    def is_finished(self) -> bool:
+        return self.program_pointer >= len(self.program)
 
-    def is_finished(self):
-        return self.instruction_pointer >= len(self.program)
-
-    def is_checked(self):
-        return self.checked
-
-    def set_checked(self):
-        self.checked = True
-
-    def get_output(self):
-        return "".join(self.output)
-
-    """
-    Executes a single step of the program. We modify the language specification slightly so that we
-    do not need to handle syntax errors.
-    """
-
-    def step(self):
+    # Executes a single step of the program. There is some unspecified behavior in the language
+    # specificiation or that are technically syntax errors, but we try to define these
+    # in some reasonable way by slightly modifying the language specification only so that we
+    # do not need to handle these errors. Treat this implementation as the specification of
+    # a new slightly modified language invented for this purpose.
+    def step(self) -> None:
         if self.is_finished():
             return
-        command = self.program[self.instruction_pointer]
+        command = self.program[self.program_pointer]
         if command == ">":
             self.data_pointer += 1
         elif command == "<":
@@ -109,68 +86,122 @@ class BrainfuckExecution:
                 # Jump it forward to the matching ] command.
                 # Keep track of how many nested loops we are in.
                 counter = 0
-                while self.instruction_pointer < len(self.program):
-                    if self.program[self.instruction_pointer] == "[":
+                while self.program_pointer < len(self.program):
+                    if self.program[self.program_pointer] == "[":
                         counter += 1
-                    elif self.program[self.instruction_pointer] == "]":
+                    elif self.program[self.program_pointer] == "]":
                         counter -= 1
                         if counter == 0:
                             break
-                    self.instruction_pointer += 1
+                    self.program_pointer += 1
         elif command == "]":
             if self.data.get(self.data_pointer, 0) != 0:
                 # Jump it back to the matching [ command.
                 # Keep track of how many nested loops we are in.
                 counter = 0
-                while self.instruction_pointer > 0:
-                    if self.program[self.instruction_pointer] == "]":
+                while self.program_pointer >= 0:
+                    if self.program[self.program_pointer] == "]":
                         counter += 1
-                    elif self.program[self.instruction_pointer] == "[":
+                    elif self.program[self.program_pointer] == "[":
                         counter -= 1
                         if counter == 0:
                             break
-                    self.instruction_pointer -= 1
-        self.instruction_pointer += 1
+                    self.program_pointer -= 1
+        self.program_pointer += 1
 
-    def steps(self, num_of_steps=1):
-        for _ in range(num_of_steps):
-            self.step()
-            if self.is_finished():
-                break
-
-    """
-    Executes the program until it is finished and returns the output.
-    """
-
-    def run(self):
+    # Executes the program until it is finished and returns the output.
+    def run(self) -> str:
         while not self.is_finished():
             self.step()
-        # print(self.data)
         return "".join(self.output)
 
 
-def allBrainfuckPrograms():
-    def nextBrainfuckProgram(str):
-        alphabet = ["<", ">", "+", "-", ".", ",", "[", "]"]
-        i = len(str) - 1
-        for i in reversed(range(0, len(str))):
-            if str[i] != "]":
-                return (
-                    str[:i]
-                    + alphabet[alphabet.index(str[i]) + 1]
-                    + "<" * (len(str) - i - 1)
-                )
-        return "<" * (len(str) + 1)
+# This class represents a universal search algorithm that can be used to find a program
+# that takes the input and finds the output. It generates the programs in a breadth-first
+# search manner, and it executes them in parallel. When it starts executing the n-th program,
+# it performs 2 steps of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps
+# of the (n - 3)-th program, etc. When a program finishes, it validates its output and if
+# it is correct, it stops the search.
+class UniversalSearch:
+    def __init__(self, input: str):
+        self.input = input
+        # Initiate the executions with an empty program
+        self.executions = [BrainfuckExecution("", input)]
+        self.n = 0
 
-    str = ""
-    while True:
-        yield str
-        str = nextBrainfuckProgram(str)
+    @staticmethod
+    def all_brainfuck_programs():
+        alphabet = "><+-.,[]"
+        k = 1
+        while True:
+            # Generates all possible tuples of length k made up from characters
+            # from alphabet. Returns a generator, so the programs are only
+            # generated when they are needed.
+            all_k_character_programs = itertools.combinations_with_replacement(
+                alphabet, k
+            )
+            for program in all_k_character_programs:
+                yield program
+            k += 1
+
+    # Function to be implemented by the user that returns True if the output is correct.
+    def validate(self, output: str) -> bool:
+        pass
+
+    # Systematically generates the programs and executes them.
+    def search(self) -> str:
+        for program in self.all_brainfuck_programs():
+            self.executions.append(BrainfuckExecution(program, str(self.input)))
+            for i in range(self.n + 1):
+                # If the program has already finished, skip it.
+                if self.executions[i].is_finished():
+                    print("X", end="")
+                    continue
+                else:
+                    print(".", end="")
+
+                # Execute the i-th program for 2^(n-i) steps.
+                for _ in range(2 ** (self.n - i)):
+                    self.executions[i].step()
+
+                # If the program has finished, validate the output.
+                if self.executions[i].is_finished():
+                    output = "".join(self.executions[i].output)
+                    if self.validate(output):
+                        return output, self.executions[i].program
+            print()
+
+            self.n += 1
+
+
+class FactorizationSearch(UniversalSearch):
+    """This class uses the universal search to find factors of a given integer."""
+
+    # Checks that the output can be splitted into more than one comma-separated
+    # integers greater than 1 whose product is the input.
+    def validate(self, output: str) -> bool:
+        factors_str = output.split(",")
+        # We immediately return in situations where the resulting product is
+        # definitely larger than self.input so that we don't end up multiplying
+        # very large numbers and mess up our time complexity.
+        if sum(len(factor_str) - 1 for factor_str in factors_str) > len(self.input) - 1:
+            return False
+        try:
+            factors = [int(factor) for factor in factors_str]
+        except ValueError:
+            return False
+        if len(factors) <= 1:
+            return False
+        product = 1
+        for factor in factors:
+            if factor <= 1:
+                return False
+            product *= factor
+        return product == int(self.input)
 
 
 def main():
-
-    # DEBUGGING
+    # Debugging
     # "Hello World!", wikipedia
     program_helloworld = BrainfuckExecution(
         "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.",
@@ -183,38 +214,13 @@ def main():
         chr(48 + 1) + chr(48 + 6) + chr(10),
     )
 
-    # UNIVERSAL SEARCH
+    try:
+        input = sys.argv[1]
+    except IndexError:
+        print(f"Usage: {sys.argv[0]} [number-to-factorise]")
+        exit(1)
 
-    input_number = int(sys.argv[1])
-
-    list_of_programs = []
-    for program in allBrainfuckPrograms():
-        # append new program to the list
-        list_of_programs.append(BrainfuckExecution(program, str(input_number)))
-        print(len(list_of_programs))
-        # simulate certain number of steps of each program in the list
-        num_of_steps = 1
-        for program in reversed(list_of_programs):
-            program.steps(num_of_steps)
-            # check the output of the algorithm, we assume it is two comma separated numbers, terminate if correct
-            if program.is_finished() and not program.is_checked():
-                try:
-                    str_a, str_b = program.get_output().split(",", 1)
-                    a, b = int(str_a), int(str_b)
-                    # we check that both numbers are <= input_number so that we
-                    # don't end up multiplying very large numbers and mess up
-                    # our time complexity:
-                    if (
-                        1 < a <= input_number
-                        and 1 < b <= input_number
-                        and a * b == input_number
-                    ):
-                        print(a, b)
-                        return
-                except:
-                    pass
-                program.set_checked()
-            num_of_steps *= 2
+    print("Output: {}, Program: {}".format(FactorizationSearch(input).search()))
 
 
 if __name__ == "__main__":
