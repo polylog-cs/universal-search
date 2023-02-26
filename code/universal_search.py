@@ -141,7 +141,7 @@ class UniversalSearch:
                 alphabet, k
             )
             for program in all_k_character_programs:
-                yield program
+                yield "".join(program)
             k += 1
 
     # Function to be implemented by the user that returns True if the output is correct.
@@ -220,7 +220,11 @@ def main():
         print(f"Usage: {sys.argv[0]} [number-to-factorise]")
         exit(1)
 
-    print("Output: {}, Program: {}".format(FactorizationSearch(input).search()))
+    output, program = FactorizationSearch(input).search()
+    print()
+    print()
+    print(f"Output: {output}")
+    print(f"Program: {program}")
 
 
 if __name__ == "__main__":
