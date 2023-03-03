@@ -7,14 +7,16 @@ def main():
         "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.",
         "",
     )
-    print("".join(program_helloworld.run()), end="")
+    assert program_helloworld.run() == "Hello World!\n"
 
     # number of steps until n terminates in the collatz procedure; Daniel B Cristofani (cristofdathevanetdotcom) http://www.hevanet.com/cristofd/brainfuck/]
     program_collatz = BrainfuckExecution(
         ">,[[----------[>>>[>>>>]+[[-]+<[->>>>++>>>>+[>>>>]++[->+<<<<<]]<<<]++++++[>------<-]>--[>>[->>>>]+>+[<<<<]>-],<]>]>>>++>+>>[<<[>>>>[-]+++++++++<[>-<-]+++++++++>[-[<->-]+[<<<<]]<[>+<-]>]>[>[>>>>]+[[-]<[+[->>>>]>+<]>[<+>[<<<<]]+<<<<]>>>[->>>>]+>+[<<<<]]>[[>+>>[<<<<+>>>>-]>]<<<<[-]>[-<<<<]]>>>>>>>]>>+[[-]++++++>>>>]<<<<[[<++++++++>-]<.[-]<[-]<[-]<]<,]",
-        chr(48 + 1) + chr(48 + 6) + chr(10),
+        "27\n",
     )
-    print("".join(program_collatz.run()), end="")
+    assert program_collatz.run() == "111\n"
+
+    print("OK")
 
 
 if __name__ == "__main__":
