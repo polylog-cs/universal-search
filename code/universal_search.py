@@ -1,13 +1,14 @@
 """
-This program [*] is an asymptotically optimal algorithm for factoring a number that is a product of two primes.  
+This program [*] is an asymptotically optimal algorithm for factoring a number that is a
+product of two primes.  
 
 It is based on simulating all Brainfuck programs in lexicographical order. 
 
 Brainfuck is a minimalist language consisting of just 8 commands: > < + - , . [ ]
 For details, see [TODO]
 
-[*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable programming
-language like Python. 
+[*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable
+programming language like Python. 
 """
 
 import itertools
@@ -16,9 +17,9 @@ import sys
 
 class BrainfuckExecution:
     """
-    This class represents a single execution of a Brainfuck program. It is initialized with the
-    program and the input. It can be stepped through one command at a time, or it can be run
-    until it is finished.
+    This class represents a single execution of a Brainfuck program. It is initialized
+    with the program and the input. It can be stepped through one command at a time, or
+    it can be run until it is finished.
     """
 
     def __init__(self, program: str, input: str):
@@ -91,11 +92,11 @@ class BrainfuckExecution:
 
 
 # This class represents a universal search algorithm that can be used to find a program
-# that takes the input and finds the output. It generates the programs in a breadth-first
-# search manner, and it executes them in parallel. When it starts executing the n-th program,
-# it performs 2 steps of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps
-# of the (n - 3)-th program, etc. When a program finishes, it validates its output and if
-# it is correct, it stops the search.
+# that takes the input and finds the output. It generates the programs in a
+# breadth-first search manner, and it executes them in parallel. When it starts
+# executing the n-th program, it performs 2 steps of the (n - 1)-th program, 4 steps of
+# the (n - 2)-th program, 8 steps of the (n - 3)-th program, etc. When a program
+# finishes, it validates its output and if it is correct, it stops the search.
 class UniversalSearch:
     def __init__(self, input: str):
         self.input = input
@@ -103,15 +104,16 @@ class UniversalSearch:
         self.executions = [BrainfuckExecution("", input)]
         self.n = 0
 
-    # Systematically generates all possible Brainfuck programs, starting from the shortest ones.
+    # Systematically generates all possible Brainfuck programs, starting from the
+    # shortest ones.
     @staticmethod
     def all_brainfuck_programs():
         alphabet = "><+-.,[]"
         k = 1
         while True:
-            # Generates all possible tuples of length k made up from characters
-            # of the alphabet. Returns a generator, so the next program is
-            # always generated only once it is needed.
+            # Generates all possible tuples of length k made up from characters of the
+            # alphabet. Returns a generator, so the next program is always generated
+            # only once it is needed.
             all_k_character_programs = itertools.combinations_with_replacement(
                 alphabet, k
             )
@@ -152,13 +154,13 @@ class UniversalSearch:
 class FactorizationSearch(UniversalSearch):
     """This class uses the universal search to find factors of a given integer."""
 
-    # Checks that the output can be split into more than one comma-separated
-    # integers greater than 1 whose product is the input.
+    # Checks that the output can be split into more than one comma-separated integers
+    # greater than 1 whose product is the input.
     def validate(self, output: str) -> bool:
         factors_str = output.split(",")
-        # We immediately return in situations where the resulting product is
-        # definitely larger than self.input, so that we don't end up multiplying
-        # very large numbers and mess up our time complexity.
+        # We immediately return in situations where the resulting product is definitely
+        # larger than self.input, so that we don't end up multiplying very large numbers
+        # and mess up our time complexity.
         if sum(len(factor_str) - 1 for factor_str in factors_str) > len(self.input) - 1:
             return False
         try:
