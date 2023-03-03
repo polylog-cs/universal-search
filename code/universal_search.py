@@ -1,12 +1,12 @@
 """
-This program* is an asymptotically optimal algorithm for factoring a number that is a product of two primes.  
+This program [*] is an asymptotically optimal algorithm for factoring a number that is a product of two primes.  
 
-It is based on simulating all brainfuck programs in lexicographical order. 
+It is based on simulating all Brainfuck programs in lexicographical order. 
 
-Brainfuck is a minimalist language consisting of just 8 commands: "><+-,.[]". 
+Brainfuck is a minimalist language consisting of just 8 commands: > < + - , . [ ]
 For details, see [TODO]
 
-*To achieve asymptotic optimality, we would need to replace brainfuck by a reasonable programming
+[*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable programming
 language like Python. 
 """
 
@@ -16,12 +16,11 @@ import sys
 
 class BrainfuckExecution:
     """
-    This class represents a single execution of a brainfuck program. It is initialized with the
+    This class represents a single execution of a Brainfuck program. It is initialized with the
     program and the input. It can be stepped through one command at a time, or it can be run
     until it is finished.
     """
 
-    # Initializes the execution with the program and the input.
     def __init__(self, program: str, input: str):
         self.program = program
         self.program_pointer = 0
@@ -31,12 +30,11 @@ class BrainfuckExecution:
         self.input_pointer = 0
         self.output = []
 
-    # Returns whether the program has finished executing.
     def is_finished(self) -> bool:
         return self.program_pointer >= len(self.program)
 
-    # Executes a single step of the program. 
-    # We generalize the language a bit so that it never crashes. 
+    # Executes a single step of the program.
+    # We generalize the language a bit so that it never crashes.
     def step(self) -> None:
         if self.is_finished():
             return
@@ -112,8 +110,8 @@ class UniversalSearch:
         k = 1
         while True:
             # Generates all possible tuples of length k made up from characters
-            # from alphabet. Returns a generator, so the next program is always
-            # generated only once it is needed.
+            # of the alphabet. Returns a generator, so the next program is
+            # always generated only once it is needed.
             all_k_character_programs = itertools.combinations_with_replacement(
                 alphabet, k
             )
@@ -174,23 +172,10 @@ class FactorizationSearch(UniversalSearch):
             if factor <= 1:
                 return False
             product *= factor
-        return product == int(self.input) # TODO n = a*b 
+        return product == int(self.input)  # TODO n = a*b
 
 
 def main():
-    # Debugging
-    # "Hello World!", wikipedia
-    program_helloworld = BrainfuckExecution(
-        "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.",
-        "",
-    )
-
-    # number of steps until n terminates in the collatz procedure; Daniel B Cristofani (cristofdathevanetdotcom) http://www.hevanet.com/cristofd/brainfuck/]
-    program_collatz = BrainfuckExecution(
-        ">,[[----------[>>>[>>>>]+[[-]+<[->>>>++>>>>+[>>>>]++[->+<<<<<]]<<<]++++++[>------<-]>--[>>[->>>>]+>+[<<<<]>-],<]>]>>>++>+>>[<<[>>>>[-]+++++++++<[>-<-]+++++++++>[-[<->-]+[<<<<]]<[>+<-]>]>[>[>>>>]+[[-]<[+[->>>>]>+<]>[<+>[<<<<]]+<<<<]>>>[->>>>]+>+[<<<<]]>[[>+>>[<<<<+>>>>-]>]<<<<[-]>[-<<<<]]>>>>>>>]>>+[[-]++++++>>>>]<<<<[[<++++++++>-]<.[-]<[-]<[-]<]<,]",
-        chr(48 + 1) + chr(48 + 6) + chr(10),
-    )
-
     try:
         input = sys.argv[1]
     except IndexError:
