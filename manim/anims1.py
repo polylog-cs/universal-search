@@ -95,6 +95,8 @@ class Intro(Scene):
 
         # TODO animace??? pridat tabulku faktorizacnich algoritmu?
 
+        # TODO riso pls nakodi tohle
+
         #So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?] Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor. 
         # For example, perhaps my algorithm is twice as slow as yours, but it is at most twice as slow for all inputs, even very large ones. 
 
@@ -111,9 +113,8 @@ class Factoring(Scene):
     def construct(self):
         default()
 
-        authors_tex = Tex("{{[Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann]\\}}{{$~3000$ CPU years}}")
-        authors_tex[0].scale(0.4)
-        authors_tex[1].scale(0.4)
+        authors_tex = Tex("[Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann], $~3000$ CPU years")
+        authors_tex.scale(0.4)
 
         n_tex, a_tex, b_tex = [Tex(str(n)) for n in horrible_multiplication()]
         eq_tex = Tex(str(r"="))

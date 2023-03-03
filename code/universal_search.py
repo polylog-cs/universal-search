@@ -1,32 +1,13 @@
 """
-This is an (essentially) asymptotically optimal program for factoring in the sense that whenever there is a (brainfuck)
-program that solves factoring in time f(n), our algorithm solves factoring in time
-O(f(n) + n**1.58). The term n**1.58 is the time complexity of multiplying two long numbers 
-with n digits in Python (Python uses Karatsuba's algorithm). 
+This program* is an asymptotically optimal algorithm for factoring a number that is a product of two primes.  
 
-The language consists of eight commands, listed below. A brainfuck program is a sequence
-of these commands, possibly interspersed with other characters (which are ignored).
-The commands are executed sequentially, with some exceptions: an instruction pointer begins
-at the first command, and each command it points to is executed, after which it normally moves
-forward to the next command. The program terminates when the instruction pointer moves past the
-last command.
+It is based on simulating all brainfuck programs in lexicographical order. 
 
-The brainfuck language uses a simple machine model consisting of the program and instruction
-pointer, as well as a one-dimensional array of at least 30,000 byte cells initialized to zero;
-a movable data pointer (initialized to point to the leftmost byte of the array);
-and two streams of bytes for input and output (most often connected to a keyboard and a monitor
-respectively, and using the ASCII character encoding).
+Brainfuck is a minimalist language consisting of just 8 commands: "><+-,.[]". 
+For details, see [TODO]
 
->	Increment the data pointer (to point to the next cell to the right).
-<	Decrement the data pointer (to point to the next cell to the left).
-+	Increment (increase by one) the byte at the data pointer.
--	Decrement (decrease by one) the byte at the data pointer.
-.	Output the byte at the data pointer.
-,	Accept one byte of input, storing its value in the byte at the data pointer.
-[	If the byte at the data pointer is zero, then instead of moving the instruction pointer
-    forward to the next command, jump it forward to the command after the matching ] command.
-]	If the byte at the data pointer is nonzero, then instead of moving the instruction pointer
-    forward to the next command, jump it back to the command after the matching [ command.
+*To achieve asymptotic optimality, we would need to replace brainfuck by a reasonable programming
+language like Python. 
 """
 
 import itertools
@@ -54,11 +35,8 @@ class BrainfuckExecution:
     def is_finished(self) -> bool:
         return self.program_pointer >= len(self.program)
 
-    # Executes a single step of the program. There is some unspecified behavior in the language
-    # specificiation or that are technically syntax errors, but we try to define these
-    # in some reasonable way by slightly modifying the language specification only so that we
-    # do not need to handle these errors. Treat this implementation as the specification of
-    # a new slightly modified language invented for this purpose.
+    # Executes a single step of the program. 
+    # We generalize the language a bit so that it never crashes. 
     def step(self) -> None:
         if self.is_finished():
             return
@@ -78,9 +56,6 @@ class BrainfuckExecution:
         elif command == ".":
             self.output.append(chr(self.data.get(self.data_pointer, 0)))
         elif command == ",":
-            # This is technically not according to the language spec, but it's
-            # pretty convenient so that the program doesn't just crash when it runs
-            # out of input.
             if self.input_pointer >= len(self.input):
                 self.data[self.data_pointer] = 0
             else:
@@ -88,8 +63,6 @@ class BrainfuckExecution:
                 self.input_pointer += 1
         elif command == "[":
             if self.data.get(self.data_pointer, 0) == 0:
-                # Jump it forward to the matching ] command.
-                # Keep track of how many nested loops we are in.
                 counter = 0
                 while self.program_pointer < len(self.program):
                     if self.program[self.program_pointer] == "[":
@@ -101,8 +74,6 @@ class BrainfuckExecution:
                     self.program_pointer += 1
         elif command == "]":
             if self.data.get(self.data_pointer, 0) != 0:
-                # Jump it back to the matching [ command.
-                # Keep track of how many nested loops we are in.
                 counter = 0
                 while self.program_pointer >= 0:
                     if self.program[self.program_pointer] == "]":
@@ -203,7 +174,7 @@ class FactorizationSearch(UniversalSearch):
             if factor <= 1:
                 return False
             product *= factor
-        return product == int(self.input)
+        return product == int(self.input) # TODO n = a*b 
 
 
 def main():
