@@ -3,6 +3,7 @@ import time
 import matplotlib as mpl
 import matplotlib.pyplot as plt
 
+
 def selectsort(ar):
     for i in range(len(ar)):
         mn = i
@@ -10,7 +11,7 @@ def selectsort(ar):
             if ar[j] < ar[mn]:
                 mn = j
         ar[i], ar[mn] = ar[mn], ar[i]
- 
+
 
 T = 10000
 N = 200
@@ -26,14 +27,14 @@ for n in range(N):
         time2 = time.time_ns()
 
         avg_time += time2 - time1
-    
+
     avg_time /= T
     avg_time /= 1e6
     results.append(avg_time)
 
 plt.plot(range(N), results)
 fontsize = 30
-plt.xlabel("array length", fontsize = fontsize)
-plt.ylabel("Time (ms)", fontsize = fontsize)
+plt.xlabel("array length", fontsize=fontsize)
+plt.ylabel("Time (ms)", fontsize=fontsize)
 
 plt.savefig("img/select.png")

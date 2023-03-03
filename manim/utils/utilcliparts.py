@@ -4,6 +4,7 @@ from utils.utilgeneral import *
 def clipart_arrow():
     return ImageMobject("img/arrow.png").scale_to_fit_height(0.7)
 
+
 def clipart_yes_no_maybe(which, height):
     pnts_yes = [
         np.array([174.042, 364.002, 0]),
@@ -11,7 +12,7 @@ def clipart_yes_no_maybe(which, height):
         np.array([181.318, 347.66, 0]),
         np.array([200.663, 367.236, 0]),
         np.array([195.928, 371.625, 0]),
-        np.array([181.376, 356.553, 0])
+        np.array([181.376, 356.553, 0]),
     ]
     pnts_no = [
         np.array([397.791, 350.711, 0]),
@@ -25,10 +26,10 @@ def clipart_yes_no_maybe(which, height):
         np.array([410.049, 363.339, 0]),
         np.array([401.857, 371.522, 0]),
         np.array([397.807, 367.35, 0]),
-        np.array([406.359, 359.167, 0])
+        np.array([406.359, 359.167, 0]),
     ]
     pnts_maybe = [
-        #np.array([300.242, 355.568, 0]),
+        # np.array([300.242, 355.568, 0]),
         np.array([300.329, 356.423, 0]),
         np.array([300.478, 357.373, 0]),
         np.array([300.915, 358.039, 0]),
@@ -120,59 +121,58 @@ def clipart_yes_no_maybe(which, height):
     ]
 
     color = ""
-    
+
     if which == "yes":
         color = GREEN
-        clipart = Polygon(
-            *pnts_yes,
-            color = color,
-            fill_color = WHITE,
-            fill_opacity = 1,
-        ).move_to(
-            ORIGIN
-        ).scale_to_fit_height(
-            height/2
+        clipart = (
+            Polygon(
+                *pnts_yes,
+                color=color,
+                fill_color=WHITE,
+                fill_opacity=1,
+            )
+            .move_to(ORIGIN)
+            .scale_to_fit_height(height / 2)
         )
 
     if which == "no":
         color = RED
-        clipart = Polygon(
-            *pnts_no,
-            color = color,
-            fill_color = WHITE,
-            fill_opacity = 1,
-        ).move_to(
-            ORIGIN
-        ).scale_to_fit_height(
-            height/2
+        clipart = (
+            Polygon(
+                *pnts_no,
+                color=color,
+                fill_color=WHITE,
+                fill_opacity=1,
+            )
+            .move_to(ORIGIN)
+            .scale_to_fit_height(height / 2)
         )
-    
+
     if which == "maybe":
         color = ORANGE
-        clipart = Polygon(
-            *pnts_maybe,
-            color = color,
-            fill_color = WHITE,
-            fill_opacity = 1,
-        ).move_to(
-            ORIGIN
-        ).scale_to_fit_height(
-            height/2.5
+        clipart = (
+            Polygon(
+                *pnts_maybe,
+                color=color,
+                fill_color=WHITE,
+                fill_opacity=1,
+            )
+            .move_to(ORIGIN)
+            .scale_to_fit_height(height / 2.5)
         )
         small_circle = Circle(
-            radius = height/12.5,
-            color = color,
-            fill_color = WHITE,
-            fill_opacity = 1,
-        ).next_to(clipart, DOWN, buff = height/20)
+            radius=height / 12.5,
+            color=color,
+            fill_color=WHITE,
+            fill_opacity=1,
+        ).next_to(clipart, DOWN, buff=height / 20)
         Group(clipart, small_circle).move_to(ORIGIN)
-    
 
     circle = Circle(
-        radius = height/2,
-        color = color,
-        fill_color = color,
-        fill_opacity = 1,
+        radius=height / 2,
+        color=color,
+        fill_color=color,
+        fill_opacity=1,
     ).move_to(ORIGIN)
 
     if which != "maybe":
@@ -180,7 +180,8 @@ def clipart_yes_no_maybe(which, height):
     else:
         return Group(circle, clipart, small_circle)
 
-def clipart_house(color = RED, height = 1, z_index = 100):
+
+def clipart_house(color=RED, height=1, z_index=100):
     pnts = [
         np.array([232.535, 333.808, 0.0]),
         np.array([277.698, 333.811, 0.0]),
@@ -204,21 +205,16 @@ def clipart_house(color = RED, height = 1, z_index = 100):
         np.array([232.549, 333.833, 0.0]),
     ]
 
-    house = Polygon(
-        *pnts,
-        color = color,
-        fill_color = color,
-		fill_opacity = 1,
-        z_index = z_index
-    ).move_to(
-        0*DOWN
-    ).scale_to_fit_height(
-        height
+    house = (
+        Polygon(*pnts, color=color, fill_color=color, fill_opacity=1, z_index=z_index)
+        .move_to(0 * DOWN)
+        .scale_to_fit_height(height)
     )
 
-    return house   
+    return house
 
-def clipart_icon(color = BLUE, height = 1, z_index = 100):
+
+def clipart_icon(color=BLUE, height=1, z_index=100):
     pnts = [
         np.array([407.837, 313.233, 0.0]),
         np.array([340.843, 431.234, 0.0]),
@@ -227,24 +223,23 @@ def clipart_icon(color = BLUE, height = 1, z_index = 100):
         np.array([187.414, 311.624, 0.0]),
     ]
 
-    icon = ArcPolygon(
-        *pnts,
-        color = color,
-        arc_config = [
-            { 'radius': 119.256, 'color': color},
-            { 'radius': 70.9444, 'color': color},
-            { 'radius': 70.9444, 'color': color},
-            { 'radius': 119.256, 'color': color},
-            { 'radius': 216.488, 'color': color},
-
-        ],
-        fill_color = color,
-		fill_opacity = 1,
-        z_index = z_index
-    ).move_to(
-        0*DOWN
-    ).scale_to_fit_height(
-        height
+    icon = (
+        ArcPolygon(
+            *pnts,
+            color=color,
+            arc_config=[
+                {"radius": 119.256, "color": color},
+                {"radius": 70.9444, "color": color},
+                {"radius": 70.9444, "color": color},
+                {"radius": 119.256, "color": color},
+                {"radius": 216.488, "color": color},
+            ],
+            fill_color=color,
+            fill_opacity=1,
+            z_index=z_index,
+        )
+        .move_to(0 * DOWN)
+        .scale_to_fit_height(height)
     )
 
     return icon

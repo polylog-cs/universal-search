@@ -6,16 +6,19 @@ from manim import *
 
 ############### DEFAULT OPTIONS
 
+
 def default():
-    VMobject.set_default(color = GRAY)
-    Polygon.set_default(color = RED)
+    VMobject.set_default(color=GRAY)
+    Polygon.set_default(color=RED)
     # SurroundingRectangle.set_default(color = RED)
     # SurroundingRectangle.set_default(fill_color = config.background_color)
     # SurroundingRectangle.set_default(fill_opacity = 1)
 
+
 ############### GENERATING SOUNDS
 
 random.seed(0)
+
 
 def random_click_file():
     return f"audio/click/click_{random.randint(0, 3)}.wav"
@@ -38,6 +41,7 @@ def random_whoops_file():
 
 def random_rubik_file():
     return f"audio/cube/r{random.randint(1, 20)}.wav"
+
 
 ############### SOLARIZED COLORS
 
@@ -65,9 +69,9 @@ BASE3 = "#fdf6e3"
 # accent tones
 
 YELLOW = "#d0b700"
-YELLOW2 = "#b58900" # The original Solarized yellow
+YELLOW2 = "#b58900"  # The original Solarized yellow
 ORANGE = "#c1670c"
-ORANGE2 = "#cb4b16" # The original Solarized orange - too close to red
+ORANGE2 = "#cb4b16"  # The original Solarized orange - too close to red
 RED = "#dc322f"
 MAGENTA = "#d33682"
 VIOLET = "#6c71c4"
