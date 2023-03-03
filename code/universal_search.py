@@ -35,7 +35,7 @@ class BrainfuckExecution:
         return self.program_pointer >= len(self.program)
 
     # Executes a single step of the program.
-    # We generalize the language a bit so that it never crashes.
+    # We extend the language specification a bit so that it never crashes.
     def step(self) -> None:
         if self.is_finished():
             return
@@ -62,6 +62,7 @@ class BrainfuckExecution:
                 self.input_pointer += 1
         elif command == "[":
             if self.data.get(self.data_pointer, 0) == 0:
+                # Jump forward to the matching ] command.
                 counter = 0
                 while self.program_pointer < len(self.program):
                     if self.program[self.program_pointer] == "[":
@@ -154,27 +155,22 @@ class UniversalSearch:
 class FactorizationSearch(UniversalSearch):
     """This class uses the universal search to find factors of a given integer."""
 
-    # Checks that the output can be split into more than one comma-separated integers
-    # greater than 1 whose product is the input.
+    # Checks that the output can be split into two comma-separated integers greater than
+    # 1 whose product is the input.
     def validate(self, output: str) -> bool:
-        factors_str = output.split(",")
         # We immediately return in situations where the resulting product is definitely
-        # larger than self.input, so that we don't end up multiplying very large numbers
-        # and mess up our time complexity.
-        if sum(len(factor_str) - 1 for factor_str in factors_str) > len(self.input) - 1:
+        # larger than self.input, to avoid multiplying very large numbers and messing up
+        # our time complexity.
+        if len(self.input) - 2 > len(self.input):
             return False
         try:
-            factors = [int(factor) for factor in factors_str]
+            a_str, b_str = output.split(",")
+            a, b = int(a_str), int(b_str)
         except ValueError:
             return False
-        if len(factors) <= 1:
+        if a <= 1 or b <= 1:
             return False
-        product = 1
-        for factor in factors:
-            if factor <= 1:
-                return False
-            product *= factor
-        return product == int(self.input)  # TODO n = a*b
+        return a * b == int(self.input)
 
 
 def main():
