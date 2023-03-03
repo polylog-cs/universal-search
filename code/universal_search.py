@@ -173,6 +173,15 @@ class FactorizationSearch(UniversalSearch):
         return a * b == int(self.input)
 
 
+# TODO VR: mozna natocit video jak implementujeme tuhle funkci (ve videu na konci casti pred diskuzi)
+class UniversalSort(
+    UniversalSearch
+):  # TODO VR: libi se mi factorizationsearch a universalsort, ale neni to kompatibilni
+    def validate(self, output):
+        # TODO asi nejjednodussi je nahazet puvodni posloupnost do hashovaci tabulky a tvarit se ze to je linearni cas? (teoreticky to tak je randomizovane treba pomoci Fredman Komlos Szemeredi, deterministicky mi to ted neni uplne jasny, mozna je to vlastne open problem)
+        pass
+
+
 def main():
     try:
         input = sys.argv[1]

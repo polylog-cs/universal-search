@@ -202,15 +202,9 @@ class FactorizationSearch(UniversalSearch):
         for factor in factors:
             if factor <= 1:
                 return False
-            product *= factor # TODO VR: me se asi v tuhle chvili vic libi checkovat jen dva faktory, ale pobavme se o tom, nemam silny nazor (duvod: takhle to muze vypadat jako ze umime resit kdyz vstup je prvocislo)
+            product *= factor
         return product == int(self.input)
 
-
-# TODO VR: mozna natocit video jak implementujeme tuhle funkci (ve videu na konci casti pred diskuzi)
-class UniversalSort(UniversalSearch): # TODO VR: libi se mi factorizationsearch a universalsort, ale neni to kompatibilni
-    def validate(self, output):
-        #TODO asi nejjednodussi je nahazet puvodni posloupnost do hashovaci tabulky a tvarit se ze to je linearni cas? (teoreticky to tak je randomizovane treba pomoci Fredman Komlos Szemeredi, deterministicky mi to ted neni uplne jasny, mozna je to vlastne open problem)
-        pass
 
 def main():
     # Debugging
