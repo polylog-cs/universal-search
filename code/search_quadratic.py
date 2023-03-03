@@ -1,32 +1,14 @@
 """
-This is an (essentially) asymptotically optimal program for factoring in the sense that whenever there is a (brainfuck)
-program that solves factoring in time f(n), our algorithm solves factoring in time
-O(f(n) + n**1.58). The term n**1.58 is the time complexity of multiplying two long numbers 
-with n digits in Python (Python uses Karatsuba's algorithm). 
+This program [*] is an asymptotically optimal algorithm for factoring a number that is a
+product of two primes.  
 
-The language consists of eight commands, listed below. A brainfuck program is a sequence
-of these commands, possibly interspersed with other characters (which are ignored).
-The commands are executed sequentially, with some exceptions: an instruction pointer begins
-at the first command, and each command it points to is executed, after which it normally moves
-forward to the next command. The program terminates when the instruction pointer moves past the
-last command.
+It is based on simulating all Brainfuck programs in lexicographical order. 
 
-The brainfuck language uses a simple machine model consisting of the program and instruction
-pointer, as well as a one-dimensional array of at least 30,000 byte cells initialized to zero;
-a movable data pointer (initialized to point to the leftmost byte of the array);
-and two streams of bytes for input and output (most often connected to a keyboard and a monitor
-respectively, and using the ASCII character encoding).
+Brainfuck is a minimalist language consisting of just 8 commands: > < + - , . [ ]
+For details, see [TODO]
 
->	Increment the data pointer (to point to the next cell to the right).
-<	Decrement the data pointer (to point to the next cell to the left).
-+	Increment (increase by one) the byte at the data pointer.
--	Decrement (decrease by one) the byte at the data pointer.
-.	Output the byte at the data pointer.
-,	Accept one byte of input, storing its value in the byte at the data pointer.
-[	If the byte at the data pointer is zero, then instead of moving the instruction pointer
-    forward to the next command, jump it forward to the command after the matching ] command.
-]	If the byte at the data pointer is nonzero, then instead of moving the instruction pointer
-    forward to the next command, jump it back to the command after the matching [ command.
+[*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable
+programming language like Python. 
 """
 
 import itertools
@@ -35,12 +17,11 @@ import sys
 
 class BrainfuckExecution:
     """
-    This class represents a single execution of a brainfuck program. It is initialized with the
-    program and the input. It can be stepped through one command at a time, or it can be run
-    until it is finished.
+    This class represents a single execution of a Brainfuck program. It is initialized
+    with the program and the input. It can be stepped through one command at a time, or
+    it can be run until it is finished.
     """
 
-    # Initializes the execution with the program and the input.
     def __init__(self, program: str, input: str):
         self.program = program
         self.program_pointer = 0
@@ -50,15 +31,11 @@ class BrainfuckExecution:
         self.input_pointer = 0
         self.output = []
 
-    # Returns whether the program has finished executing.
     def is_finished(self) -> bool:
         return self.program_pointer >= len(self.program)
 
-    # Executes a single step of the program. There is some unspecified behavior in the language
-    # specificiation or that are technically syntax errors, but we try to define these
-    # in some reasonable way by slightly modifying the language specification only so that we
-    # do not need to handle these errors. Treat this implementation as the specification of
-    # a new slightly modified language invented for this purpose.
+    # Executes a single step of the program.
+    # We extend the language specification a bit so that it never crashes.
     def step(self) -> None:
         if self.is_finished():
             return
@@ -78,9 +55,6 @@ class BrainfuckExecution:
         elif command == ".":
             self.output.append(chr(self.data.get(self.data_pointer, 0)))
         elif command == ",":
-            # This is technically not according to the language spec, but it's
-            # pretty convenient so that the program doesn't just crash when it runs
-            # out of input.
             if self.input_pointer >= len(self.input):
                 self.data[self.data_pointer] = 0
             else:
@@ -88,8 +62,7 @@ class BrainfuckExecution:
                 self.input_pointer += 1
         elif command == "[":
             if self.data.get(self.data_pointer, 0) == 0:
-                # Jump it forward to the matching ] command.
-                # Keep track of how many nested loops we are in.
+                # Jump forward to the matching ] command.
                 counter = 0
                 while self.program_pointer < len(self.program):
                     if self.program[self.program_pointer] == "[":
@@ -101,8 +74,6 @@ class BrainfuckExecution:
                     self.program_pointer += 1
         elif command == "]":
             if self.data.get(self.data_pointer, 0) != 0:
-                # Jump it back to the matching [ command.
-                # Keep track of how many nested loops we are in.
                 counter = 0
                 while self.program_pointer >= 0:
                     if self.program[self.program_pointer] == "]":
@@ -122,11 +93,11 @@ class BrainfuckExecution:
 
 
 # This class represents a universal search algorithm that can be used to find a program
-# that takes the input and finds the output. It generates the programs in a breadth-first
-# search manner, and it executes them in parallel. When it starts executing the n-th program,
-# it performs 2 steps of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps
-# of the (n - 3)-th program, etc. When a program finishes, it validates its output and if
-# it is correct, it stops the search.
+# that takes the input and finds the output. It generates the programs in a
+# breadth-first search manner, and it executes them in parallel. When it starts
+# executing the n-th program, it performs 2 steps of the (n - 1)-th program, 4 steps of
+# the (n - 2)-th program, 8 steps of the (n - 3)-th program, etc. When a program
+# finishes, it validates its output and if it is correct, it stops the search.
 class UniversalSearch:
     def __init__(self, input: str):
         self.input = input
@@ -134,15 +105,16 @@ class UniversalSearch:
         self.executions = [BrainfuckExecution("", input)]
         self.n = 0
 
-    # Systematically generates all possible Brainfuck programs, starting from the shortest ones.
+    # Systematically generates all possible Brainfuck programs, starting from the
+    # shortest ones.
     @staticmethod
     def all_brainfuck_programs():
         alphabet = "><+-.,[]"
         k = 1
         while True:
-            # Generates all possible tuples of length k made up from characters
-            # from alphabet. Returns a generator, so the next program is always
-            # generated only once it is needed.
+            # Generates all possible tuples of length k made up from characters of the
+            # alphabet. Returns a generator, so the next program is always generated
+            # only once it is needed.
             all_k_character_programs = itertools.combinations_with_replacement(
                 alphabet, k
             )
@@ -183,43 +155,34 @@ class UniversalSearch:
 class FactorizationSearch(UniversalSearch):
     """This class uses the universal search to find factors of a given integer."""
 
-    # Checks that the output can be split into more than one comma-separated
-    # integers greater than 1 whose product is the input.
+    # Checks that the output can be split into two comma-separated integers greater than
+    # 1 whose product is the input.
     def validate(self, output: str) -> bool:
-        factors_str = output.split(",")
-        # We immediately return in situations where the resulting product is
-        # definitely larger than self.input, so that we don't end up multiplying
-        # very large numbers and mess up our time complexity.
-        if sum(len(factor_str) - 1 for factor_str in factors_str) > len(self.input) - 1:
+        # We immediately return in situations where the resulting product is definitely
+        # larger than self.input, to avoid multiplying very large numbers and messing up
+        # our time complexity.
+        if len(self.input) - 2 > len(self.input):
             return False
         try:
-            factors = [int(factor) for factor in factors_str]
+            a_str, b_str = output.split(",")
+            a, b = int(a_str), int(b_str)
         except ValueError:
             return False
-        if len(factors) <= 1:
+        if a <= 1 or b <= 1:
             return False
-        product = 1
-        for factor in factors:
-            if factor <= 1:
-                return False
-            product *= factor
-        return product == int(self.input)
+        return a * b == int(self.input)
+
+
+# TODO VR: mozna natocit video jak implementujeme tuhle funkci (ve videu na konci casti pred diskuzi)
+class UniversalSort(
+    UniversalSearch
+):  # TODO VR: libi se mi factorizationsearch a universalsort, ale neni to kompatibilni
+    def validate(self, output):
+        # TODO asi nejjednodussi je nahazet puvodni posloupnost do hashovaci tabulky a tvarit se ze to je linearni cas? (teoreticky to tak je randomizovane treba pomoci Fredman Komlos Szemeredi, deterministicky mi to ted neni uplne jasny, mozna je to vlastne open problem)
+        pass
 
 
 def main():
-    # Debugging
-    # "Hello World!", wikipedia
-    program_helloworld = BrainfuckExecution(
-        "++++++++++[>+++++++>++++++++++>+++>+<<<<-]>++.>+.+++++++..+++.>++.<<+++++++++++++++.>.+++.------.--------.>+.>.",
-        "",
-    )
-
-    # number of steps until n terminates in the collatz procedure; Daniel B Cristofani (cristofdathevanetdotcom) http://www.hevanet.com/cristofd/brainfuck/]
-    program_collatz = BrainfuckExecution(
-        ">,[[----------[>>>[>>>>]+[[-]+<[->>>>++>>>>+[>>>>]++[->+<<<<<]]<<<]++++++[>------<-]>--[>>[->>>>]+>+[<<<<]>-],<]>]>>>++>+>>[<<[>>>>[-]+++++++++<[>-<-]+++++++++>[-[<->-]+[<<<<]]<[>+<-]>]>[>[>>>>]+[[-]<[+[->>>>]>+<]>[<+>[<<<<]]+<<<<]>>>[->>>>]+>+[<<<<]]>[[>+>>[<<<<+>>>>-]>]<<<<[-]>[-<<<<]]>>>>>>>]>>+[[-]++++++>>>>]<<<<[[<++++++++>-]<.[-]<[-]<[-]<]<,]",
-        chr(48 + 1) + chr(48 + 6) + chr(10),
-    )
-
     try:
         input = sys.argv[1]
     except IndexError:

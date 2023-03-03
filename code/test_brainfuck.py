@@ -16,6 +16,14 @@ def main():
     )
     assert program_collatz.run() == "111\n"
 
+    program_loop = BrainfuckExecution("+]", "")
+    num_steps = 0
+    while not program_loop.is_finished():
+        num_steps += 1
+        program_loop.step()
+    # 2 steps (increment + conditional jump) per one iteration
+    assert num_steps == 512
+
     print("OK")
 
 
