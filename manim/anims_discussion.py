@@ -13,7 +13,18 @@ class Discussion1(Scene):
         # So this was Levin’s universal search and I expect that many of you are now a bit confused, shocked, or even disgusted. None of these are the purpose of this video, so let me finish with a bunch of thoughts on how to understand the universal search and what is the lesson you should take away. 
 
         # First of all, what I don’t want you to take away, is that asymptotic complexity is a broken concept. Let’s say we want to analyze some algorithm like selectsort. There are a bunch of approaches you could take. First, you could code the algorithm and empirically measure its complexity. 
+
+        # TODO ukazat tam selectsort?         
+        # def selectsort(array):
+        #     for i in range(len(array)):
+        #         mn = i
+        #         for j in range(i + 1, len(array)):
+        #             if array[j] < array[mn]:
+        #                 mn = j
+        #         array[i], array[mn] = array[mn], array[i]
         
+
+
         empirical_img = ImageMobject("img/select.png").scale_to_fit_width(3).to_corner(UL)
 
         # Or you could count how many steps the algorithm needs to solve any input of size n, but compute this number exactly, with all constants and lower order terms. 
@@ -70,10 +81,15 @@ class Discussion1(Scene):
         # But as the concepts are getting more abstract, they get less informative. In competitive programming for example, it is quite typical that there is an easy quadratic solution to a problem and the hard part is getting it to O(n) or O(nlog(n)). So there we definitely need to distinguish between different polynomial-time algorithms. 
 
         arrow2 = Arrow(
-            start = empirical_img.get_center(),
-            end = poly_tex.get_center(),
+            start = poly_tex.get_center(),
+            end = empirical_img.get_center(),
             buff = 0
         ).next_to(Group(empirical_img, poly_tex, tick), UP)
+
+        self.play(
+            FadeIn(arrow2)
+        )
+        self.wait()
 
         comp1_tex = Tex("Easy: $O(n^2)$")
         comp2_tex = Tex("Hard: $O(n \log n)$")
@@ -100,7 +116,10 @@ class Discussion1(Scene):
 
         # The asymptotic complexity often lies in the sweet spot. It is usually both quite easy to compute, and also quite informative. This makes it the right level of abstraction for many situations, like in understanding data structures or in competitive programming. 
         
-        rec = SurroundingRectangle(asymptotic_tex, Group(asymptotic_tex, Dot().move_to(asymptotic_tex.get_bottom() + DOWN), Dot().move_to(asymptotic_tex.get_top() + UP)), color = RED)
+        rec = SurroundingRectangle(
+            Group(asymptotic_tex, Dot().move_to(asymptotic_tex.get_bottom() + DOWN), Dot().move_to(asymptotic_tex.get_top() + UP)), 
+            color = RED
+        )
 
         self.play(
             Create(rec)
@@ -108,11 +127,13 @@ class Discussion1(Scene):
         self.wait()
 
         self.play(
-            Uncreate(rec)
+            Uncreate(rec),
+            FadeOut(Group(comp1_tex, comp2_tex)),
         )
         self.wait()
         
-        # Sure, we cannot apply it blindly: it doesn’t capture that some algorithms may have ridiculously large multiplicative constants in their complexity, which is the case for the universal search. But you know what, in other fields, like physics, we also work with frictionless surfaces that don’t actually exist. All models are wrong, it’s just that some of them happen to be useful. 
+        # Sure, we cannot apply it blindly: it doesn’t capture that some algorithms may have ridiculously large multiplicative constants in their complexity, which is the case for the universal search. 
+        # But you know what, in other fields, like physics, we also work with frictionless surfaces that don’t actually exist. All models are wrong, it’s just that some of them happen to be useful. 
 
 class Discussion2(Scene):
     def construct(self):

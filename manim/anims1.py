@@ -106,6 +106,38 @@ class Intro(Scene):
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing! 
         #Or just run the algorithm on some real data! In that case be careful, our implementation is in Python, so it’s a bit slow. Good luck and see you in a few days with the follow-up video!
 
+
+class Factoring(Scene):
+    def construct(self):
+        default()
+
+        authors_tex = Tex("{{[Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann]\\}}{{$~3000$ CPU years}}")
+        authors_tex[0].scale(0.4)
+        authors_tex[1].scale(0.4)
+
+        n_tex, a_tex, b_tex = [Tex(str(n)) for n in horrible_multiplication()]
+        eq_tex = Tex(str(r"="))
+        times_tex = Tex(str(r"$\times$"))
+
+        mult_group = Group(
+            authors_tex,
+            n_tex,
+            eq_tex, 
+            a_tex,
+            times_tex,
+            b_tex,
+        ).arrange(DOWN)
+
+        self.play(
+            FadeIn(mult_group)
+        )
+        self.wait()
+
+
+
+        self.wait(5)
+
+
 class Polylog(Scene):
     def construct(self):
         default()

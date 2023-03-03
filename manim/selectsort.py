@@ -12,7 +12,7 @@ def selectsort(ar):
         ar[i], ar[mn] = ar[mn], ar[i]
  
 
-T = 1000
+T = 10000
 N = 200
 results = []
 for n in range(N):

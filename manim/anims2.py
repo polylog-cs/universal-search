@@ -120,20 +120,20 @@ class Polylog(Scene):
         channel_name = Tex(r"polylog", color=text_color)
         channel_name.scale(4).shift(1 * UP)
 
-        logo_solarized = ImageMobject("img/logo-solarized.png").scale(0.032).move_to(2 * LEFT + 1 * UP + 0.455 * RIGHT)
-        self.play(
-           Write(authors),
-           Write(channel_name), 
-        )
-        self.play(
-            FadeIn(logo_solarized)
-        )
+        logo_solarized = ImageMobject("img/logo-solarized.png").scale(0.032).move_to(2 * LEFT + 1 * UP + 0.5 * RIGHT)
+        Group(channel_name, logo_solarized).shift(2*LEFT + 0.5*UP)
+        authors.scale(0.5).next_to(channel_name, DOWN)
 
+        self.play(
+            Write(authors),
+            Write(channel_name), 
+            FadeIn(logo_solarized),
+        )
         self.wait()
 
-        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(4).to_corner(DR)
+        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3).to_corner(DR)
         quote_txt = Group(
-            Tex("Only math nerds would call $2^{500}$ finite. "),
+            Tex(r"\textit{``Only math nerds would call $2^{500}$ finite. ''}"),
             Tex("Attributed to Leonid Levin").scale(0.7)
         ).arrange_in_grid(cols = 1, cell_alignment=RIGHT).next_to(levin_img, LEFT).align_to(levin_img, DOWN)
 
@@ -142,6 +142,7 @@ class Polylog(Scene):
             FadeIn(quote_txt)
         )
 
+        self.wait()
         self.play(
             *[FadeOut(o) for o in self.mobjects]
         )
@@ -159,9 +160,13 @@ class Part1(Scene):
 
         # undef $/;open(_,$0);/ \dx([\dA-F]*)/while(<_>);@&=split(//,$1);@/=@&;
         # $".=chr(hex(join("",splice(@&,0,2))))while(@&); eval$”;
+        # TODO simpanzi nejsou opice
 
         # http://www.foo.be/docs/tpj/issues/vol3_2/tpj0302-0012.html
         # ]
+
+        chimp_img = ImageMobject("img/chimp.jpg").scale_to_fit_width(6) 
+
 
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors. 
 
@@ -171,6 +176,8 @@ class Part1(Scene):
 
         # while True:
         # 	print(“Are we there yet?”)
+
+        infinite_tex = Tex(r"{{while True: }}{{print(“Are we there yet?”)}}")
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics. 
 
@@ -182,7 +189,13 @@ class Part1(Scene):
 
         # And that’s basically the whole algorithm. In the actual code we shared with you, we simulated Brainfuck programs instead of Python programs because it was suggested to us by a higher authority [konverzace s ChatGPT], but in this explanation, let’s stick with Python. 
 
+        gpt_img = ImageMobject("img/chatgpt.jpg").scale_to_fit_height(8)
+
         # This algorithm was discovered by Leonid Levin in the early 1970’s and now it is known as the universal search, so I will use this name from now on.  [Levin s thug life glasses?] I hope that now you can intuitively see how it can happen that we have no idea what the time complexity of the universal search is and also why it is so slow that it struggles to factor the number 4. [Zopakovat ty dva body]
+
+        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
+        levin_tex = Tex("Leonid Levin")
+        levin_group = Group(levin_img, levin_tex).to_corner(DR)
 
         # But the only thing I promised was that universal search is asymptotically optimal. In other words, I promised that whenever there is some factoring algorithm with time complexity f(n), then the universal search has time complexity O(f(n)), in other words, it is slower at most by a constant factor. 
 
