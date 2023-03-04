@@ -114,7 +114,13 @@ class Factoring(Scene):
         )
         authors_tex.scale(0.4)
 
-        n_tex, a_tex, b_tex = [Tex(str(n)) for n in horrible_multiplication()]
+        def allow_breaks(s):
+            return "\hskip 0pt{}".join(s)
+
+        n_tex, a_tex, b_tex = [
+            Tex("\\hsize=9cm{}" + allow_breaks(str(n)), tex_environment=None).scale(0.8)
+            for n in horrible_multiplication()
+        ]
         eq_tex = Tex(str(r"="))
         times_tex = Tex(str(r"$\times$"))
 
