@@ -1,6 +1,7 @@
 from utils.utilgeneral import *
 from utils.util import *
 from manim import *
+import manim as m
 
 
 class Intro(Scene):
@@ -143,17 +144,21 @@ class Polylog(Scene):
 
         channel_name = Tex(r"polylog", color=text_color)
         channel_name.scale(4).shift(1 * UP)
+        channel_name_without_o = Tex(r"p\hskip 5.28pt lylog", color=text_color)
+        channel_name_without_o.scale(4).shift(1 * UP)
 
         logo_solarized = (
-            ImageMobject("img/logo-solarized.png")
-            .scale(0.032)
-            .move_to(2 * LEFT + 1 * UP + 0.455 * RIGHT)
+            SVGMobject("img/logo-solarized.svg")
+            .scale(0.55)
+            .move_to(2 * LEFT + 0.95 * UP + 0.49 * RIGHT)
         )
         self.play(
             Write(authors),
             Write(channel_name),
         )
         self.play(FadeIn(logo_solarized))
+        self.add(channel_name_without_o)
+        self.remove(channel_name)
 
         self.wait()
 
