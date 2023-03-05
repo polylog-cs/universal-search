@@ -48,9 +48,6 @@ def random_rubik_file():
 
 # background tones (dark theme)
 
-from manim.utils.color import GRAY
-
-
 BASE03 = "#002b36"
 BASE02 = "#073642"
 BASE01 = "#586e75"
