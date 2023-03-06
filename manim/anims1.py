@@ -195,18 +195,18 @@ class Asymptotics(Scene):
                 [0, max_y, 1],
             )
 
-        x_range1, y_range1 = make_ranges(1e2, 1e5)
-        x_range2, y_range2 = make_ranges(1e3, 1e6)
-        x_range3, y_range3 = make_ranges(5e3, 5e7)
+        x_range1, y_range1 = make_ranges(1e2, 1e3)
+        x_range2, y_range2 = make_ranges(1e3, 1e4)
+        x_range3, y_range3 = make_ranges(5e3, 1e5)
 
         def f_ours_good(x):
-            return x**2 * 2
+            return x * math.log(x + 2) ** 2 * 2 / 10
 
         def f_ours_bad(x):
-            return x**3 / 1e3
+            return x**2 / 2e2
 
         def f_yours(x):
-            return x**2
+            return x * math.log(x + 2) ** 2 / 10
 
         plot = (
             RescalablePlot(
@@ -240,7 +240,10 @@ class Asymptotics(Scene):
         )
         our_algo_full = our_algo
         our_algo = VGroup(badge, our_algo_placeholder)
-        # our_algo = our_algo_placeholder
+        self.add(our_algo)
+
+        # Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor.
+        # For example, perhaps my algorithm is twice as slow as yours, but it is at most twice as slow for all inputs, even very large ones.
 
         your_algo = (
             Triangle(color=COLOR_YOURS, fill_opacity=1)
@@ -251,18 +254,20 @@ class Asymptotics(Scene):
 
         self.play(Write(plot))
 
-        self.play(RescalePlot(plot, x_range=x_range2, y_range=y_range2, run_time=4))
+        def our_updater(obj):
+            obj.next_to(plot.plots[0], RIGHT + UP)
+            obj.shift(0.3 * DOWN)
+
+        your_algo.add_updater(our_updater)
+        # self.play(RescalePlot(plot, x_range=x_range2, y_range=y_range2, run_time=4))
+
         self.wait(1)
-        # self.play(RescalePlot(plot, x_range=x_range3, y_range=y_range3, run_time=2))
 
         plot.fns.pop()
         plot.fns.append((f_ours_bad, COLOR_OURS_BAD))
         self.play(plot.animate.redraw())
         self.wait(1)
         self.play(RescalePlot(plot, x_range=x_range3, y_range=y_range3, run_time=4))
-
-        # Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor.
-        # For example, perhaps my algorithm is twice as slow as yours, but it is at most twice as slow for all inputs, even very large ones.
 
         # So it is not possible that you could come up with an algorithm such that as the input size increases, my algorithm would get slower and slower relative to yours.
 
