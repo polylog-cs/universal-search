@@ -94,83 +94,6 @@ class Intro(Scene):
         # TODO animace??? pridat tabulku faktorizacnich algoritmu?
 
 
-class RescalablePlot(VMobject):
-    def __init__(self, x_range, y_range, fns=None, *args, **kwargs):
-        super().__init__(**kwargs)
-        self.fns = fns if fns is not None else []
-        self.x_range = x_range[:]
-        self.y_range = y_range[:]
-        self.scaling_factor = 1
-        self.shift_direction = 0.0
-
-        self.axes, self.plots = self.axes_and_plots()
-        self.add(self.axes, *self.plots)
-
-    def _sparsify_range(self, r):
-        step = r[2]
-        while 50 * step < r[1] - r[0]:
-            step *= 10
-        return [r[0], r[1], step]
-
-    def axes_and_plots(self):
-        axes = (
-            Axes(
-                x_range=self._sparsify_range(self.x_range),
-                y_range=self._sparsify_range(self.y_range),
-            )
-            .scale(self.scaling_factor)
-            .shift(self.shift_direction)
-        )
-        plots = []
-        for fn, color in self.fns:
-            plots.append(axes.plot(fn, color=color))
-        return axes, plots
-
-    def scale(self, factor, *args, **kwargs):
-        self.scaling_factor = factor
-        self.redraw()
-        return self
-
-    def shift(self, direction, *args, **kwargs):
-        self.shift_direction = direction
-        self.redraw()
-        return self
-
-    def redraw(self):
-        axes, plots = self.axes_and_plots()
-        self.axes.become(axes)
-        for old, new in zip(self.plots, plots):
-            old.become(new)
-        for new in plots[len(self.plots) :]:
-            self.plots.append(new)
-            self.add(new)
-
-
-class RescalePlot(Animation):
-    def __init__(self, mobject: RescalablePlot, x_range, y_range, **kwargs):
-        self.ox_range = mobject.x_range
-        self.oy_range = mobject.y_range
-        self.tx_range = x_range
-        self.ty_range = y_range
-        super().__init__(mobject, **kwargs)
-
-    def interpolate_mobject(self, alpha: float) -> None:
-        a = self.rate_func(alpha)
-
-        def mix_up(orig, target):
-            min = (1 - a) * orig[0] + a * target[0]
-            max = (1 - a) * orig[1] + a * target[1]
-            num_orig = (orig[1] - orig[0]) / orig[2]
-            num_target = (target[1] - target[0]) / target[2]
-            num = (1 - a) * num_orig + a * num_target
-            density = (max - min) / num
-            return [min, max, density]
-
-        self.mobject.x_range = mix_up(self.ox_range, self.tx_range)
-        self.mobject.y_range = mix_up(self.oy_range, self.ty_range)
-        self.mobject.redraw()
-
-
 class Asymptotics(Scene):
     def construct(self):
         default()
@@ -185,46 +108,43 @@ class Asymptotics(Scene):
         scale_width = target_size / our_algo.width
         scale_height = target_size / our_algo.height
 
-        COLOR_OURS = "#002b36"
-        COLOR_OURS_BAD = CYAN
+        COLOR_GOOD = "#002b36"
+        COLOR_BAD = COLOR_GOOD
         COLOR_YOURS = RED
+        COLOR_OURS = COLOR_GOOD
 
-        def make_ranges(max_x, max_y):
-            return (
-                [0, max_x, 1],
-                [0, max_y, 1],
-            )
+        def make_range(max):
+            return [0, max, max / 10]
 
-        x_range1, y_range1 = make_ranges(1e2, 1e3)
-        x_range2, y_range2 = make_ranges(1e3, 1e4)
-        x_range3, y_range3 = make_ranges(5e3, 1e5)
+        x_range, y_range = make_range(2e3), make_range(2e5)
 
-        def f_ours_good(x):
-            return x * math.log(x + 2) ** 2 * 2 / 10
+        def f_good(x):
+            return x**1.5 * 2
 
-        def f_ours_bad(x):
-            return x**2 / 2e2
+        def f_bad(x):
+            return x**4 / 4e7
 
         def f_yours(x):
-            return x * math.log(x + 2) ** 2 / 10
+            return x**1.5
 
-        plot = (
-            RescalablePlot(
-                x_range=x_range1,
-                y_range=y_range1,
-                fns=[(f_yours, COLOR_YOURS), (f_ours_good, COLOR_OURS)],
+        axes = (
+            Axes(
+                x_range=x_range,
+                y_range=y_range,
             )
             .scale(0.9)
             .shift(LEFT)
         )
-        # labels = axes1.get_axis_labels(x_label="input size", y_label="time")
+        labels = axes.get_axis_labels(
+            x_label=r"\text{input size}", y_label=r"\text{time}"
+        )
 
         self.play(
-            our_algo.animate.scale((scale_width, scale_height, 1)).next_to(plot, RIGHT)
+            our_algo.animate.scale((scale_width, scale_height, 1)).next_to(axes, RIGHT)
         )
         our_algo_placeholder = (
             Square(
-                color=COLOR_OURS,
+                color=COLOR_GOOD,
                 fill_opacity=1,
             )
             .scale(0.5)
@@ -252,22 +172,92 @@ class Asymptotics(Scene):
         )
         self.play(FadeOut(our_algo_full), FadeIn(badge), FadeIn(your_algo))
 
-        self.play(Write(plot))
+        self.play(Write(axes), Write(labels))
 
-        def our_updater(obj):
-            obj.next_to(plot.plots[0], RIGHT + UP)
-            obj.shift(0.3 * DOWN)
+        plot_good = axes.plot(f_good, color=COLOR_GOOD)
+        plot_bad = axes.plot(f_bad, color=COLOR_BAD)
+        plot_yours = axes.plot(f_yours, color=COLOR_YOURS)
+        f_ours = f_good
+        plot_ours = plot_good
 
-        your_algo.add_updater(our_updater)
-        # self.play(RescalePlot(plot, x_range=x_range2, y_range=y_range2, run_time=4))
+        def make_updater(plot):
+            def updater(obj):
+                obj.next_to(plot, RIGHT + UP)
+                obj.shift(0.4 * DOWN)
 
+            return updater
+
+        ptr_group = VGroup(
+            our_algo.copy().scale(0.7), Tex(), your_algo.copy().scale(0.7)
+        )
+        your_algo.add_updater(make_updater(plot_yours))
+        our_algo.add_updater(make_updater(plot_ours))
+
+        self.play(Write(plot_ours), Write(plot_yours))
+
+        zero = axes.coords_to_point(0, 0)
+        arrow = Arrow(zero + DOWN, zero)
+        self.play(Write(arrow))
+
+        def ptr_updater(obj):
+            x = axes.point_to_coords(arrow.get_center())[0]
+            x = max(x, 1e-5)
+            y_ours = f_ours(x)
+            y_yours = f_yours(x)
+            ratio = y_ours / y_yours
+            our, tex, your = obj
+            tex.become(MathTex(r" = {:.2f}\times".format(ratio)))
+            obj.arrange()
+            obj.next_to(arrow, RIGHT)
+
+        def lines_updater(obj):
+            ctp = axes.coords_to_point
+            x = axes.point_to_coords(arrow.get_center())[0]
+            x = max(x, 1e-5)
+            y_ours = f_ours(x)
+            y_yours = f_yours(x)
+            line, point_yours, point_ours = obj
+            line.become(
+                DashedLine(
+                    start=ctp(x, 0),
+                    end=ctp(x, max(y_ours, y_yours)),
+                    stroke_width=1,
+                )
+            )
+            point_ours.become(Dot(ctp(x, y_ours), color=COLOR_OURS))
+            point_yours.become(Dot(ctp(x, y_yours), color=COLOR_YOURS))
+
+        a = Line()
+        ptr_group.add_updater(ptr_updater)
+        ptr_updater(ptr_group)
+        lines_group = VGroup(DashedLine(), Dot(), Dot())
+        lines_group.add_updater(lines_updater)
+        lines_updater(lines_group)
+        self.play(FadeIn(ptr_group), FadeIn(lines_group))
+
+        self.play(arrow.animate.shift(10 * RIGHT), run_time=2)
+        self.wait(1)
+        self.play(arrow.animate.shift(5 * LEFT))
         self.wait(1)
 
-        plot.fns.pop()
-        plot.fns.append((f_ours_bad, COLOR_OURS_BAD))
-        self.play(plot.animate.redraw())
-        self.wait(1)
-        self.play(RescalePlot(plot, x_range=x_range3, y_range=y_range3, run_time=4))
+        ptr_group.suspend_updating()
+        lines_group.suspend_updating()
+        self.play(FadeOut(ptr_group), FadeOut(lines_group))
+        self.play(plot_ours.animate.become(plot_bad))
+        f_ours = f_bad
+
+        # ptr_updater(ptr_group)
+        # lines_updater(lines_group)
+        self.remove(ptr_group)
+        self.remove(lines_group)
+        self.play(FadeIn(ptr_group), FadeIn(lines_group))
+        ptr_group.resume_updating()
+        lines_group.resume_updating()
+
+        self.play(arrow.animate.shift(5 * LEFT))
+        self.play(arrow.animate.shift(10 * RIGHT), run_time=4)
+
+        # self.play(RescalePlot(plot, x_range=x_range3, y_range=y_range3, run_time=4))
 
         # So it is not possible that you could come up with an algorithm such that as the input size increases, my algorithm would get slower and slower relative to yours.
 
