@@ -140,7 +140,9 @@ class Asymptotics(Scene):
         )
 
         self.play(
-            our_algo.animate.scale((scale_width, scale_height, 1)).next_to(axes, RIGHT)
+            our_algo.animate.scale(
+                (scale_width * 1.05, scale_height * 1.05, 1)
+            ).next_to(axes, RIGHT)
         )
         our_algo_placeholder = (
             Square(
@@ -159,7 +161,7 @@ class Asymptotics(Scene):
             .shift(0.15 * DOWN + 0.15 * RIGHT)
         )
         our_algo_full = our_algo
-        our_algo = VGroup(badge, our_algo_placeholder)
+        our_algo = VGroup(our_algo_placeholder, badge)
         self.add(our_algo)
 
         # Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor.
@@ -177,8 +179,13 @@ class Asymptotics(Scene):
         plot_good = axes.plot(f_good, color=COLOR_GOOD)
         plot_bad = axes.plot(f_bad, color=COLOR_BAD)
         plot_yours = axes.plot(f_yours, color=COLOR_YOURS)
-        f_ours = f_good
-        plot_ours = plot_good
+        plot_ours = plot_good.copy()
+
+        def f_ours(x):
+            zero = plot_good.get_top()[1]
+            one = plot_bad.get_top()[1]
+            alpha = (plot_ours.get_top()[1] - zero) / (one - zero)
+            return (1 - alpha) * f_good(x) + alpha * f_bad(x)
 
         def make_updater(plot):
             def updater(obj):
@@ -188,7 +195,7 @@ class Asymptotics(Scene):
             return updater
 
         ptr_group = VGroup(
-            our_algo.copy().scale(0.7), Tex(), your_algo.copy().scale(0.7)
+            our_algo.copy().scale(0.7), MathTex(), your_algo.copy().scale(0.7)
         )
         your_algo.add_updater(make_updater(plot_yours))
         our_algo.add_updater(make_updater(plot_ours))
@@ -216,52 +223,38 @@ class Asymptotics(Scene):
             x = max(x, 1e-5)
             y_ours = f_ours(x)
             y_yours = f_yours(x)
-            line, point_yours, point_ours = obj
-            line.become(
-                DashedLine(
-                    start=ctp(x, 0),
-                    end=ctp(x, max(y_ours, y_yours)),
-                    stroke_width=1,
-                )
+            line, point_ours, point_yours = obj
+            line.put_start_and_end_on(
+                ctp(x, 0),
+                ctp(x, max(y_ours, y_yours)),
             )
-            point_ours.become(Dot(ctp(x, y_ours), color=COLOR_OURS))
-            point_yours.become(Dot(ctp(x, y_yours), color=COLOR_YOURS))
+            # print(len(plot_ours.get_all_points()))
+            point_ours.move_to(ctp(x, y_ours))
+            point_yours.move_to(ctp(x, y_yours))
 
-        a = Line()
-        ptr_group.add_updater(ptr_updater)
+        lines_group = VGroup(
+            DashedLine(stroke_width=1), Dot(color=COLOR_OURS), Dot(color=COLOR_YOURS)
+        )
         ptr_updater(ptr_group)
-        lines_group = VGroup(DashedLine(), Dot(), Dot())
-        lines_group.add_updater(lines_updater)
         lines_updater(lines_group)
+        self.remove(ptr_group, lines_group)
         self.play(FadeIn(ptr_group), FadeIn(lines_group))
+        ptr_group.add_updater(ptr_updater)
+        lines_group.add_updater(lines_updater)
 
         self.play(arrow.animate.shift(10 * RIGHT), run_time=2)
         self.wait(1)
         self.play(arrow.animate.shift(5 * LEFT))
         self.wait(1)
 
-        ptr_group.suspend_updating()
-        lines_group.suspend_updating()
-        self.play(FadeOut(ptr_group), FadeOut(lines_group))
-        self.play(plot_ours.animate.become(plot_bad))
-        f_ours = f_bad
-
-        # ptr_updater(ptr_group)
-        # lines_updater(lines_group)
-        self.remove(ptr_group)
-        self.remove(lines_group)
-        self.play(FadeIn(ptr_group), FadeIn(lines_group))
-        ptr_group.resume_updating()
-        lines_group.resume_updating()
-
-        self.play(arrow.animate.shift(5 * LEFT))
-        self.play(arrow.animate.shift(10 * RIGHT), run_time=4)
-
-        # self.play(RescalePlot(plot, x_range=x_range3, y_range=y_range3, run_time=4))
-
         # So it is not possible that you could come up with an algorithm such that as the input size increases, my algorithm would get slower and slower relative to yours.
 
         # In other words, up to constant factors, our algorithm completely nails it.
+
+        self.play(plot_ours.animate.become(plot_bad))
+
+        self.play(arrow.animate.shift(5 * LEFT))
+        self.play(arrow.animate.shift(10 * RIGHT), run_time=4)
 
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing!
         # Or just run the algorithm on some real data! In that case be careful, our implementation is in Python, so it’s a bit slow. Good luck and see you in a few days with the follow-up video!
