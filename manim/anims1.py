@@ -101,9 +101,37 @@ class Asymptotics(Scene):
         # TODO riso pls nakodi tohle
 
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
-        our_algo = m.ImageMobject("img/program3x_placeholder.png")
-        our_algo.width = 16 * 0.75
-        self.play(FadeIn(our_algo))
+        our_algo_img = m.ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(14.2) # TODO nezapomenout vyprintscreenovat final verzi v solarized barvach
+        #our_algo.width = 16 * 0.75
+        self.play(
+            FadeIn(our_algo_img),
+        )
+        self.wait()
+        
+        badge_img = ImageMobject("img/badge_downscaled.png").scale_to_fit_width(6)
+        badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1*UP)
+        badge_group = Group(badge_img, badge_tex)
+
+
+        badge_group.generate_target()
+        badge_group.target.scale(0.7).align_to(our_algo_img, DR).shift(1*DOWN)
+
+        our_algo = Group(
+            our_algo_img,
+            badge_group
+        )
+
+        # TODO double check it is ok to use this image: https://gallery.yopriceville.com/Free-Clipart-Pictures/Badges-and-Labels-PNG/Green_Classic_Seal_Badge_PNG_Clipart#.ZAaV6dLMJkg
+        
+        self.play(
+            FadeIn(badge_group)
+        )
+        self.wait()
+        self.play(
+            MoveToTarget(badge_group)
+        )
+        self.wait()
+
         target_size = 0.5
         scale_width = target_size / our_algo.width
         scale_height = target_size / our_algo.height
@@ -266,29 +294,7 @@ class Factoring(Scene):
     def construct(self):
         default()
 
-        authors_tex = Tex(
-            "[Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann], $~3000$ CPU years"
-        )
-        authors_tex.scale(0.4)
-
-        def allow_breaks(s):
-            return "\hskip 0pt{}".join(s)
-
-        n_tex, a_tex, b_tex = [
-            Tex("\\hsize=9cm{}" + allow_breaks(str(n)), tex_environment=None).scale(0.8)
-            for n in horrible_multiplication()
-        ]
-        eq_tex = Tex(str(r"="))
-        times_tex = Tex(str(r"$\times$"))
-
-        mult_group = Group(
-            authors_tex,
-            n_tex,
-            eq_tex,
-            a_tex,
-            times_tex,
-            b_tex,
-        ).arrange(DOWN)
+        mult_group = horrible_multiplication()
 
         self.play(FadeIn(mult_group))
         self.wait()

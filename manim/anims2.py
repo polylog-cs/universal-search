@@ -17,15 +17,21 @@ class Intro(Scene):
         downarrow_tex = (
             Tex(r"$\Downarrow ?$").scale(2).next_to(statement_tex, DOWN, buff=1)
         )
-        turing_img = (
-            ImageMobject("img/award.jpg").scale(2).next_to(downarrow_tex, DOWN, buff=1)
-        )
+        prices_img = [
+            ImageMobject("img/turing.jpg").scale_to_fit_height(3),
+            ImageMobject("img/fields.jpg").scale_to_fit_height(3),
+            ImageMobject("img/abacus.png").scale_to_fit_height(3),
+        ]
+        prices_group = Group(*prices_img).arrange(RIGHT).next_to(downarrow_tex, DOWN).shift(1*DOWN)
+
 
         self.play(FadeIn(statement_tex))
         self.wait()
         self.play(FadeIn(downarrow_tex))
         self.wait()
-        self.play(FadeIn(turing_img))
+        self.play(Succession(
+            *[FadeIn(price) for price in prices_group]
+            ))
         self.wait()
         # TODO vtip s mísou?
 
@@ -37,12 +43,21 @@ class Intro(Scene):
 
         self.play(
             FadeOut(downarrow_tex),
-            FadeOut(turing_img),
+            FadeOut(prices_group),
         )
         self.play(FadeIn(statement2_tex))
         self.wait()
 
         # But even if we don’t know the complexity of our algorithm, why not just run it on real instances? If we can solve the factoring problem really fast, it means we can break a huge part of today's cryptography and that sounds interesting even without the math proof that the algorithm works.
+
+        mult_group = horrible_multiplication().scale(0.5).to_edge(DOWN)
+
+        self.play(FadeIn(mult_group))
+        self.wait()
+        self.play(FadeOut(mult_group))
+        self.wait()
+        
+
         # The only possible conclusion: Our algorithm is insanely slow [sound effect] in practice.
 
         statement3_tex = (

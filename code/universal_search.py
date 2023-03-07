@@ -8,7 +8,7 @@ Brainfuck is a minimalist language consisting of just 8 commands: > < + - , . [ 
 For details, see [TODO]
 
 [*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable
-programming language like Python. 
+programming language like Python and make a few more small changes.   
 """
 
 import itertools
@@ -18,8 +18,7 @@ import sys
 class BrainfuckExecution:
     """
     This class represents a single execution of a Brainfuck program. It is initialized
-    with the program and the input. It can be stepped through one command at a time, or
-    it can be run until it is finished.
+    with the program and the input. It can be stepped through one command at a time. 
     """
 
     def __init__(self, program: str, input: str):
@@ -85,6 +84,7 @@ class BrainfuckExecution:
                     self.program_pointer -= 1
         self.program_pointer += 1
 
+    # TODO smazat? 
     # Executes the program until it is finished and returns the output.
     def run(self) -> str:
         while not self.is_finished():
@@ -92,12 +92,13 @@ class BrainfuckExecution:
         return "".join(self.output)
 
 
-# This class represents a universal search algorithm that can be used to find a program
-# that takes the input and finds the output. It generates the programs in a
-# breadth-first search manner, and it executes them in parallel. When it starts
-# executing the n-th program, it performs 2 steps of the (n - 1)-th program, 4 steps of
-# the (n - 2)-th program, 8 steps of the (n - 3)-th program, etc. When a program
-# finishes, it validates its output and if it is correct, it stops the search.
+# This class represents a universal search algorithm that is used to find a program
+# that takes the input and computes the output. We generate all programs in an
+# exhaustive manner, and execute them in parallel. When we start
+# executing the n-th program, we simulate 1 step of the n-th program, 2 steps 
+# of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps 
+# of the (n - 3)-th program, etc. When a program finishes, we validate its output 
+# and if it is correct, we stop the search.
 class UniversalSearch:
     def __init__(self, input: str):
         self.input = input
@@ -158,9 +159,6 @@ class FactorizationSearch(UniversalSearch):
     # Checks that the output can be split into two comma-separated integers greater than
     # 1 whose product is the input.
     def validate(self, output: str) -> bool:
-        # We immediately return in situations where the resulting product is definitely
-        # larger than self.input, to avoid multiplying very large numbers and messing up
-        # our time complexity.
         if len(self.input) - 2 > len(self.input):
             return False
         try:
@@ -174,6 +172,7 @@ class FactorizationSearch(UniversalSearch):
 
 
 # TODO VR: mozna natocit video jak implementujeme tuhle funkci (ve videu na konci casti pred diskuzi)
+# ne nutne pro sort, ale nenapada me lepsi problem
 class UniversalSort(
     UniversalSearch
 ):  # TODO VR: libi se mi factorizationsearch a universalsort, ale neni to kompatibilni

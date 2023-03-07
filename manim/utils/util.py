@@ -81,7 +81,33 @@ def division_animation(num, obj):
 
 
 def horrible_multiplication():
+    authors_tex = Tex(
+        "\\hsize=20cm{} [Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann 2020], $~3000$ CPU years"
+    )
+    authors_tex.scale(0.4)
+
+    def allow_breaks(s):
+        return "\hskip 0pt{}".join(s)
+
     n = 2140324650240744961264423072839333563008614715144755017797754920881418023447140136643345519095804679610992851872470914587687396261921557363047454770520805119056493106687691590019759405693457452230589325976697471681738069364894699871578494975937497937
     a = 64135289477071580278790190170577389084825014742943447208116859632024532344630238623598752668347708737661925585694639798853367
     b = 33372027594978156556226010605355114227940760344767554666784520987023841729210037080257448673296881877565718986258036932062711
-    return (n, a, b)
+
+    n_tex, a_tex, b_tex = [
+        Tex("\\hsize=9cm{}" + allow_breaks(str(k)), tex_environment=None).scale(0.8)
+        for k in [n,a,b]
+    ]
+    eq_tex = Tex(str(r"="))
+    times_tex = Tex(str(r"$\times$"))
+
+    mult_group = Group(
+        authors_tex,
+        n_tex,
+        eq_tex,
+        a_tex,
+        times_tex,
+        b_tex,
+    ).arrange(DOWN)
+
+
+    return mult_group
