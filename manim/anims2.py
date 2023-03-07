@@ -12,7 +12,7 @@ class Intro(Scene):
 
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
         statement_tex = Tex(
-            r"We know a concrete asymptotically optimal algorithm for factoring. "
+            r"Asymptotically optimal algorithm for factoring "
         ).shift(3 * UP)
         downarrow_tex = (
             Tex(r"$\Downarrow ?$").scale(2).next_to(statement_tex, DOWN, buff=1)
@@ -51,6 +51,7 @@ class Intro(Scene):
         # But even if we don’t know the complexity of our algorithm, why not just run it on real instances? If we can solve the factoring problem really fast, it means we can break a huge part of today's cryptography and that sounds interesting even without the math proof that the algorithm works.
 
         mult_group = horrible_multiplication().scale(0.5).to_edge(DOWN)
+        #TODO misto tohohle tam hodit screenshot z předchozího videa
 
         self.play(FadeIn(mult_group))
         self.wait()
