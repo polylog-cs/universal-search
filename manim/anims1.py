@@ -4,6 +4,38 @@ from utils import *
 
 # ^ also imports manim and changes some of its defaults
 
+class Polylogo(Scene):
+    def construct(self):
+        default()
+        authors = Tex(
+            r"\textbf{Richard Hladík, Filip Hlásek, Václav Rozhoň, Václav Volhejn}",
+            color=text_color,
+            font_size=40,
+        ).shift(3 * DOWN + 0 * LEFT)
+
+        channel_name = Tex(r"polylog", color=text_color)
+        channel_name.scale(4).shift(1 * UP)
+        channel_name_without_o = Tex(r"p\hskip 5.28pt lylog", color=text_color)
+        channel_name_without_o.scale(4).shift(1 * UP)
+
+        logo_solarized = (
+            SVGMobject("img/logo-solarized.svg")
+            .scale(0.55)
+            .move_to(2 * LEFT + 0.95 * UP + 0.49 * RIGHT)
+        )
+        self.play(
+            Write(authors),
+            Write(channel_name),
+        )
+        self.play(FadeIn(logo_solarized))
+        self.add(channel_name_without_o)
+        self.remove(channel_name)
+
+        self.wait()
+
+        self.play(*[FadeOut(o) for o in self.mobjects])
+        self.wait()
+
 
 class Intro(Scene):
     def construct(self):
@@ -11,14 +43,35 @@ class Intro(Scene):
 
         # What if I asked you to multiply two long primes, each with n digits? That’s simple, you can just use the algorithm you know from school,
 
-        # TODO primes
-        num1 = 39847
-        num2 = 39847
+        # following numbers are primes http://compoasso.free.fr/primelistweb/page/prime/liste_online_en.php
+        num1 = 51797
+        num2 = 71713
 
+        num1 = 701527
+        num2 = 322351
+
+        num1 = 3202363
+        num2 = 8764867
+        
         num1_tex = Tex(str(num1))
-        num2_tex = Tex(str(num1))
+        num2_tex = Tex(str(num2))
 
-        self.play(FadeIn(Group(num1_tex, num2_tex).arrange(RIGHT).move_to(ORIGIN)))
+        self.play(FadeIn(Group(num1_tex, num2_tex).arrange(RIGHT, buff = 1).move_to(ORIGIN)))
+        brace_groups = []
+        for obj in [num1_tex, num2_tex]:
+            brace = Brace(obj, DOWN)
+            n_tex = Tex(r"$n$ digits").next_to(brace, DOWN)
+            brace_groups.append(Group(brace, n_tex))
+        
+        self.play(
+            *[FadeIn(g) for g in brace_groups]
+        )
+        self.wait()
+        self.play(
+            *[FadeOut(g) for g in brace_groups]
+        )
+        self.wait()
+
 
         mult_objects, mult_anims = multiplication_animation(
             num1, num2, num1_tex, num2_tex
@@ -59,9 +112,6 @@ class Intro(Scene):
 
         # But what about the opposite problem where I give you a product of two primes and ask you to find the prime factors. How do you solve that one?
 
-        div_objects, div_anims = division_animation(num1 * num2, res_tex)
-        self.play(div_anims[0])
-        self.wait()
 
         # Well, you can check whether that input number is divisible by 2,3,4,5 and so on, until you hit a factor. But if the number on input has n digits, its size is up to 10^n and hence you will need up to sqrt( 10^n) steps before you find a factor.
 
@@ -70,14 +120,25 @@ class Intro(Scene):
             r"{{$n$ digits}}{{$\Rightarrow$ size up to $10^n$}}{{$\Rightarrow$ up to $\sqrt{10^n}$ steps}}"
         )
         sqrt_tex[0].next_to(brace, DOWN)
-        sqrt_tex[1].next_to(sqrt_tex[0], RIGHT, buff=0.5)
-        sqrt_tex[2].next_to(sqrt_tex[1], RIGHT, buff=0.5)
+        sqrt_tex[1].next_to(sqrt_tex[0], DOWN, buff=0.5)
+        sqrt_tex[2].next_to(sqrt_tex[1], DOWN, buff=0.5)
 
-        self.play(FadeIn(brace), FadeIn(sqrt_tex))
+        self.play(FadeIn(brace), FadeIn(sqrt_tex[0]))
+        self.wait()
+
+        # TODO animace divisibility
+        div_objects, div_anims = division_animation(num1 * num2, res_tex)
+        self.play(div_anims[0])
+        self.wait()
+
+
+        self.play(FadeIn(sqrt_tex[1]))
+        self.wait()
+        self.play(FadeIn(sqrt_tex[2]))
         self.wait()
 
         # This is much slower than the time n^2 it takes to multiply two numbers.
-        formula_tex = Tex(r"$n^2 \ll \sqrt{10^n}$").next_to(sqrt_tex, DOWN, buff=1)
+        formula_tex = Tex(r"$n^2 \ll \sqrt{10^n}$").next_to(sqrt_tex[1], RIGHT, buff=2)
 
         self.play(
             Succession(
@@ -89,16 +150,41 @@ class Intro(Scene):
         )
         self.wait()
 
-        # There were faster algorithms known for factoring, but all of them were much slower than n^2. Finding a fast classical algorithm for factoring has been one of the most important open questions of computer science for a long time. And for a good reason: an efficient factoring algorithm would break large parts of today’s cryptography.
 
-        # TODO animace??? pridat tabulku faktorizacnich algoritmu?
+
+class Factoring(Scene):
+    def construct(self):
+        default()
+
+        mult_group = horrible_multiplication()
+        num_group = mult_group[0]
+        authors_tex = mult_group[1]
+
+        t = 0.3
+        self.play(
+            Succession(
+                AnimationGroup(FadeIn(num_group[0]), FadeIn(authors_tex)),
+                Wait(t),
+                FadeIn(num_group[1]),
+                Wait(t),
+                FadeIn(num_group[2]),
+                Wait(t),
+                FadeIn(num_group[3]),
+                Wait(t),
+                FadeIn(num_group[4]),
+            )
+        )
+        self.wait()
+
+        self.wait(5)
+
+
+
 
 
 class Asymptotics(Scene):
     def construct(self):
         default()
-
-        # TODO riso pls nakodi tohle
 
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
         our_algo_img = m.ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(14.2) # TODO nezapomenout vyprintscreenovat final verzi v solarized barvach
@@ -109,7 +195,7 @@ class Asymptotics(Scene):
         self.wait()
         
         badge_img = ImageMobject("img/badge_downscaled.png").scale_to_fit_width(6)
-        badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1*UP)
+        badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
         badge_group = Group(badge_img, badge_tex)
 
 
@@ -194,7 +280,7 @@ class Asymptotics(Scene):
 
         # Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor.
         # For example, perhaps my algorithm is twice as slow as yours, but it is at most twice as slow for all inputs, even very large ones.
-
+        # TODO obrazek pro your algo
         your_algo = (
             Triangle(color=COLOR_YOURS, fill_opacity=1)
             .scale(0.5 * target_size)
@@ -289,47 +375,3 @@ class Asymptotics(Scene):
 
         self.wait(5)
 
-
-class Factoring(Scene):
-    def construct(self):
-        default()
-
-        mult_group = horrible_multiplication()
-
-        self.play(FadeIn(mult_group))
-        self.wait()
-
-        self.wait(5)
-
-
-class Polylog(Scene):
-    def construct(self):
-        default()
-        authors = Tex(
-            r"\textbf{Richard Hladík, Filip Hlásek, Václav Rozhoň, Václav Volhejn}",
-            color=text_color,
-            font_size=40,
-        ).shift(3 * DOWN + 0 * LEFT)
-
-        channel_name = Tex(r"polylog", color=text_color)
-        channel_name.scale(4).shift(1 * UP)
-        channel_name_without_o = Tex(r"p\hskip 5.28pt lylog", color=text_color)
-        channel_name_without_o.scale(4).shift(1 * UP)
-
-        logo_solarized = (
-            SVGMobject("img/logo-solarized.svg")
-            .scale(0.55)
-            .move_to(2 * LEFT + 0.95 * UP + 0.49 * RIGHT)
-        )
-        self.play(
-            Write(authors),
-            Write(channel_name),
-        )
-        self.play(FadeIn(logo_solarized))
-        self.add(channel_name_without_o)
-        self.remove(channel_name)
-
-        self.wait()
-
-        self.play(*[FadeOut(o) for o in self.mobjects])
-        self.wait()

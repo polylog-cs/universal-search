@@ -37,7 +37,7 @@ class Intro(Scene):
 
         # Before showing you our algorithm, let’s see how it can even be possible that we know such an algorithm and yet do not have Turing awards for finding out what the complexity of factoring is.
         # Well, the only possibility is that although we know the asymptotically optimal algorithm, we unfortunately don’t know what its time complexity is!
-        statement2_tex = Tex(r"1) We don't know it's time complexity!").next_to(
+        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(
             statement_tex, DOWN, buff=1
         )
 
@@ -62,80 +62,128 @@ class Intro(Scene):
         # The only possible conclusion: Our algorithm is insanely slow [sound effect] in practice.
 
         statement3_tex = (
-            Tex(r"2) It is insanely slow. ")
+            Tex(r"2) The algorithm is insanely slow. ")
             .next_to(statement2_tex, DOWN, buff=0.5)
             .align_to(statement2_tex, LEFT)
         )
         self.play(FadeIn(statement3_tex))
         self.wait()
 
+        self.play(
+            FadeOut(statement_tex),
+            Group(statement2_tex, statement3_tex).animate.to_edge(UP),
+            )
+        line = Line(start = 10*LEFT, end = 10*RIGHT, color = GRAY).next_to(statement3_tex, DOWN)
+        self.play(FadeIn(line))
+        self.wait()
+
         # This is totally possible according to the definition of asymptotic optimality.
         # In computer science, we are doing asymptotic statements all the time, like when we say that select sort has time complexity O(n^2), this big O simply hides some constant in front of the function, plus some lower order terms. [objeví se opravdová komplexita select sortu a u toho “actual complexity”]
 
-        select_tex = (
-            Tex("{{Asymptotic time complexity of select sort }}{{$= O(n^2)$. }}")
-            .next_to(statement3_tex, DOWN, buff=1)
-            .to_edge(LEFT)
-        )
-        select_tex2 = (
-            Tex("{{Actual time complexity: }}{{$= n^2/2 + 3n + 10$. }}")
-            .next_to(select_tex, DOWN, buff=0.5)
-            .align_to(select_tex, LEFT)
-        )
-        select_tex2[1].next_to(select_tex[1], DOWN, buff=0.5).align_to(
-            select_tex[1], LEFT
-        )
-
-        self.play(FadeIn(select_tex))
-        self.wait()
-
-        self.play(FadeIn(select_tex2))
-        self.wait()
-
-        # So all of these functions are O(n^2). [asi bych tam dal i n nebo něco takového protože později implicitně používáme že O není theta]
-
-        self.play(
-            FadeOut(
-                Group(
-                    select_tex[0],
-                    select_tex[1][0],
-                    select_tex[1][-1],
-                    select_tex2[0],
-                    select_tex2[1][0],
-                )
-            )
-        )
-        self.wait()
-
         complexities = (
             Group(
-                Tex(r"$n^2/2 + 3n + 10$"),
-                Tex(r"$10n^2 + 42$"),
-                Tex(r"$n/2$"),
-                Tex(r"$100000000000n^2$"),
+                Tex(r"{{$n^2$}}{{$/2$}}{{$ + 3n $}}{{$ + 10$}}"),
+                Tex(r"{{$10$}}{{$n^2$}}{{$ + 42$}}"),
+                Tex(r"{{$10$}}{{$n^2 $}}{{$ + 42$}}"),
+                Tex(r"{{$100000000000$}}{{$n^2$}}"),
             )
             .arrange(DOWN)
             .move_to(3 * LEFT + 2 * DOWN)
         )
-        brace = Brace(complexities, RIGHT, buff=1)
-        n2_tex = Tex(r"$O(n^2)$").next_to(brace, RIGHT, buff=1)
+        
+        for i, obj in zip([0, 1, 1, 1], complexities):
+            obj.generate_target()
+            obj.target = Tex(r"$O(n^2)$")
+            obj.target.shift(
+                obj[i][0].get_center()
+                - obj.target[0][2].get_center()
+            )
 
         self.play(
-            ReplacementTransform(select_tex[1][1:-1], n2_tex),
-            ReplacementTransform(select_tex2[1][1:], complexities[0]),
-            FadeIn(brace),
-        )
-
-        for i in range(1, len(complexities)):
-            self.play(
-                FadeIn(complexities[i]),
+            Succession(
+                FadeIn(complexities[0]), Wait(),
+                FadeIn(complexities[1]), Wait(),
+                FadeIn(complexities[2]), Wait(),
             )
+        )
         self.wait()
 
-        # In particular, one million times n^2 is also O(n^2), although such an algorithm would be extremely slow in practice. So asymptotic complexity may sometimes be deceptive. It is an empirical fact that this does not usually happen, but you will soon see that our case is, well, very exceptional.
-
-        self.play(Circumscribe(complexities[-1], color=RED))
+        self.play(
+            Succession(
+                FadeIn(complexities[0].target), Wait(),
+                FadeIn(complexities[1].target), Wait(),
+                FadeIn(complexities[2].target), Wait(),
+            )
+        )
         self.wait()
+
+        
+        
+
+        # select_tex = (
+        #     Tex("{{Asymptotic time complexity of select sort }}{{$= O(n^2)$. }}")
+        #     .next_to(statement3_tex, DOWN, buff=1)
+        #     .to_edge(LEFT)
+        # )
+        # select_tex2 = (
+        #     Tex("{{Actual time complexity: }}{{$= n^2/2 + 3n + 10$. }}")
+        #     .next_to(select_tex, DOWN, buff=0.5)
+        #     .align_to(select_tex, LEFT)
+        # )
+        # select_tex2[1].next_to(select_tex[1], DOWN, buff=0.5).align_to(
+        #     select_tex[1], LEFT
+        # )
+
+        # self.play(FadeIn(select_tex))
+        # self.wait()
+
+        # self.play(FadeIn(select_tex2))
+        # self.wait()
+
+        # # So all of these functions are O(n^2). [asi bych tam dal i n nebo něco takového protože později implicitně používáme že O není theta]
+
+        # self.play(
+        #     FadeOut(
+        #         Group(
+        #             select_tex[0],
+        #             select_tex[1][0],
+        #             select_tex[1][-1],
+        #             select_tex2[0],
+        #             select_tex2[1][0],
+        #         )
+        #     )
+        # )
+        # self.wait()
+
+        # complexities = (
+        #     Group(
+        #         Tex(r"$n^2/2 + 3n + 10$"),
+        #         Tex(r"$10n^2 + 42$"),
+        #         Tex(r"$n/2$"),
+        #         Tex(r"$100000000000n^2$"),
+        #     )
+        #     .arrange(DOWN)
+        #     .move_to(3 * LEFT + 2 * DOWN)
+        # )
+        # brace = Brace(complexities, RIGHT, buff=1)
+        # n2_tex = Tex(r"$O(n^2)$").next_to(brace, RIGHT, buff=1)
+
+        # self.play(
+        #     ReplacementTransform(select_tex[1][1:-1], n2_tex),
+        #     ReplacementTransform(select_tex2[1][1:], complexities[0]),
+        #     FadeIn(brace),
+        # )
+
+        # for i in range(1, len(complexities)):
+        #     self.play(
+        #         FadeIn(complexities[i]),
+        #     )
+        # self.wait()
+
+        # # In particular, one million times n^2 is also O(n^2), although such an algorithm would be extremely slow in practice. So asymptotic complexity may sometimes be deceptive. It is an empirical fact that this does not usually happen, but you will soon see that our case is, well, very exceptional.
+
+        # self.play(Circumscribe(complexities[-1], color=RED))
+        # self.wait()
 
         # The constant factors in our algorithm are so tragically huge that it struggles to factor even 4 = 2x2. [ukázat, jak to pouštíme v terminálu pro čtyřku]
 

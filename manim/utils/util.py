@@ -63,9 +63,10 @@ def multiplication_animation(num1, num2, obj1, obj2):
 
 
 def division_animation(num, obj):
-    num_tex = Tex(num).scale(2).to_edge(LEFT)
-    div_sign = Tex(r"/").scale(2).next_to(num_tex, RIGHT)
-    eq_sign = Tex(r"=").scale(2).next_to(num_tex, RIGHT).shift(4 * RIGHT)
+    sc = 1.5
+    num_tex = Tex(num).scale(sc).to_edge(LEFT)
+    div_sign = Tex(r"/").scale(sc).next_to(num_tex, RIGHT)
+    eq_sign = Tex(r"=").scale(sc).next_to(num_tex, RIGHT).shift(4 * RIGHT)
 
     objects = Group(num_tex)
 
@@ -82,9 +83,9 @@ def division_animation(num, obj):
 
 def horrible_multiplication():
     authors_tex = Tex(
-        "\\hsize=20cm{} [Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann 2020], $~3000$ CPU years"
+        "\\hsize=20cm{} [Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann 2020], RSA Factoring Challenge"
     )
-    authors_tex.scale(0.4)
+    authors_tex.scale(0.4).to_corner(DR)
 
     def allow_breaks(s):
         return "\hskip 0pt{}".join(s)
@@ -101,7 +102,6 @@ def horrible_multiplication():
     times_tex = Tex(str(r"$\times$"))
 
     mult_group = Group(
-        authors_tex,
         n_tex,
         eq_tex,
         a_tex,
@@ -110,4 +110,4 @@ def horrible_multiplication():
     ).arrange(DOWN)
 
 
-    return mult_group
+    return Group(mult_group, authors_tex)
