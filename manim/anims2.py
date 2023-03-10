@@ -85,41 +85,21 @@ class Intro(Scene):
 
         complexities = (
             Group(
-                Tex(r"{{$n^2$}}{{$/2$}}{{$ + 3n $}}{{$ + 10$}}"),
-                Tex(r"{{$10$}}{{$n^2$}}{{$ + 42$}}"),
-                Tex(r"{{$10$}}{{$n^2 $}}{{$ + 42$}}"),
-                Tex(r"{{$100000000000$}}{{$n^2$}}"),
+                CollapsibleAsymptotics(["", "n^2", "/2 + 3n + 10"]),
+                CollapsibleAsymptotics(["10", "n^2", "{} + 42"]),
+                CollapsibleAsymptotics(["100000000000", "n^2", ""]),
             )
             .arrange(DOWN)
             .move_to(3 * LEFT + 2 * DOWN)
         )
 
-        for i, obj in zip([0, 1, 1, 1], complexities):
-            obj.generate_target()
-            obj.target = Tex(r"$O(n^2)$")
-            obj.target.shift(obj[i][0].get_center() - obj.target[0][2].get_center())
-
-        self.play(
-            Succession(
-                FadeIn(complexities[0]),
-                Wait(),
-                FadeIn(complexities[1]),
-                Wait(),
-                FadeIn(complexities[2]),
-                Wait(),
-            )
-        )
+        self.play(AnimationGroup(*map(FadeIn, complexities), lag_ratio=1.5))
         self.wait()
 
         self.play(
-            Succession(
-                FadeIn(complexities[0].target),
-                Wait(),
-                FadeIn(complexities[1].target),
-                Wait(),
-                FadeIn(complexities[2].target),
-                Wait(),
-            )
+            AnimationGroup(
+                *(complexity.collapse() for complexity in complexities), lag_ratio=1.5
+            ),
         )
         self.wait()
 

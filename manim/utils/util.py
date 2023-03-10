@@ -96,7 +96,7 @@ def horrible_multiplication():
 
     n_tex, a_tex, b_tex = [
         Tex("\\hsize=9cm{}" + allow_breaks(str(k)), tex_environment=None).scale(0.8)
-        for k in [n,a,b]
+        for k in [n, a, b]
     ]
     eq_tex = Tex(str(r"="))
     times_tex = Tex(str(r"$\times$"))
@@ -109,5 +109,30 @@ def horrible_multiplication():
         b_tex,
     ).arrange(DOWN)
 
-
     return Group(mult_group, authors_tex)
+
+
+class CollapsibleAsymptotics(VMobject):
+    def __init__(self, tex, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.tex = MathTex(*[t if t else "{}" for t in tex])
+        self.immovable = self.tex[1]
+        self.add(self.tex)
+
+    def collapse(self):
+        fake_tex = Group(
+            MathTex("\mathcal{O}("),
+            MathTex(self.immovable.get_tex_string()),
+            MathTex(")"),
+        )
+        fake_tex[0].next_to(self.tex, LEFT, buff=SMALL_BUFF)
+        fake_tex[1].shift(self.immovable.get_center() - fake_tex[1].get_center())
+        fake_tex[2].next_to(self.tex, RIGHT, buff=SMALL_BUFF)
+
+        new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
+        new_tex.shift(self.immovable.get_center() - new_tex[1].get_center())
+        return AnimationGroup(
+            *(FadeIn(new_tex[i], target_position=fake_tex[i]) for i in range(3)),
+            FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
+            FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
+        )
