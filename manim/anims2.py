@@ -220,7 +220,7 @@ class Polylog(Scene):
         self.wait()
 
 
-class Part1(Scene):
+class MonkeyTyping(Scene):
     def construct(self):
         default()
         # Explaining Levin’s search
@@ -245,8 +245,20 @@ class Part1(Scene):
 
         return
 
+
+class ProgramsWithoutStepping(Scene):
+    def construct(self):
+        default()
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
+        p1 = ProgramInvocation(
+            'print("Aaa")', stdin="4", stdout="SyntaxError", ok=False
+        )
+        self.add(p1)
+        self.wait(1)
+        self.play(p1.step())
+        self.play(p1.step())
+        self.play(p1.finish())
         # [animace se stackem programů, postupně točíme kolečka a z algortimů vždy vypadne nějaká chybová hláška nebo nějaký output]
 
         # That’s the main idea. There are just a few small problems with this approach: the most important one is that at some point we encounter algorithms with infinite loops that do not terminate, like this one:
@@ -257,7 +269,12 @@ class Part1(Scene):
         infinite_tex = Tex(r"{{while True: }}{{print(“Are we there yet?”)}}")
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
+        self.wait(5)
 
+
+class Part1Rest(Scene):
+    def construct(self):
+        default()
         # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.

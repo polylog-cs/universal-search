@@ -1,3 +1,5 @@
+import math
+
 from manim import *
 
 
@@ -136,3 +138,67 @@ class CollapsibleAsymptotics(VMobject):
             FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
             FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
         )
+
+
+class ProgramInvocation(VMobject):
+    def __init__(self, code, stdin, stdout, ok, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.wheels = 0
+        self.code = Code(
+            code=code,
+            language="Python",
+            tab_width=4,
+            style="solarized-light",
+            font="monospace",
+            insert_line_no=False,
+            font_size=24,
+        )
+
+        font_size = 24
+        self.stdin = VGroup(
+            Text(stdin, font="monospace", font_size=font_size), MathTex(r"\Rightarrow")
+        ).arrange()
+        self.stdout = VGroup(
+            MathTex(r"\Rightarrow"), Text(stdout, font="monospace", font_size=font_size)
+        ).arrange()
+        self.ok = ok
+        self.group = (
+            VGroup(
+                self.stdin,
+                self.code,
+            )
+            .arrange()
+            .shift(3 * LEFT)
+        )
+        self.wheel = Square(color=RED).scale(0.2)
+        self.add(self.group)
+
+    def arrange(self):
+        self.group.arrange(center=False)
+
+    def finish(self):
+        self.group.add(self.stdout)
+        self.arrange()
+        return FadeIn(self.stdout)
+
+    def step(self):
+        self.wheels += 1
+        self.group.add(self.wheel.copy())
+        cur = self.group[-1]
+        self.arrange()
+
+        old_obj = self.wheel.copy().next_to(cur, LEFT)
+        old_pos = old_obj.get_center()
+        target_pos = cur.get_center()
+        target_angle = -math.radians(90)
+
+        def update(obj, alpha):
+            obj.become(
+                old_obj.copy()
+                .rotate(alpha * target_angle)
+                .move_to(alpha * target_pos + (1 - alpha) * old_pos)
+                .fade(1 - alpha)
+            )
+
+        return UpdateFromAlphaFunc(cur, update)
+        # return FadeIn(self.group[-1], target_position=self.group[-2])
