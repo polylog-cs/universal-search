@@ -1,7 +1,7 @@
-from utils.utilgeneral import *
-from utils.util import *
 from manim import *
+from utils.util import *
 from utils.utilcliparts import *
+from utils.utilgeneral import *
 
 
 class Intro(Scene):
@@ -11,9 +11,9 @@ class Intro(Scene):
         # As many of you guessed by the date when we published our previous video, it was not completely honest. The fact that the video suggested that we solved one of the biggest open problems of computer science may also have been a clue.
 
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
-        statement_tex = Tex(
-            r"Asymptotically optimal algorithm for factoring "
-        ).shift(3 * UP)
+        statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
+            3 * UP
+        )
         downarrow_tex = (
             Tex(r"$\Downarrow ?$").scale(2).next_to(statement_tex, DOWN, buff=1)
         )
@@ -22,16 +22,18 @@ class Intro(Scene):
             ImageMobject("img/fields.jpg").scale_to_fit_height(3),
             ImageMobject("img/abacus.png").scale_to_fit_height(3),
         ]
-        prices_group = Group(*prices_img).arrange(RIGHT).next_to(downarrow_tex, DOWN).shift(1*DOWN)
-
+        prices_group = (
+            Group(*prices_img)
+            .arrange(RIGHT)
+            .next_to(downarrow_tex, DOWN)
+            .shift(1 * DOWN)
+        )
 
         self.play(FadeIn(statement_tex))
         self.wait()
         self.play(FadeIn(downarrow_tex))
         self.wait()
-        self.play(Succession(
-            *[FadeIn(price) for price in prices_group]
-            ))
+        self.play(Succession(*[FadeIn(price) for price in prices_group]))
         self.wait()
         # TODO vtip s mísou?
 
@@ -51,13 +53,12 @@ class Intro(Scene):
         # But even if we don’t know the complexity of our algorithm, why not just run it on real instances? If we can solve the factoring problem really fast, it means we can break a huge part of today's cryptography and that sounds interesting even without the math proof that the algorithm works.
 
         mult_group = horrible_multiplication().scale(0.5).to_edge(DOWN)
-        #TODO misto tohohle tam hodit screenshot z předchozího videa
+        # TODO misto tohohle tam hodit screenshot z předchozího videa
 
         self.play(FadeIn(mult_group))
         self.wait()
         self.play(FadeOut(mult_group))
         self.wait()
-        
 
         # The only possible conclusion: Our algorithm is insanely slow [sound effect] in practice.
 
@@ -72,8 +73,10 @@ class Intro(Scene):
         self.play(
             FadeOut(statement_tex),
             Group(statement2_tex, statement3_tex).animate.to_edge(UP),
-            )
-        line = Line(start = 10*LEFT, end = 10*RIGHT, color = GRAY).next_to(statement3_tex, DOWN)
+        )
+        line = Line(start=10 * LEFT, end=10 * RIGHT, color=GRAY).next_to(
+            statement3_tex, DOWN
+        )
         self.play(FadeIn(line))
         self.wait()
 
@@ -90,35 +93,35 @@ class Intro(Scene):
             .arrange(DOWN)
             .move_to(3 * LEFT + 2 * DOWN)
         )
-        
+
         for i, obj in zip([0, 1, 1, 1], complexities):
             obj.generate_target()
             obj.target = Tex(r"$O(n^2)$")
-            obj.target.shift(
-                obj[i][0].get_center()
-                - obj.target[0][2].get_center()
-            )
+            obj.target.shift(obj[i][0].get_center() - obj.target[0][2].get_center())
 
         self.play(
             Succession(
-                FadeIn(complexities[0]), Wait(),
-                FadeIn(complexities[1]), Wait(),
-                FadeIn(complexities[2]), Wait(),
+                FadeIn(complexities[0]),
+                Wait(),
+                FadeIn(complexities[1]),
+                Wait(),
+                FadeIn(complexities[2]),
+                Wait(),
             )
         )
         self.wait()
 
         self.play(
             Succession(
-                FadeIn(complexities[0].target), Wait(),
-                FadeIn(complexities[1].target), Wait(),
-                FadeIn(complexities[2].target), Wait(),
+                FadeIn(complexities[0].target),
+                Wait(),
+                FadeIn(complexities[1].target),
+                Wait(),
+                FadeIn(complexities[2].target),
+                Wait(),
             )
         )
         self.wait()
-
-        
-        
 
         # select_tex = (
         #     Tex("{{Asymptotic time complexity of select sort }}{{$= O(n^2)$. }}")
@@ -260,7 +263,7 @@ class Part1(Scene):
             self.add_sound(random_typewriter_file())
             self.wait(0.3)
 
-        return        
+        return
 
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
