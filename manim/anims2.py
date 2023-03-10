@@ -252,13 +252,25 @@ class ProgramsWithoutStepping(Scene):
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
         p1 = ProgramInvocation(
-            'print("Aaa")', stdin="4", stdout="SyntaxError", ok=False
+            'print("Aaa"', stdin="4", stdout="SyntaxError", ok=False
+        ).shift(UP)
+        p2 = ProgramInvocation('print("Aaa")', stdin="4", stdout="Aaa", ok=False)
+        p3 = ProgramInvocation('print("2 2")', stdin="4", stdout="2 2", ok=True).shift(
+            DOWN
         )
         self.add(p1)
+        self.add(p2)
+        self.add(p3)
         self.wait(1)
-        self.play(p1.step())
-        self.play(p1.step())
-        self.play(p1.finish())
+        self.play(p1.step(), p1.step())
+        self.play(p2.step())
+        self.play(p3.step(), p3.step(), p3.step())
+        self.play(p1.show_output())
+        self.play(p1.show_verdict())
+        self.play(p2.show_output())
+        self.play(p2.show_verdict())
+        self.play(p3.show_output())
+        self.play(p3.show_verdict())
         # [animace se stackem programů, postupně točíme kolečka a z algortimů vždy vypadne nějaká chybová hláška nebo nějaký output]
 
         # That’s the main idea. There are just a few small problems with this approach: the most important one is that at some point we encounter algorithms with infinite loops that do not terminate, like this one:

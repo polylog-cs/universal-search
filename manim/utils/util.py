@@ -1,6 +1,6 @@
 import math
 
-from manim import *
+from .utilgeneral import *
 
 
 def multiplication_animation(num1, num2, obj1, obj2):
@@ -152,14 +152,18 @@ class ProgramInvocation(VMobject):
             font="monospace",
             insert_line_no=False,
             font_size=24,
+            margin=0.2,
         )
 
+        arrow = MathTex(r"\Rightarrow")
         font_size = 24
         self.stdin = VGroup(
-            Text(stdin, font="monospace", font_size=font_size), MathTex(r"\Rightarrow")
+            Text(stdin, font="monospace", font_size=font_size), arrow.copy()
         ).arrange()
+        color = RED if "Error" in stdout else TEXT_COLOR
         self.stdout = VGroup(
-            MathTex(r"\Rightarrow"), Text(stdout, font="monospace", font_size=font_size)
+            arrow.copy(),
+            Text(stdout, font="monospace", font_size=font_size, color=color),
         ).arrange()
         self.ok = ok
         self.group = (
@@ -170,16 +174,25 @@ class ProgramInvocation(VMobject):
             .arrange()
             .shift(3 * LEFT)
         )
-        self.wheel = Square(color=RED).scale(0.2)
+        self.wheel = SVGMobject("img/gear.svg").scale(0.3).set_fill(GRAY)
         self.add(self.group)
 
     def arrange(self):
         self.group.arrange(center=False)
 
-    def finish(self):
+    def show_output(self):
         self.group.add(self.stdout)
         self.arrange()
         return FadeIn(self.stdout)
+
+    def show_verdict(self):
+        if self.ok:
+            verdict = Text("✓", color=GREEN, font_size=80)
+        else:
+            verdict = Text("×", color=RED, font_size=80)
+        self.group.add(verdict)
+        self.arrange()
+        return FadeIn(self.group[-1], scale=3)
 
     def step(self):
         self.wheels += 1
@@ -191,14 +204,15 @@ class ProgramInvocation(VMobject):
         old_pos = old_obj.get_center()
         target_pos = cur.get_center()
         target_angle = -math.radians(90)
+        prev_rotation = 0
 
         def update(obj, alpha):
-            obj.become(
-                old_obj.copy()
-                .rotate(alpha * target_angle)
-                .move_to(alpha * target_pos + (1 - alpha) * old_pos)
-                .fade(1 - alpha)
-            )
+            nonlocal prev_rotation
+            obj.rotate(-prev_rotation + alpha * target_angle).move_to(
+                alpha * target_pos + (1 - alpha) * old_pos
+            ).set_fill(opacity=alpha)
+            prev_rotation = alpha * target_angle
 
-        return UpdateFromAlphaFunc(cur, update)
-        # return FadeIn(self.group[-1], target_position=self.group[-2])
+        return UpdateFromAlphaFunc(
+            cur, update, rate_func=rate_functions.ease_in_out_quad
+        )
