@@ -254,6 +254,13 @@ class Part1(Scene):
         # ]
 
         chimp_img = ImageMobject("img/chimp.jpg").scale_to_fit_width(6)
+        self.add(chimp_img)
+
+        for i in range(20):
+            self.add_sound(random_typewriter_file())
+            self.wait(0.3)
+
+        return        
 
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
@@ -311,7 +318,7 @@ class Part1(Scene):
 
         mult_algs_texts = [
             ["When", "Who", "Technique", "Complexity"],
-            ["$<$3000BC", "unknown", "just do it", r"$O(n^2)$"],
+            ["$<$3000BC", "unknown", "straightforward", r"$O(n^2)$"],
             ["1962", "Karatsuba", "divide \& conquer", r"$O(n^{1.58})$"],
             ["1963", "Toom", "divide \& conquer", r"$O(n^{1.01})$"],
             ["1966", "Schönhage \& Strassen", "FFT", r"$n \cdot \text{polylog}(n)$"],

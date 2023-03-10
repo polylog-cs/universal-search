@@ -6,6 +6,7 @@ from manim import *
 
 ############### DEFAULT OPTIONS
 
+random.seed(0)
 
 def default():
     VMobject.set_default(color=GRAY)
@@ -16,8 +17,8 @@ def default():
 
 
 ############### GENERATING SOUNDS
+# self.add_sound(file_name)
 
-random.seed(0)
 
 
 def random_click_file():
@@ -41,6 +42,9 @@ def random_whoops_file():
 
 def random_rubik_file():
     return f"audio/cube/r{random.randint(1, 20)}.wav"
+
+def random_typewriter_file():
+    return f"audio/typewriter/t{random.randint(0, 9)}.wav"
 
 
 ############### SOLARIZED COLORS
