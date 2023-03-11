@@ -143,11 +143,9 @@ class CollapsibleAsymptotics(VMobject):
 
 
 class ProgramInvocation(VMobject):
-    def __init__(self, code, stdin, stdout, ok, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.wheels = 0
-        self.code = Code(
-            code=code,
+    def _make_code(text):
+        return Code(
+            code=text,
             language="Python",
             tab_width=4,
             style="solarized-light",
@@ -157,6 +155,10 @@ class ProgramInvocation(VMobject):
             margin=0.2,
         )
 
+    def __init__(self, code, stdin, stdout, ok, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.wheels = 0
+        self.code = ProgramInvocation._make_code(code)
         arrow = MathTex(r"\Rightarrow")
         font_size = 24
         self.stdin = VGroup(
@@ -168,14 +170,10 @@ class ProgramInvocation(VMobject):
             Text(stdout, font="monospace", font_size=font_size, color=color),
         ).arrange()
         self.ok = ok
-        self.group = (
-            VGroup(
-                self.stdin,
-                self.code,
-            )
-            .arrange()
-            .shift(3 * LEFT)
-        )
+        self.group = VGroup(
+            self.stdin,
+            self.code,
+        ).arrange()
         self.wheel = (
             SVGMobject("img/gear.svg")
             .scale(0.3)
@@ -186,6 +184,7 @@ class ProgramInvocation(VMobject):
             .set_sheen_factor(0)
         )
         self.add(self.group)
+        self.add_updater(ProgramInvocation.arrange)
 
     def arrange(self):
         self.group.arrange(center=False)
@@ -204,6 +203,11 @@ class ProgramInvocation(VMobject):
         self.arrange()
         return FadeIn(self.group[-1], scale=3)
 
+    def finish(self, lag_ratio=0.5):
+        return AnimationGroup(
+            self.show_output(), self.show_verdict(), lag_ratio=lag_ratio
+        )
+
     def step(self):
         self.wheels += 1
         target_angle = -math.radians(90)
@@ -217,12 +221,130 @@ class ProgramInvocation(VMobject):
         old_pos = old_obj.get_center()
         target_pos = cur.get_center()
 
-        def update(obj, alpha):
+        def update(self, alpha):
+            obj = self.group[-1]
             obj.restore()
             obj.move_to(alpha * target_pos + (1 - alpha) * old_pos).set_fill(
                 opacity=alpha
             ).rotate(alpha * target_angle)
 
         return UpdateFromAlphaFunc(
-            cur, update, rate_func=rate_functions.ease_in_out_quad
+            self,
+            update,
+            rate_func=rate_functions.ease_in_out_quad,
+            suspend_mobject_updating=True,
         )
+
+    def dumb_down(self):
+        new_code = ProgramInvocation._make_code("...").move_to(self.code)
+        return self.code.animate.become(new_code)
+
+
+program_alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ \n"
+
+
+def nth_python_program(n):
+    C = len(program_alphabet)
+    l = 1
+    while C**l <= n:
+        n -= C**l
+        l += 1
+
+    # n-th Python program of length l, so, type n in C-ary
+    out = []
+    for i in range(l):
+        out.append(program_alphabet[n % C])
+        n //= C
+    return "".join(reversed(out))
+
+
+def program_to_number(code):
+    def cmp(i):
+        prog = nth_python_program(i)
+        if len(prog) < len(code):
+            return -1
+        if len(prog) > len(code):
+            return 1
+        for p, c in zip(prog, code):
+            if p == c:
+                continue
+            if program_alphabet.index(p) < program_alphabet.index(c):
+                return -1
+            else:
+                return 1
+        return 0
+
+    n = 1
+    while cmp(n) < 0:
+        n *= 2
+    l = n // 2
+    r = n
+    while l <= r:
+        c = (l + r) // 2
+        res = cmp(c)
+        if res == 0:
+            return c
+        if res < 0:
+            l = c + 1
+        else:
+            r = c - 1
+
+
+def programs_around(code, before=0, after=0):
+    num = program_to_number(code)
+    return [nth_python_program(i) for i in range(num - before, num + after + 1)]
+
+
+class ProgramInvocationList(VGroup):
+    def __init__(self, stdin, expected_stdout, top_pos, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        super().arrange(DOWN, center=False)
+        self.expected_stdout = expected_stdout
+        self.top_pos = top_pos
+        self.stdin = stdin
+        self.arrange()
+        self.add_updater(ProgramInvocationList.arrange)
+        self.dots = ProgramInvocation("...", self.stdin, "", False)
+
+    def arrange(self):
+        for prev, program in zip(self, self[1:]):
+            program.align_to(prev, LEFT)
+            prev = program
+
+    def add_program(self, program):
+        self.add(program)
+        if len(self) == 1:
+            program.align_to(self.top_pos, UP)
+            program.align_to(self.top_pos, LEFT)
+        else:
+            program.next_to(self[-2], DOWN)
+        self.arrange()
+        return FadeIn(self[-1])
+
+    def add_dots(self, reps=1):
+        return [self.add_program(self.dots.copy()) for _ in range(reps)]
+
+    def add_programs_around(self, code, code_stdout, before=0, after=0):
+        anims = []
+        num = program_to_number(code)
+        pre = []
+        post = []
+        for i in range(num - before, num + after + 1):
+            if i == num:
+                stdout = code_stdout
+                ok = stdout == self.expected_stdout
+            else:
+                stdout = "SyntaxError"
+                ok = False
+            anims.append(
+                self.add_program(
+                    ProgramInvocation(nth_python_program(i), self.stdin, stdout, ok)
+                )
+            )
+            if i < num:
+                pre.append(self[-1])
+            elif i > num:
+                post.append(self[-1])
+            else:
+                important_program = self[-1]
+        return anims, (pre, important_program, post)

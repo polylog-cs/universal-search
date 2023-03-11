@@ -246,39 +246,61 @@ class MonkeyTyping(Scene):
         return
 
 
-class ProgramsWithoutStepping(Scene):
+class ProgramsWithoutStepping(MovingCameraScene):
     def construct(self):
         default()
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
-        p1 = ProgramInvocation(
-            'print("Aaa"', stdin="4", stdout="SyntaxError", ok=False
-        ).shift(UP)
-        p2 = ProgramInvocation('print("Aaa")', stdin="4", stdout="Aaa", ok=False)
-        p3 = ProgramInvocation('print("2 2")', stdin="4", stdout="2 2", ok=True).shift(
-            DOWN
+        stdin = "4"
+        p = ProgramInvocationList(stdin, "2 2", 6 * LEFT + 3 * UP)
+        self.play(
+            AnimationGroup(
+                *p.add_programs_around("a", "SyntaxError", 0, 10)[0], lag_ratio=0.1
+            )
         )
-        self.add(p1)
-        self.add(p2)
-        self.add(p3)
-        self.wait(1)
-        self.play(p1.step(), p1.step())
-        self.play(p2.step())
-        self.play(p3.step(), p3.step(), p3.step())
-        self.play(p1.show_output())
-        self.play(p1.show_verdict())
-        self.play(p2.show_output())
-        self.play(p2.show_verdict())
-        self.play(p3.show_output())
-        self.play(p3.show_verdict())
-        # [animace se stackem programů, postupně točíme kolečka a z algortimů vždy vypadne nějaká chybová hláška nebo nějaký output]
+        self.play(AnimationGroup(*(q.finish() for q in p[:3]), lag_ratio=0.8))
+        self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
+        p.add_dots(30),
+        _, (pre, banana, post) = p.add_programs_around(
+            'print("banana")', "banana", 15, 10
+        )
+        self.add(p)  # To display the newly added programs
+
+        self.play(
+            self.camera.frame.animate.align_to(banana, DOWN),
+            run_time=3,
+        )
+        self.play(AnimationGroup(*(q.finish() for q in pre[-10:]), lag_ratio=0.2))
+        self.play(banana.finish())
+        for q in post:
+            q.finish()
 
         # That’s the main idea. There are just a few small problems with this approach: the most important one is that at some point we encounter algorithms with infinite loops that do not terminate, like this one:
 
-        # while True:
-        # 	print(“Are we there yet?”)
-
-        infinite_tex = Tex(r"{{while True: }}{{print(“Are we there yet?”)}}")
+        p.add_dots(30)
+        _, (pre, infinite, post) = p.add_programs_around(
+            """
+while True:
+    print("Are we there yet?")
+    # I'm bored
+""".strip(),
+            "",
+            15,
+            0,
+        )
+        for q in pre:
+            q.finish()
+        self.add(p)
+        self.play(
+            self.camera.frame.animate.align_to(infinite, DOWN),
+            run_time=3,
+        )
+        self.wait(1)
+        self.play(infinite.show_output())
+        self.wait(1)
+        waiting = Circle().scale(0.3).next_to(infinite.group, RIGHT)
+        infinite.group.add(waiting)
+        self.play(FadeIn(waiting))
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
         self.wait(5)
