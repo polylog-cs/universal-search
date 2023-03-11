@@ -1,5 +1,7 @@
 import math
 
+from manim import *
+
 from .utilgeneral import *
 
 
@@ -174,7 +176,15 @@ class ProgramInvocation(VMobject):
             .arrange()
             .shift(3 * LEFT)
         )
-        self.wheel = SVGMobject("img/gear.svg").scale(0.3).set_fill(GRAY)
+        self.wheel = (
+            SVGMobject("img/gear.svg")
+            .scale(0.3)
+            .set_fill(GRAY)
+            .set_stroke_width(0)
+            .set_background_stroke_width(0)
+            .set_sheen_direction((0, 0, 0))
+            .set_sheen_factor(0)
+        )
         self.add(self.group)
 
     def arrange(self):
@@ -196,22 +206,22 @@ class ProgramInvocation(VMobject):
 
     def step(self):
         self.wheels += 1
+        target_angle = -math.radians(90)
         self.group.add(self.wheel.copy())
         cur = self.group[-1]
+        cur.save_state()
+        cur.rotate(target_angle)
         self.arrange()
 
         old_obj = self.wheel.copy().next_to(cur, LEFT)
         old_pos = old_obj.get_center()
         target_pos = cur.get_center()
-        target_angle = -math.radians(90)
-        prev_rotation = 0
 
         def update(obj, alpha):
-            nonlocal prev_rotation
-            obj.rotate(-prev_rotation + alpha * target_angle).move_to(
-                alpha * target_pos + (1 - alpha) * old_pos
-            ).set_fill(opacity=alpha)
-            prev_rotation = alpha * target_angle
+            obj.restore()
+            obj.move_to(alpha * target_pos + (1 - alpha) * old_pos).set_fill(
+                opacity=alpha
+            ).rotate(alpha * target_angle)
 
         return UpdateFromAlphaFunc(
             cur, update, rate_func=rate_functions.ease_in_out_quad
