@@ -246,6 +246,7 @@ class MonkeyTyping(Scene):
         return
 
 
+# Smaller values for faster preview
 NUM_DOTS = 5
 NUM_AROUND = 5
 # NUM_DOTS = 30
@@ -255,7 +256,6 @@ STDOUT = "2 2"
 INFINITE_PROGRAM = """
 while True:
     print("Are we there yet?")
-    # I'm bored
 """.strip()
 
 
@@ -279,7 +279,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.add(p)  # To display the newly added programs
 
         self.play(
-            self.camera.frame.animate.align_to(banana, DOWN),
+            self.camera.frame.animate.align_to(banana.get_bottom() + 0.1 * DOWN, DOWN),
             run_time=3,
         )
         self.play(
@@ -296,8 +296,12 @@ class ProgramsWithoutStepping(MovingCameraScene):
             INFINITE_PROGRAM, "", NUM_AROUND, 0
         )
         self.add(p)
+        for q in pre:
+            q.finish()
         self.play(
-            self.camera.frame.animate.align_to(infinite, UP),
+            self.camera.frame.animate.align_to(
+                infinite.get_bottom() + 0.1 * DOWN, DOWN
+            ),
             run_time=3,
         )
         self.wait(2)
@@ -316,11 +320,18 @@ class ProgramsWithoutStepping(MovingCameraScene):
         def rotate(obj):
             obj.rotate(angle_per_s / config.frame_rate)
 
+        infinite.add(waiting)
         waiting.add_updater(rotate)
         self.play(FadeIn(waiting))
 
         self.wait(3, frozen_frame=False)
+        self.play(
+            FadeOut(p[:-1]),
+            infinite.animate.align_to(self.camera.frame.get_top() + 0.1 * DOWN, UP),
+        )
         self.play(FadeOut(waiting), FadeOut(infinite.stdout))
+        self.play(infinite.dumb_down())
+        infinite.arrange()
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
         self.wait(2)
@@ -329,20 +340,22 @@ class ProgramsWithoutStepping(MovingCameraScene):
 class ProgramsWithStepping(MovingCameraScene):
     def construct(self):
         default()
-        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT + 3 * UP)
-        _, (pre, infinite, post) = p.add_programs_around(
-            INFINITE_PROGRAM, "", NUM_AROUND, 0
-        )
+        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT)
+        p.add_programs_around(INFINITE_PROGRAM, "", 0, 0)
         self.add(p)
-        self.camera.frame.align_to(infinite, UP)
+        self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
+        p[0].dumb_down(animate=False)
         self.wait(1)
-        self.play(infinite.dumb_down())
+        self.play(FadeIn(p.arrow))
+        for _ in range(20):
+            self.play(AnimationGroup(*p.step(), lag_ratio=0.5))
 
         # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we use that our problem is factoring and not something else.
+        self.wait(5)
 
 
 class Part1Rest(Scene):
