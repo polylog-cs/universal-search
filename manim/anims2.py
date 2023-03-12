@@ -246,17 +246,25 @@ class MonkeyTyping(Scene):
         return
 
 
+NUM_DOTS = 5
+NUM_AROUND = 5
+# NUM_DOTS = 30
+# NUM_AROUND = 15
+STDIN = "4"
+STDOUT = "2 2"
+INFINITE_PROGRAM = """
+while True:
+    print("Are we there yet?")
+    # I'm bored
+""".strip()
+
+
 class ProgramsWithoutStepping(MovingCameraScene):
     def construct(self):
         default()
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
-        NUM_DOTS = 5
-        NUM_AROUND = 5
-        # NUM_DOTS = 30
-        # NUM_AROUND = 15
-        stdin = "4"
-        p = ProgramInvocationList(stdin, "2 2", 6 * LEFT + 3 * UP)
+        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT + 3 * UP)
         self.play(
             AnimationGroup(
                 *p.add_programs_around("a", "SyntaxError", 0, 10)[0], lag_ratio=0.1
@@ -285,14 +293,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
 
         p.add_dots(NUM_DOTS)
         _, (pre, infinite, post) = p.add_programs_around(
-            """
-while True:
-    print("Are we there yet?")
-    # I'm bored
-""".strip(),
-            "",
-            NUM_AROUND,
-            0,
+            INFINITE_PROGRAM, "", NUM_AROUND, 0
         )
         self.add(p)
         self.play(
@@ -319,15 +320,24 @@ while True:
         self.play(FadeIn(waiting))
 
         self.wait(3, frozen_frame=False)
-        self.play(FadeOut(waiting))
+        self.play(FadeOut(waiting), FadeOut(infinite.stdout))
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
         self.wait(2)
 
 
-class ProgramsWithStepping(Scene):
+class ProgramsWithStepping(MovingCameraScene):
     def construct(self):
         default()
+        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT + 3 * UP)
+        _, (pre, infinite, post) = p.add_programs_around(
+            INFINITE_PROGRAM, "", NUM_AROUND, 0
+        )
+        self.add(p)
+        self.camera.frame.align_to(infinite, UP)
+        self.wait(1)
+        self.play(infinite.dumb_down())
+
         # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
