@@ -251,6 +251,10 @@ class ProgramsWithoutStepping(MovingCameraScene):
         default()
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
+        NUM_DOTS = 5
+        NUM_AROUND = 5
+        # NUM_DOTS = 30
+        # NUM_AROUND = 15
         stdin = "4"
         p = ProgramInvocationList(stdin, "2 2", 6 * LEFT + 3 * UP)
         self.play(
@@ -260,9 +264,9 @@ class ProgramsWithoutStepping(MovingCameraScene):
         )
         self.play(AnimationGroup(*(q.finish() for q in p[:3]), lag_ratio=0.8))
         self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
-        p.add_dots(30),
+        p.add_dots(NUM_DOTS),
         _, (pre, banana, post) = p.add_programs_around(
-            'print("banana")', "banana", 15, 10
+            'print("banana")', "banana", NUM_AROUND, NUM_AROUND
         )
         self.add(p)  # To display the newly added programs
 
@@ -270,14 +274,16 @@ class ProgramsWithoutStepping(MovingCameraScene):
             self.camera.frame.animate.align_to(banana, DOWN),
             run_time=3,
         )
-        self.play(AnimationGroup(*(q.finish() for q in pre[-10:]), lag_ratio=0.2))
+        self.play(
+            AnimationGroup(*(q.finish() for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
+        )
         self.play(banana.finish())
         for q in post:
             q.finish()
 
         # That’s the main idea. There are just a few small problems with this approach: the most important one is that at some point we encounter algorithms with infinite loops that do not terminate, like this one:
 
-        p.add_dots(30)
+        p.add_dots(NUM_DOTS)
         _, (pre, infinite, post) = p.add_programs_around(
             """
 while True:
@@ -285,28 +291,41 @@ while True:
     # I'm bored
 """.strip(),
             "",
-            15,
+            NUM_AROUND,
             0,
         )
-        for q in pre:
-            q.finish()
         self.add(p)
         self.play(
-            self.camera.frame.animate.align_to(infinite, DOWN),
+            self.camera.frame.animate.align_to(infinite, UP),
             run_time=3,
         )
-        self.wait(1)
+        self.wait(2)
         self.play(infinite.show_output())
-        self.wait(1)
-        waiting = Circle().scale(0.3).next_to(infinite.group, RIGHT)
-        infinite.group.add(waiting)
+        self.wait(2)
+        waiting_big = Circle(color=YELLOW, stroke_width=8, radius=0.2).next_to(
+            infinite.group, RIGHT
+        )
+        waiting_small = Arc(color=ORANGE, stroke_width=8, radius=0.2).shift(
+            waiting_big.get_center()
+        )
+        waiting = VGroup(waiting_big, waiting_small)
+
+        angle_per_s = math.radians(-120)
+
+        def rotate(obj):
+            obj.rotate(angle_per_s / config.frame_rate)
+
+        waiting.add_updater(rotate)
         self.play(FadeIn(waiting))
 
+        self.wait(3, frozen_frame=False)
+        self.play(FadeOut(waiting))
+
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
-        self.wait(5)
+        self.wait(2)
 
 
-class Part1Rest(Scene):
+class ProgramsWithStepping(Scene):
     def construct(self):
         default()
         # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
@@ -315,6 +334,10 @@ class Part1Rest(Scene):
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we use that our problem is factoring and not something else.
 
+
+class Part1Rest(Scene):
+    def construct(self):
+        default()
         # And that’s basically the whole algorithm. In the actual code we shared with you, we simulated Brainfuck programs instead of Python programs because it was suggested to us by a higher authority [konverzace s ChatGPT], but in this explanation, let’s stick with Python.
 
         gpt_img = ImageMobject("img/chatgpt.jpg").scale_to_fit_height(8)
