@@ -37,6 +37,9 @@ class Polylogo(Scene):
         self.wait()
 
 
+soft_color = BASE02
+soft_opacity = 0.3
+
 class Intro(Scene):
     def construct(self):
         default()
@@ -74,8 +77,97 @@ class Intro(Scene):
 
 
         mult_objects, mult_anims = multiplication_animation(
-            num1, num2, num1_tex, num2_tex
+            self, num1, num2, num1_tex, num2_tex
         )
+
+
+        nums_intermediate = []
+        tmp = num2
+        while tmp > 0:
+            digit = tmp % 10
+            tmp //= 10
+            nums_intermediate.append(digit * num1)
+        num = num1 * num2
+
+        num_tex = Tex(str(num))
+        nums_intermediate_tex = [Tex(str(n), z_index = 10) for n in nums_intermediate]
+
+        line1 = Line(start=num2_tex.get_left() + 0.3*LEFT, end=num2_tex.get_right(), color=GRAY)
+        line2 = line1.copy()
+        num1_tex_target = num1_tex.copy()
+        num2_tex_target = num2_tex.copy()
+        
+        objects = Group(
+            num1_tex_target,
+            num2_tex_target,
+            line1,
+            *nums_intermediate_tex,
+            line2,
+            num_tex,
+        ).arrange_in_grid(cols=1, cell_alignment=RIGHT)
+        times_tex = Tex(r"$\times$").next_to(num2_tex_target, LEFT, buff = 0.1)
+
+        for i in range(1, len(nums_intermediate_tex)):
+            nums_intermediate_tex[i].align_to(nums_intermediate_tex[i - 1][0][-2], RIGHT)
+        nums_intermediate_rec = [SurroundingRectangle(num, buff = 0.1, color = soft_color, fill_color = soft_color, fill_opacity = soft_opacity, z_index = 0) for num in nums_intermediate_tex]
+
+        objects.remove(line2)
+        line2 = Line(
+                start=nums_intermediate_tex[-1].get_left()[0] * RIGHT
+                + line2.get_center()[1] * UP,
+                end=nums_intermediate_tex[0].get_right()[0] * RIGHT
+                + line2.get_center()[1] * UP,
+                color=GRAY,
+            )
+        objects.add(line2)
+        # animations
+
+        self.play(
+            Transform(num1_tex, num1_tex_target),
+            Transform(num2_tex, num2_tex_target),
+        )
+        self.play(
+            FadeIn(times_tex),
+            FadeIn(line1)
+        )
+
+
+        rec = SurroundingRectangle(num2_tex[0][-1], buff = 0.1, color = soft_color, fill_opacity = soft_opacity, fill_color = soft_color, z_index = 0)
+        rec2 = nums_intermediate_rec[0]
+
+        for i in range(len(str(num2))):
+            if i == 0:
+                self.play(
+                    FadeIn(rec),
+                    FadeIn(nums_intermediate_tex[i]),
+                    FadeIn(rec2),
+                )
+            else:
+                self.play(
+                    rec.animate.move_to(num2_tex[0][-i-1].get_center()),
+                    FadeIn(nums_intermediate_tex[i]),
+                    Transform(rec2, nums_intermediate_rec[i]),
+                )
+        self.play(FadeOut(rec), FadeOut(nums_intermediate_rec[-1]))
+        self.wait()
+
+        return
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
         # mult_objects = Group(
         #     num1_tex,
         #     num2_tex,
@@ -114,7 +206,7 @@ class Intro(Scene):
 
 
         # Well, you can check whether that input number is divisible by 2,3,4,5 and so on, until you hit a factor. But if the number on input has n digits, its size is up to 10^n and hence you will need up to sqrt( 10^n) steps before you find a factor.
-
+        return
         brace = Brace(div_objects[0], DOWN)
         sqrt_tex = Tex(
             r"{{$n$ digits}}{{$\Rightarrow$ size up to $10^n$}}{{$\Rightarrow$ up to $\sqrt{10^n}$ steps}}"

@@ -301,6 +301,12 @@ while True:
         waiting = Circle().scale(0.3).next_to(infinite.group, RIGHT)
         infinite.group.add(waiting)
         self.play(FadeIn(waiting))
+        ''' TODO mozna nekam dodat checkovaci algoritmus
+        try a,b = output
+        if a*b == n: tick
+        else krizek
+        nebo tak neco
+        '''
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
         self.wait(5)

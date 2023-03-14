@@ -5,7 +5,7 @@ from manim import *
 from .utilgeneral import *
 
 
-def multiplication_animation(num1, num2, obj1, obj2):
+def multiplication_animation(scene, num1, num2, obj1, obj2):
     # TODO dá se získat text v obj1?
     # create objects
 
@@ -36,34 +36,53 @@ def multiplication_animation(num1, num2, obj1, obj2):
     for i in range(1, len(nums_intermediate_tex)):
         nums_intermediate_tex[i].align_to(nums_intermediate_tex[i - 1][0][-2], RIGHT)
 
-    # print(line2.get_center())
-
     objects.remove(line2)
-    objects.add(
-        Line(
+    line2 = Line(
             start=nums_intermediate_tex[-1].get_left()[0] * RIGHT
             + line2.get_center()[1] * UP,
             end=nums_intermediate_tex[0].get_right()[0] * RIGHT
             + line2.get_center()[1] * UP,
             color=GRAY,
         )
-    )
-
-    # print(line2.get_center())
-
+    objects.add(line2)
     # animations
 
-    anims1 = Succession(
+    
+    anims1 = [
         ReplacementTransform(obj1, num1_tex),
         ReplacementTransform(obj2, num2_tex),
-        FadeIn(objects),
+        FadeIn(line1)
+    ]
+
+    rec = SurroundingRectangle(num2_tex[0][-1], buff = 0.1, color = RED)
+    print(len(str(num2)))
+    for i in range(len(str(num2))):
+        if i == 0:
+            anims1.append(
+                AnimationGroup(
+                    FadeIn(rec),
+                    FadeIn(nums_intermediate_tex[i]),
+                )
+            )
+        else:
+            anims1.append(
+                AnimationGroup(
+                    rec.animate.move_to(num2_tex[0][-i-1].get_center()),
+                    FadeIn(nums_intermediate_tex[i])
+                )
+            )
+            rec.move_to(num2_tex[0][-i-1].get_center()),
+    anims1.append(
+        FadeOut(rec)
     )
+    anims1.append(Wait())
+    rec.move_to(num2_tex[0][-1].get_center())
 
     anims2 = AnimationGroup(
         FadeOut(objects),
     )
 
-    return objects, [anims1, anims2]
+    return objects, [Succession(*anims1), anims2]
 
 
 def division_animation(num, obj):
