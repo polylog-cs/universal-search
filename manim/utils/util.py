@@ -254,9 +254,16 @@ class ProgramInvocation(VMobject):
             suspend_mobject_updating=True,
         )
 
-    def dumb_down(self):
-        new_code = ProgramInvocation._make_code("...").move_to(self.code)
-        return self.code.animate.become(new_code)
+    def dumb_down(self, animate=True):
+        new_code = (
+            ProgramInvocation._make_code("[code]")
+            .move_to(self.code)
+            .align_to(self.code, LEFT)
+        )
+        if animate:
+            return self.code.animate.become(new_code)
+        else:
+            return self.code.become(new_code)
 
 
 program_alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ \n"
@@ -324,6 +331,15 @@ class ProgramInvocationList(VGroup):
         self.arrange()
         self.add_updater(ProgramInvocationList.arrange)
         self.dots = ProgramInvocation("...", self.stdin, "", False)
+        self.dummy = ProgramInvocation("[code]", self.stdin, "", False)
+        self.ptr = 0
+        self.arrow = (
+            Arrow(start=RIGHT, end=LEFT)
+            .move_to(self.top_pos)
+            .shift(0.3 * DOWN)
+            .set_x(6)
+        )
+        self.now_adding = False
 
     def arrange(self):
         for prev, program in zip(self, self[1:]):
@@ -342,6 +358,9 @@ class ProgramInvocationList(VGroup):
 
     def add_dots(self, reps=1):
         return [self.add_program(self.dots.copy()) for _ in range(reps)]
+
+    def add_dummy(self, reps=1):
+        return [self.add_program(self.dummy.copy()) for _ in range(reps)]
 
     def add_programs_around(self, code, code_stdout, before=0, after=0):
         anims = []
@@ -367,3 +386,26 @@ class ProgramInvocationList(VGroup):
             else:
                 important_program = self[-1]
         return anims, (pre, important_program, post)
+
+    def point_arrow_at(self, i):
+        target = self.arrow.copy().next_to(self[i], RIGHT).set_x(6)
+        return self.arrow.animate.become(target)
+
+    def step(self):
+        anims = []
+        oldlen = len(self)
+        if self.now_adding:
+            anims_dummy = self.add_dummy()
+            anims.append(self.point_arrow_at(self.ptr + 1))
+            anims.append(*anims_dummy)
+            self.now_adding = False
+        else:
+            step = self[self.ptr].step()
+            anims.append(self.point_arrow_at(self.ptr))
+            anims.append(step)
+            if self.ptr == oldlen - 1:
+                self.now_adding = True
+                return anims
+
+        self.ptr = (self.ptr + 1) % oldlen
+        return anims
