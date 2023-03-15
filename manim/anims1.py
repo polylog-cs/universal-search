@@ -1,7 +1,7 @@
 from manim import *
 import manim as m  # hack for type hinting
 from utils import *
-
+# -r 
 # ^ also imports manim and changes some of its defaults
 
 class Polylogo(Scene):
@@ -38,11 +38,12 @@ class Polylogo(Scene):
 
 
 soft_color = BASE02
-soft_opacity = 0.3
+soft_opacity = 0.0
 
 class Intro(Scene):
     def construct(self):
         default()
+        self.next_section(skip_animations=False)
 
         # What if I asked you to multiply two long primes, each with n digits? That’s simple, you can just use the algorithm you know from school,
 
@@ -76,11 +77,6 @@ class Intro(Scene):
         self.wait()
 
 
-        mult_objects, mult_anims = multiplication_animation(
-            self, num1, num2, num1_tex, num2_tex
-        )
-
-
         nums_intermediate = []
         tmp = num2
         while tmp > 0:
@@ -109,13 +105,13 @@ class Intro(Scene):
 
         for i in range(1, len(nums_intermediate_tex)):
             nums_intermediate_tex[i].align_to(nums_intermediate_tex[i - 1][0][-2], RIGHT)
-        nums_intermediate_rec = [SurroundingRectangle(num, buff = 0.1, color = soft_color, fill_color = soft_color, fill_opacity = soft_opacity, z_index = 0) for num in nums_intermediate_tex]
+        nums_intermediate_rec = [SurroundingRectangle(num, buff = 0.1, color = soft_color,  stroke_opacity = soft_opacity, fill_color = soft_color, fill_opacity = soft_opacity, z_index = 0) for num in nums_intermediate_tex]
 
         objects.remove(line2)
         line2 = Line(
-                start=nums_intermediate_tex[-1].get_left()[0] * RIGHT
+                end=nums_intermediate_tex[-1].get_left()[0] * RIGHT
                 + line2.get_center()[1] * UP,
-                end=nums_intermediate_tex[0].get_right()[0] * RIGHT
+                start=nums_intermediate_tex[0].get_right()[0] * RIGHT
                 + line2.get_center()[1] * UP,
                 color=GRAY,
             )
@@ -132,82 +128,133 @@ class Intro(Scene):
         )
 
 
-        rec = SurroundingRectangle(num2_tex[0][-1], buff = 0.1, color = soft_color, fill_opacity = soft_opacity, fill_color = soft_color, z_index = 0)
+        rec = SurroundingRectangle(num2_tex[0][-1], buff = 0.1, color = soft_color, stroke_opacity = soft_opacity, fill_opacity = soft_opacity, fill_color = soft_color, z_index = 0)
         rec2 = nums_intermediate_rec[0]
 
         for i in range(len(str(num2))):
             if i == 0:
                 self.play(
-                    FadeIn(rec),
+                    #FadeIn(rec),
                     FadeIn(nums_intermediate_tex[i]),
-                    FadeIn(rec2),
+                    #FadeIn(rec2),
+                    run_time = 0.3
                 )
             else:
                 self.play(
-                    rec.animate.move_to(num2_tex[0][-i-1].get_center()),
+                    #rec.animate.move_to(num2_tex[0][-i-1].get_center()),
                     FadeIn(nums_intermediate_tex[i]),
-                    Transform(rec2, nums_intermediate_rec[i]),
+                    #Transform(rec2, nums_intermediate_rec[i]),
+                    run_time = 0.3
                 )
-        self.play(FadeOut(rec), FadeOut(nums_intermediate_rec[-1]))
+        #self.play(FadeOut(rec), FadeOut(rec2))
         self.wait()
 
-        return
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        # mult_objects = Group(
-        #     num1_tex,
-        #     num2_tex,
-        #     line1,
-        #     *nums_intermediate_tex,
-        #     num_tex,
-        #     line2,
-        # )
-
-        self.play(mult_anims[0])
+        self.play(
+            Create(line2)
+        )
+        self.play(
+            Succession(
+                *[
+                    AnimationGroup(FadeIn(let), run_time = 0.2)
+                    for let in reversed(num_tex[0])
+                ]
+            )
+        )
         self.wait()
+
 
         # it takes only roughly n^2 steps to compute the result.
 
-        border = SurroundingRectangle(Group(*mult_objects[3:-2]), color=RED)
-        brace = Brace(border, RIGHT)
+        border = SurroundingRectangle(Group(*nums_intermediate_tex), color=RED, fill_opacity = 0.1, fill_color = RED)
+        #brace = Brace(border, RIGHT)
         n2_tex = Tex(r"$n^2$ operations").next_to(brace, RIGHT)
 
         self.play(
             FadeIn(border),
-            FadeIn(brace),
+            #FadeIn(brace),
             FadeIn(n2_tex),
         )
         self.wait()
 
-        res_tex = mult_objects[-2].copy()
-        self.add(res_tex)
-
         self.play(
-            mult_anims[1],
-            FadeOut(*Group(border, brace, n2_tex)),
+            FadeOut(objects[2:-2]),
+            FadeOut(num1_tex),
+            FadeOut(num2_tex),
+            FadeOut(objects[-1]),
+            FadeOut(times_tex),
+            FadeOut(*Group(border, n2_tex)),
         )
         self.wait()
 
         # But what about the opposite problem where I give you a product of two primes and ask you to find the prime factors. How do you solve that one?
 
-
+        self.next_section(skip_animations=False)
         # Well, you can check whether that input number is divisible by 2,3,4,5 and so on, until you hit a factor. But if the number on input has n digits, its size is up to 10^n and hence you will need up to sqrt( 10^n) steps before you find a factor.
-        return
-        brace = Brace(div_objects[0], DOWN)
+
+
+        sc = 1.2
+        num_tex.generate_target()
+        num_tex.target = Tex(num).scale(sc).to_edge(LEFT).shift(0.6*RIGHT + 2*UP)
+        div_sign = Tex(r"/").scale(sc).next_to(num_tex.target, RIGHT)
+        eq_sign = Tex(r"=").scale(sc).next_to(num_tex.target, RIGHT).shift(3.2 * RIGHT)
+    
+        objects = Group(num_tex)
+
+        self.play(
+            MoveToTarget(num_tex),
+        )
+        self.play(
+            FadeIn(Group(div_sign, eq_sign)),
+        )
+
+
+        divisors = []
+        divisors += list(range(2, 8))
+        for l in range(1, len(num_tex[0])):
+            for _ in range(5):
+                div = random.randrange(10**l, 10**(l+1)-1)
+                if div < num1:
+                    divisors.append(div)
+        divisors.sort()
+
+
+        pairs = []
+        for div in divisors:
+            tex1 = Tex(str(div)).scale(sc).next_to(eq_sign, LEFT)
+            n = '{:.2f}'.format(round(num/div, 3))
+            tex2 = Tex(r"{{" + n.split(".")[0] + r"}}{{." + n.split(".")[1] + r"$\dots$}}").scale(sc if len(str(round(num/div))) <= 12 else 1 ).next_to(eq_sign, RIGHT)
+            pairs.append([tex1, tex2])
+
+        for pair in pairs:
+            pair[1][1].set_color(RED)
+
+        pairs.append(
+            [Tex(str(num1)).scale(sc).next_to(eq_sign, LEFT).set_color(GREEN), Tex(str(num2)).scale(sc).next_to(eq_sign, RIGHT).set_color(GREEN)]
+        )
+
+        fst = True
+        for i in range(len(pairs)):
+            if fst == True:
+                fst = False
+                self.play(
+                    FadeIn(Group(*pairs[i])),
+                )
+            else:
+                g = Group(*pairs[i])
+                for j in [0,1]:
+                    pairs[i][j].save_state()
+                g.shift(1*DOWN).set_color(BACKGROUND_COLOR)
+                self.play(
+                    Group(*pairs[i-1]).animate.shift(1*UP).set_color(BACKGROUND_COLOR),
+                    *[pairs[i][j].animate.restore() for j in [0,1]]
+                )
+
+
+        self.wait(2)
+
+        self.next_section(skip_animations=False)
+
+        brace = Brace(num_tex, DOWN).shift(0.3*DOWN)
         sqrt_tex = Tex(
             r"{{$n$ digits}}{{$\Rightarrow$ size up to $10^n$}}{{$\Rightarrow$ up to $\sqrt{10^n}$ steps}}"
         )
@@ -218,11 +265,6 @@ class Intro(Scene):
         self.play(FadeIn(brace), FadeIn(sqrt_tex[0]))
         self.wait()
 
-        # TODO animace divisibility
-        div_objects, div_anims = division_animation(num1 * num2, res_tex)
-        self.play(div_anims[0])
-        self.wait()
-
 
         self.play(FadeIn(sqrt_tex[1]))
         self.wait()
@@ -230,17 +272,16 @@ class Intro(Scene):
         self.wait()
 
         # This is much slower than the time n^2 it takes to multiply two numbers.
-        formula_tex = Tex(r"$n^2 \ll \sqrt{10^n}$").next_to(sqrt_tex[1], RIGHT, buff=2)
-
+        formula_tex = Tex(r"{{$\sqrt{10^n}$}}{{$\gg n^2$}}").next_to(sqrt_tex[1], RIGHT, buff = 3)
         self.play(
-            Succession(
-                sqrt_tex[2][5:10]
-                .copy()
-                .animate.move_to(formula_tex[0][3:].get_center()),  # TODO
-                FadeIn(formula_tex[0][0:3]),
-            )
+            sqrt_tex[2][5:10]
+            .copy()
+            .animate.move_to(formula_tex[0][0].get_center()),
         )
-        self.wait()
+        self.play(
+            FadeIn(formula_tex[1]),
+        )
+        self.wait(2)
 
 
 
@@ -274,7 +315,7 @@ class Factoring(Scene):
 
 
 
-class Asymptotics(Scene):
+class Asymptotics(Scene): # TODO zmenit placeholdery na obrazky
     def construct(self):
         default()
 
@@ -286,13 +327,13 @@ class Asymptotics(Scene):
         )
         self.wait()
         
-        badge_img = ImageMobject("img/badge_downscaled.png").scale_to_fit_width(6)
-        badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
-        badge_group = Group(badge_img, badge_tex)
+        badge_img = ImageMobject("img/badge_text.png").scale_to_fit_width(6)
+        #badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
+        badge_group = Group(badge_img)
 
 
         badge_group.generate_target()
-        badge_group.target.scale(0.7).align_to(our_algo_img, DR).shift(1*DOWN)
+        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5*DOWN)
 
         our_algo = Group(
             our_algo_img,
@@ -301,14 +342,38 @@ class Asymptotics(Scene):
 
         # TODO double check it is ok to use this image: https://gallery.yopriceville.com/Free-Clipart-Pictures/Badges-and-Labels-PNG/Green_Classic_Seal_Badge_PNG_Clipart#.ZAaV6dLMJkg
         
+        self.add_sound("audio/tada_success.mp3")
         self.play(
             FadeIn(badge_group)
         )
         self.wait()
+        
         self.play(
             MoveToTarget(badge_group)
         )
         self.wait()
+
+        our_group = Group(our_algo_img, badge_group)
+        self.play(
+            our_group.animate.scale_to_fit_height(3).move_to(3*RIGHT)
+        )
+        self.wait()
+        your_algo_img = ImageMobject("img/you.png").scale_to_fit_height(3).move_to(3*LEFT)
+        self.play(
+            FadeIn(your_algo_img)
+        )
+        self.wait()
+        self.play(
+            our_group.animate.scale(1.3),
+            run_time = 0.5
+        )
+        self.play(
+            our_group.animate.scale(1/1.3),
+            run_time = 0.5
+        )
+        self.wait()
+        
+
 
         target_size = 0.5
         scale_width = target_size / our_algo.width
