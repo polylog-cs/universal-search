@@ -369,7 +369,17 @@ class Part1Rest(Scene):
         default()
         # And that’s basically the whole algorithm. In the actual code we shared with you, we simulated Brainfuck programs instead of Python programs because it was suggested to us by a higher authority [konverzace s ChatGPT], but in this explanation, let’s stick with Python.
 
-        gpt_img = ImageMobject("img/chatgpt.jpg").scale_to_fit_height(8)
+        gpt_img = ImageMobject("img/chatgpt.png").scale_to_fit_height(8)
+        self.play(
+            FadeIn(gpt_img)
+        )
+        self.wait()
+        self.play(
+            FadeOut(gpt_img)
+        )
+        self.wait()
+
+        return
 
         # This algorithm was discovered by Leonid Levin in the early 1970’s and now it is known as the universal search, so I will use this name from now on.  [Levin s thug life glasses?] I hope that now you can intuitively see how it can happen that we have no idea what the time complexity of the universal search is and also why it is so slow that it struggles to factor the number 4. [Zopakovat ty dva body]
 
