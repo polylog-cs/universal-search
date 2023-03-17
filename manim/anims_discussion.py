@@ -223,7 +223,7 @@ class Discussion2(Scene):
             points = HilbertCurve(iter, 2).points_from_distances(distances)
             points = [[p[0], p[1], 0] for p in points]
             print(points)
-            curve = Polygon(*points, color=RED).scale_to_fit_width(
+            curve = Polygon(*points, *reversed(points), color=RED).scale_to_fit_width(
                 3 * (1 - 2 ** (-iter))
             )
             bounding_square = (
