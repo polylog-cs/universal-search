@@ -108,8 +108,8 @@ class UniversalSearch:
         k = 1
         while True:
             # Generates all possible tuples of length k made up from characters of the
-            # alphabet. Returns a generator, so the next program is always generated
-            # only once it is needed.
+            # brainfuck alphabet. Returns a generator, so the next program is always 
+            # generated only once it is needed.
             all_k_character_programs = itertools.combinations_with_replacement(
                 alphabet, k
             )
@@ -117,7 +117,7 @@ class UniversalSearch:
                 yield "".join(program)
             k += 1
 
-    # Function to be implemented by the user that returns True if the output is correct.
+    # Function to be implemented by the user; returns True if the output is correct.
     def check(self, output: str) -> bool:
         pass
 
