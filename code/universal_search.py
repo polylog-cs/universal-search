@@ -1,23 +1,24 @@
 """
 This program [*] is an asymptotically optimal algorithm for factoring a number that is a
-product of two primes.  
+product of two primes.
 
-It is based on simulating all Brainfuck programs in lexicographical order. 
+It is based on simulating all Brainfuck programs in lexicographical order.
 
 Brainfuck is a minimalist language consisting of just 8 commands: > < + - , . [ ]
 For details, see https://esolangs.org/wiki/Brainfuck
 
 [*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable
-programming language like Python and make a few more small changes.   
+programming language like Python and make a few more small changes.
 """
 
 import itertools
 import sys
 
+
 class BrainfuckExecution:
     """
     This class represents a single execution of a Brainfuck program. It is initialized
-    with the program and the input. It can be stepped through one command at a time. 
+    with the program and the input. It can be stepped through one command at a time.
     """
 
     def __init__(self, program: str, input: str):
@@ -88,9 +89,9 @@ class UniversalSearch:
     This class represents a universal search algorithm that is used to find a program
     that takes the input and computes the output. We generate all programs in an
     exhaustive manner, and execute them in parallel. When we start
-    executing the n-th program, we simulate 1 step of the n-th program, 2 steps 
-    of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps 
-    of the (n - 3)-th program, etc. When a program finishes, we check its output 
+    executing the n-th program, we simulate 1 step of the n-th program, 2 steps
+    of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps
+    of the (n - 3)-th program, etc. When a program finishes, we check its output
     and if it is correct, we stop the search.
     """
 
@@ -108,7 +109,7 @@ class UniversalSearch:
         k = 1
         while True:
             # Generates all possible tuples of length k made up from characters of the
-            # brainfuck alphabet. Returns a generator, so the next program is always 
+            # brainfuck alphabet. Returns a generator, so the next program is always
             # generated only once it is needed.
             all_k_character_programs = itertools.combinations_with_replacement(
                 alphabet, k
@@ -165,14 +166,21 @@ class UniversalFactorization(UniversalSearch):
 
 class UniversalSort(UniversalSearch):
     def check(self, output: str) -> bool:
-        # TODO risa
-        # predpokladame self.input je list cisel nebo tak neco
-        # checkneme jestli output je list cisel
-        # hodime je to hash tabulky, to same pro input, checkneme jestli je to to same
-        # zcheckneme ze output je monotonni
-        # muzeme a nemusime resit co kdyz na inputu je to same cislo dvakrat
+        def split_to_ints(string):
+            return [int(x) for x in string.split(",")]
 
-        pass
+        in_list = split_to_ints(self.input)
+        try:
+            out_list = split_to_ints(output)
+        except ValueError:
+            return False
+        # We assume the input doesn't contain the same number twice
+        if set(out_list) != set(in_list):
+            return False
+        for i in range(len(out_list) - 1):
+            if out_list[i] > out_list[i + 1]:
+                return False
+        return True
 
 
 def main():
