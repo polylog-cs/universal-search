@@ -51,9 +51,10 @@ class Discussion1(Scene):
         # You can see how these options get increasingly abstract and as they are getting more abstract, they are also getting easier to work with. In one extreme, analyzing an algorithm empirically is pretty hard and even impossible to do for nontrivial values of n, because there are too many inputs to check. On the other hand, understanding whether an algorithm runs in polynomial time is often really easy.
 
         arrow1 = Arrow(
-            start=empirical_img.get_center(), end=poly_tex.get_center(), buff=0
+            start=empirical_img.get_center(), end=poly_tex.get_center(), buff=0,
         ).next_to(Group(empirical_img, poly_tex, tick), DOWN)
-        # TODO pridat duhu
+        arrow1.set_color(color=[GREEN, GREEN, YELLOW, RED])
+        arrow1.tip.set_color(GREEN)
 
         self.play(Create(arrow1))
         self.wait()
@@ -87,6 +88,8 @@ class Discussion1(Scene):
         arrow2 = Arrow(
             start=poly_tex.get_center(), end=empirical_img.get_center(), buff=0
         ).next_to(Group(empirical_img, poly_tex, tick), UP)
+        arrow2.set_color(color=[RED, YELLOW, GREEN, GREEN])
+        arrow2.tip.set_color(GREEN)
 
         self.play(FadeIn(arrow2))
         self.wait()
