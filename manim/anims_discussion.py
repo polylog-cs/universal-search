@@ -230,7 +230,7 @@ class Discussion2(Scene):
                 Square(color=GRAY).scale_to_fit_width(
                     3).move_to(curve.get_center())
             )
-            return Group(bounding_square, curve)
+            return VGroup(bounding_square, curve)
 
         curves = (
             Group(
@@ -252,13 +252,14 @@ class Discussion2(Scene):
             .next_to(hilberttitle_tex, DOWN)
         )
 
+        run_time = 2
         self.play(
             Succession(
-                FadeIn(curves[0]),
-                FadeIn(curves[1]),
-                FadeIn(curves[2]),
+                Write(curves[0], run_time=run_time),
+                Write(curves[1], run_time=run_time),
+                Write(curves[2], run_time=run_time),
                 FadeIn(curves[3]),
-                FadeIn(curves[4]),
+                Write(curves[4], run_time=run_time),
                 FadeIn(hilberttitle_tex),
                 FadeIn(hilbertexplanation_tex),
             )
