@@ -194,9 +194,9 @@ class Intro(Scene):
 
         sc = 1.2
         num_tex.generate_target()
-        num_tex.target = Tex(num).scale(sc).to_edge(LEFT).shift(0.6*RIGHT + 2*UP)
+        num_tex.target = Tex(num).scale(sc).to_edge(LEFT).shift(0.3*RIGHT + 1.5*UP)
         div_sign = Tex(r"/").scale(sc).next_to(num_tex.target, RIGHT)
-        eq_sign = Tex(r"=").scale(sc).next_to(num_tex.target, RIGHT).shift(3.2 * RIGHT)
+        eq_sign = Tex(r"=").scale(sc).next_to(num_tex.target, RIGHT).shift(2.8 * RIGHT)
     
         objects = Group(num_tex)
 

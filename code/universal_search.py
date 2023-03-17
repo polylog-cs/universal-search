@@ -5,7 +5,7 @@ product of two primes.
 It is based on simulating all Brainfuck programs in lexicographical order. 
 
 Brainfuck is a minimalist language consisting of just 8 commands: > < + - , . [ ]
-For details, see [TODO]
+For details, see https://esolangs.org/wiki/Brainfuck
 
 [*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable
 programming language like Python and make a few more small changes.   
@@ -13,7 +13,6 @@ programming language like Python and make a few more small changes.
 
 import itertools
 import sys
-
 
 class BrainfuckExecution:
     """
@@ -61,7 +60,6 @@ class BrainfuckExecution:
                 self.input_pointer += 1
         elif command == "[":
             if self.data.get(self.data_pointer, 0) == 0:
-                # Jump forward to the matching ] command.
                 counter = 0
                 while self.program_pointer < len(self.program):
                     if self.program[self.program_pointer] == "[":
@@ -84,22 +82,18 @@ class BrainfuckExecution:
                     self.program_pointer -= 1
         self.program_pointer += 1
 
-    # TODO smazat? 
-    # Executes the program until it is finished and returns the output.
-    def run(self) -> str:
-        while not self.is_finished():
-            self.step()
-        return "".join(self.output)
 
-
-# This class represents a universal search algorithm that is used to find a program
-# that takes the input and computes the output. We generate all programs in an
-# exhaustive manner, and execute them in parallel. When we start
-# executing the n-th program, we simulate 1 step of the n-th program, 2 steps 
-# of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps 
-# of the (n - 3)-th program, etc. When a program finishes, we validate its output 
-# and if it is correct, we stop the search.
 class UniversalSearch:
+    """
+    This class represents a universal search algorithm that is used to find a program
+    that takes the input and computes the output. We generate all programs in an
+    exhaustive manner, and execute them in parallel. When we start
+    executing the n-th program, we simulate 1 step of the n-th program, 2 steps 
+    of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps 
+    of the (n - 3)-th program, etc. When a program finishes, we check its output 
+    and if it is correct, we stop the search.
+    """
+
     def __init__(self, input: str):
         self.input = input
         # Initiate the executions with an empty program
@@ -124,7 +118,7 @@ class UniversalSearch:
             k += 1
 
     # Function to be implemented by the user that returns True if the output is correct.
-    def validate(self, output: str) -> bool:
+    def check(self, output: str) -> bool:
         pass
 
     # Systematically generates the programs and executes them.
@@ -143,24 +137,22 @@ class UniversalSearch:
                 for _ in range(2 ** (self.n - i)):
                     self.executions[i].step()
 
-                # If the program has finished, validate the output.
+                # If the program has finished, check the output.
                 if self.executions[i].is_finished():
                     output = "".join(self.executions[i].output)
-                    if self.validate(output):
+                    if self.check(output):
                         return output, self.executions[i].program
             print()
 
             self.n += 1
 
 
-class FactorizationSearch(UniversalSearch):
+class UniversalFactorization(UniversalSearch):
     """This class uses the universal search to find factors of a given integer."""
 
     # Checks that the output can be split into two comma-separated integers greater than
     # 1 whose product is the input.
-    def validate(self, output: str) -> bool:
-        if len(self.input) - 2 > len(self.input):
-            return False
+    def check(self, output: str) -> bool:
         try:
             a_str, b_str = output.split(",")
             a, b = int(a_str), int(b_str)
@@ -171,13 +163,15 @@ class FactorizationSearch(UniversalSearch):
         return a * b == int(self.input)
 
 
-# TODO VR: mozna natocit video jak implementujeme tuhle funkci (ve videu na konci casti pred diskuzi)
-# ne nutne pro sort, ale nenapada me lepsi problem
-class UniversalSort(
-    UniversalSearch
-):  # TODO VR: libi se mi factorizationsearch a universalsort, ale neni to kompatibilni
-    def validate(self, output):
-        # TODO asi nejjednodussi je nahazet puvodni posloupnost do hashovaci tabulky a tvarit se ze to je linearni cas? (teoreticky to tak je randomizovane treba pomoci Fredman Komlos Szemeredi, deterministicky mi to ted neni uplne jasny, mozna je to vlastne open problem)
+class UniversalSort(UniversalSearch):
+    def check(self, output: str) -> bool:
+        # TODO risa
+        # predpokladame self.input je list cisel nebo tak neco
+        # checkneme jestli output je list cisel
+        # hodime je to hash tabulky, to same pro input, checkneme jestli je to to same
+        # zcheckneme ze output je monotonni
+        # muzeme a nemusime resit co kdyz na inputu je to same cislo dvakrat
+
         pass
 
 
@@ -188,8 +182,7 @@ def main():
         print(f"Usage: {sys.argv[0]} [number-to-factorise]")
         exit(1)
 
-    output, program = FactorizationSearch(input).search()
-    print()
+    output, program = UniversalFactorization(input).search()
     print()
     print(f"Output: {output}")
     print(f"Program: {program}")
