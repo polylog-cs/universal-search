@@ -21,7 +21,8 @@ def multiplication_animation(scene, num1, num2, obj1, obj2):
     nums_intermediate_tex = [Tex(str(n)) for n in nums_intermediate]
     num2_tex = Tex(r"$\times$" + str(num2))
 
-    line1 = Line(start=num2_tex.get_left(), end=num2_tex.get_right(), color=GRAY)
+    line1 = Line(start=num2_tex.get_left(),
+                 end=num2_tex.get_right(), color=GRAY)
     line2 = line1.copy()
 
     objects = Group(
@@ -34,27 +35,27 @@ def multiplication_animation(scene, num1, num2, obj1, obj2):
     ).arrange_in_grid(cols=1, cell_alignment=RIGHT)
 
     for i in range(1, len(nums_intermediate_tex)):
-        nums_intermediate_tex[i].align_to(nums_intermediate_tex[i - 1][0][-2], RIGHT)
+        nums_intermediate_tex[i].align_to(
+            nums_intermediate_tex[i - 1][0][-2], RIGHT)
 
     objects.remove(line2)
     line2 = Line(
-            start=nums_intermediate_tex[-1].get_left()[0] * RIGHT
-            + line2.get_center()[1] * UP,
-            end=nums_intermediate_tex[0].get_right()[0] * RIGHT
-            + line2.get_center()[1] * UP,
-            color=GRAY,
-        )
+        start=nums_intermediate_tex[-1].get_left()[0] * RIGHT
+        + line2.get_center()[1] * UP,
+        end=nums_intermediate_tex[0].get_right()[0] * RIGHT
+        + line2.get_center()[1] * UP,
+        color=GRAY,
+    )
     objects.add(line2)
     # animations
 
-    
     anims1 = [
         ReplacementTransform(obj1, num1_tex),
         ReplacementTransform(obj2, num2_tex),
         FadeIn(line1)
     ]
 
-    rec = SurroundingRectangle(num2_tex[0][-1], buff = 0.1, color = RED)
+    rec = SurroundingRectangle(num2_tex[0][-1], buff=0.1, color=RED)
     print(len(str(num2)))
     for i in range(len(str(num2))):
         if i == 0:
@@ -118,7 +119,8 @@ def horrible_multiplication():
     b = 33372027594978156556226010605355114227940760344767554666784520987023841729210037080257448673296881877565718986258036932062711
 
     n_tex, a_tex, b_tex = [
-        Tex("\\hsize=9cm{}" + allow_breaks(str(k)), tex_environment=None).scale(0.8)
+        Tex("\\hsize=9cm{}" + allow_breaks(str(k)),
+            tex_environment=None).scale(0.8)
         for k in [n, a, b]
     ]
     eq_tex = Tex(str(r"="))
@@ -149,13 +151,15 @@ class CollapsibleAsymptotics(VMobject):
             MathTex(")"),
         )
         fake_tex[0].next_to(self.tex, LEFT, buff=SMALL_BUFF)
-        fake_tex[1].shift(self.immovable.get_center() - fake_tex[1].get_center())
+        fake_tex[1].shift(self.immovable.get_center() -
+                          fake_tex[1].get_center())
         fake_tex[2].next_to(self.tex, RIGHT, buff=SMALL_BUFF)
 
         new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
         new_tex.shift(self.immovable.get_center() - new_tex[1].get_center())
         return AnimationGroup(
-            *(FadeIn(new_tex[i], target_position=fake_tex[i]) for i in range(3)),
+            *(FadeIn(new_tex[i], target_position=fake_tex[i])
+              for i in range(3)),
             FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
             FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
         )
@@ -376,7 +380,8 @@ class ProgramInvocationList(VGroup):
                 ok = False
             anims.append(
                 self.add_program(
-                    ProgramInvocation(nth_python_program(i), self.stdin, stdout, ok)
+                    ProgramInvocation(nth_python_program(i),
+                                      self.stdin, stdout, ok)
                 )
             )
             if i < num:
@@ -396,16 +401,17 @@ class ProgramInvocationList(VGroup):
         oldlen = len(self)
         if self.now_adding:
             anims_dummy = self.add_dummy()
-            anims.append(self.point_arrow_at(self.ptr + 1))
+            anims.append(self.point_arrow_at(oldlen))
             anims.append(*anims_dummy)
+            oldlen += 1
             self.now_adding = False
         else:
             step = self[self.ptr].step()
             anims.append(self.point_arrow_at(self.ptr))
             anims.append(step)
-            if self.ptr == oldlen - 1:
+            if self.ptr == 0:
                 self.now_adding = True
                 return anims
 
-        self.ptr = (self.ptr + 1) % oldlen
+        self.ptr = (self.ptr - 1 + oldlen) % oldlen
         return anims
