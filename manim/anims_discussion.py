@@ -60,7 +60,8 @@ class Discussion1(Scene):
 
         self.play(
             Circumscribe(
-                Group(empirical_img, Dot().move_to(empirical_img.get_bottom() + DOWN)),
+                Group(empirical_img, Dot().move_to(
+                    empirical_img.get_bottom() + DOWN)),
                 color=RED,
             ),
         )
@@ -150,7 +151,8 @@ class Discussion2(Scene):
         width = 6
         explanation_scale = 0.5
 
-        weier_img = ImageMobject("img/weierstrass.png").scale_to_fit_width(width)
+        weier_img = ImageMobject(
+            "img/weierstrass.png").scale_to_fit_width(width)
         weiertitle_tex = Tex("Weierstrass function").next_to(weier_img, DOWN)
         weierexplanation_tex = (
             Tex("Continuous everywhere, yet differentiable nowhere. ")
@@ -179,8 +181,10 @@ class Discussion2(Scene):
 
         anims = [
             [
-                AnimationGroup(FadeIn(img), FadeIn(title), FadeIn(explanation)),
-                AnimationGroup(FadeOut(img), FadeOut(title), FadeOut(explanation)),
+                AnimationGroup(FadeIn(img), FadeIn(
+                    title), FadeIn(explanation)),
+                AnimationGroup(FadeOut(img), FadeOut(
+                    title), FadeOut(explanation)),
             ]
             for img, title, explanation in [
                 [weier_img, weiertitle_tex, weierexplanation_tex],
@@ -220,7 +224,8 @@ class Discussion2(Scene):
                 3 * (1 - 2 ** (-iter))
             )
             bounding_square = (
-                Square(color=GRAY).scale_to_fit_width(3).move_to(curve.get_center())
+                Square(color=GRAY).scale_to_fit_width(
+                    3).move_to(curve.get_center())
             )
             return Group(bounding_square, curve)
 
@@ -279,7 +284,8 @@ class Discussion3(Scene):
             [61, "early 1960's", "Edmonds", "polynomial time"],
             [65, "1965", "Hartmanis-Stearns", "Time hierarchy theorem"],
             [67, "1967", "Blum", "Blum's speedup theorem"],
-            [71, "1971", "Cook, independently Levin", "Satisfiability is NP complete"],
+            [71, "1971", "Cook, independently Levin",
+                "Satisfiability is NP complete"],
             [72, "1972", "Karp", "21 NP complete problems"],
             [73, "1973", "Levin", "Universal search"],
         ]
@@ -380,7 +386,8 @@ class Discussion3(Scene):
         self.wait()
 
         recc1 = SurroundingRectangle(question1_tex, color=RED)
-        recc2 = SurroundingRectangle(Group(question2_tex, question3_tex), color=RED)
+        recc2 = SurroundingRectangle(
+            Group(question2_tex, question3_tex), color=RED)
         rec1, rec2 = rec2, rec1
 
         self.play(FadeIn(rec1), FadeIn(recc1))
