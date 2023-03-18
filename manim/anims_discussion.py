@@ -145,7 +145,7 @@ class Discussion1(Scene):
 class Discussion2(Scene):
     def construct(self):
         default()
-        self.next_section(skip_animations=True)
+        self.next_section(skip_animations=False)
         self.add(vasek_head)
 
         # Going back to the universal search, knowing a bunch of weird examples is often extremely useful if you are a researcher in the area, because it helps you to build intuition and quickly disprove some hypotheses.
@@ -166,8 +166,8 @@ class Discussion2(Scene):
 
         cantor_img = (
             ImageMobject("img/cantor.png")
-            .scale_to_fit_width(width)
-            .align_to(weier_img, DOWN)
+            .scale_to_fit_width(width * 0.8)
+            .shift(shft)
         )
         cantortitle_tex = Tex("Cantor function").next_to(cantor_img, DOWN)
         cantorexplanation_tex = (
@@ -182,9 +182,9 @@ class Discussion2(Scene):
         anims = [
             [
                 AnimationGroup(FadeIn(img), FadeIn(
-                    title), FadeIn(explanation)),
+                    title)),
                 AnimationGroup(FadeOut(img), FadeOut(
-                    title), FadeOut(explanation)),
+                    title)),
             ]
             for img, title, explanation in [
                 [weier_img, weiertitle_tex, weierexplanation_tex],
@@ -203,44 +203,51 @@ class Discussion2(Scene):
         )
         self.wait()
 
-        self.play(
-            anims[1][1],
-        )
-        self.wait()
-
         self.next_section(skip_animations=False)
         from hilbertcurve.hilbertcurve import HilbertCurve
+
+        side_length = 4
+        bounding_square = (
+            Square(color=GRAY).scale_to_fit_width(
+                side_length).shift(shft)
+        )
 
         def create_curve(iter):
             if iter >= 10:
                 return Square(
                     color=RED, fill_opacity=1, fill_color=RED
-                ).scale_to_fit_width(3)
+                ).scale_to_fit_width(side_length)
                 # TODO pak dropnout, aby se i plný čtverec nakreslil Hilbertovsky
             distances = list(range(4**iter))
             points = HilbertCurve(iter, 2).points_from_distances(distances)
             points = [[p[0], p[1], 0] for p in points]
             print(points)
-            #curve = Polygon(*points, *reversed(points), color=RED).scale_to_fit_width(
-            #    3 * (1 - 2 ** (-iter))
-            #)
-            curve = []
-            for i in range(len(points) - 1):
-                curve.append(Line(
-                    start = points[i], 
-                    end = points[i+1],
-                    color = RED
-                    )
-                )
-            Group(*curve).scale_to_fit_width(3 * (1 - 2 ** (-iter)))
+            curve = Polygon(*points, *reversed(points), color=RED).scale_to_fit_width(
+               side_length * (1 - 2 ** (-iter))
+            ).move_to(bounding_square.get_center())
+            if iter >= 6:
+                curve.stroke_width = curve.stroke_width * 2
+            # curve = []
+            # for i in range(len(points) - 1):
+            #     curve.append(Line(
+            #         start = points[i], 
+            #         end = points[i+1],
+            #         color = RED
+            #         )
+            #     )
+            # Group(*curve).scale_to_fit_width(3 * (1 - 2 ** (-iter))).move_to(bounding_square.get_center())
             return curve
-
-        bounding_square = (
-            Square(color=GRAY).scale_to_fit_width(
-                3).shift(shft)
+        hilberttitle_tex = Tex("Hilbert curve").next_to(bounding_square, DOWN)
+        hilbertexplanation_tex = (
+            Tex("A continuous curve with positive area. ")
+            .scale(explanation_scale)
+            .next_to(hilberttitle_tex, DOWN)
         )
+
         self.play(
-            FadeIn(bounding_square)
+            FadeIn(bounding_square),
+            FadeIn(hilberttitle_tex),
+            anims[1][1],
         )
         self.wait()
 
@@ -248,7 +255,22 @@ class Discussion2(Scene):
         self.play(
             *[FadeIn(line) for line in curve1]
         )
-        
+        self.wait()
+
+        for i in range(2, 8):
+            curve2 = create_curve(i)
+            self.play(
+                Transform(curve1, curve2)
+            )        
+            self.wait()
+
+        red_square = Square(
+                    color=RED, fill_opacity=1, fill_color=RED
+                ).scale_to_fit_width(side_length).move_to(bounding_square.get_center())
+        self.play(
+            FadeIn(red_square)
+        )
+        self.wait()
 
         return
         curves = (
@@ -264,12 +286,6 @@ class Discussion2(Scene):
         )
         curves[2:].next_to(curves[0], DOWN).align_to(curves[0], LEFT)
 
-        hilberttitle_tex = Tex("Hilbert curve").next_to(curves[4], DOWN)
-        hilbertexplanation_tex = (
-            Tex("A continuous curve with positive area. ")
-            .scale(explanation_scale)
-            .next_to(hilberttitle_tex, DOWN)
-        )
 
         run_time = 2
         self.play(
