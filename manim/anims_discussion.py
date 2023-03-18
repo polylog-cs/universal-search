@@ -145,17 +145,18 @@ class Discussion1(Scene):
 class Discussion2(Scene):
     def construct(self):
         default()
+        self.next_section(skip_animations=True)
         self.add(vasek_head)
 
         # Going back to the universal search, knowing a bunch of weird examples is often extremely useful if you are a researcher in the area, because it helps you to build intuition and quickly disprove some hypotheses.
 
-        # TODO
-
+        
+        shft = 1*LEFT
         width = 6
         explanation_scale = 0.5
 
         weier_img = ImageMobject(
-            "img/weierstrass.png").scale_to_fit_width(width)
+            "img/weierstrass.png").scale_to_fit_width(width).shift(shft)
         weiertitle_tex = Tex("Weierstrass function").next_to(weier_img, DOWN)
         weierexplanation_tex = (
             Tex("Continuous everywhere, yet differentiable nowhere. ")
@@ -177,10 +178,6 @@ class Discussion2(Scene):
             .next_to(cantortitle_tex, DOWN)
         )
 
-        # TODO mozna hilbert misto osgood
-        # osgood_img = ImageMobject("img/osgood.png").scale_to_fit_width(width).align_to(weier_img, DOWN)
-        # osgoodtitle_tex = Tex("Osgood curve").next_to(osgood_img, DOWN)
-        # osgoodexplanation_tex = Tex("A non-self-intersecting curve with positive area. ").scale(explanation_scale).next_to(osgoodtitle_tex, DOWN)
 
         anims = [
             [
@@ -211,6 +208,7 @@ class Discussion2(Scene):
         )
         self.wait()
 
+        self.next_section(skip_animations=False)
         from hilbertcurve.hilbertcurve import HilbertCurve
 
         def create_curve(iter):
@@ -223,15 +221,36 @@ class Discussion2(Scene):
             points = HilbertCurve(iter, 2).points_from_distances(distances)
             points = [[p[0], p[1], 0] for p in points]
             print(points)
-            curve = Polygon(*points, *reversed(points), color=RED).scale_to_fit_width(
-                3 * (1 - 2 ** (-iter))
-            )
-            bounding_square = (
-                Square(color=GRAY).scale_to_fit_width(
-                    3).move_to(curve.get_center())
-            )
-            return VGroup(bounding_square, curve)
+            #curve = Polygon(*points, *reversed(points), color=RED).scale_to_fit_width(
+            #    3 * (1 - 2 ** (-iter))
+            #)
+            curve = []
+            for i in range(len(points) - 1):
+                curve.append(Line(
+                    start = points[i], 
+                    end = points[i+1],
+                    color = RED
+                    )
+                )
+            Group(*curve).scale_to_fit_width(3 * (1 - 2 ** (-iter)))
+            return curve
 
+        bounding_square = (
+            Square(color=GRAY).scale_to_fit_width(
+                3).shift(shft)
+        )
+        self.play(
+            FadeIn(bounding_square)
+        )
+        self.wait()
+
+        curve1 = create_curve(1)
+        self.play(
+            *[FadeIn(line) for line in curve1]
+        )
+        
+
+        return
         curves = (
             Group(
                 create_curve(1),
