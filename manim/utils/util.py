@@ -105,14 +105,15 @@ def division_animation(num, obj):
     return objects, [anims1, anims2]
 
 
+def allow_breaks(s):
+    return "\hskip 0pt{}".join(s)
+
+
 def horrible_multiplication():
     authors_tex = Tex(
         "\\hsize=20cm{} [Boudot, Gaudry, Guillevic, Heninger, Thomé, Zimmermann 2020], RSA Factoring Challenge"
     )
     authors_tex.scale(0.4).to_corner(DR)
-
-    def allow_breaks(s):
-        return "\hskip 0pt{}".join(s)
 
     n = 2140324650240744961264423072839333563008614715144755017797754920881418023447140136643345519095804679610992851872470914587687396261921557363047454770520805119056493106687691590019759405693457452230589325976697471681738069364894699871578494975937497937
     a = 64135289477071580278790190170577389084825014742943447208116859632024532344630238623598752668347708737661925585694639798853367
@@ -143,7 +144,7 @@ class CollapsibleAsymptotics(VMobject):
         self.tex = MathTex(*[t if t else "{}" for t in tex])
         self.immovable = self.tex[1]
         self.add(self.tex)
-        
+
     def collapse(self):
         fake_tex = Group(
             MathTex("\mathcal{O}("),
@@ -155,14 +156,16 @@ class CollapsibleAsymptotics(VMobject):
                           fake_tex[1].get_center())
         fake_tex[2].next_to(self.tex, RIGHT, buff=SMALL_BUFF)
 
-        self.new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
-        self.new_tex.shift(self.immovable.get_center() - self.new_tex[1].get_center())
+        self.new_tex = MathTex(
+            "\mathcal{O}(", self.immovable.get_tex_string(), ")")
+        self.new_tex.shift(self.immovable.get_center() -
+                           self.new_tex[1].get_center())
         return AnimationGroup(
             *(FadeIn(self.new_tex[i], target_position=fake_tex[i])
               for i in range(3)),
             FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
             FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
-            AnimationGroup(FadeOut(self.tex[1]), run_time = 0.01),
+            AnimationGroup(FadeOut(self.tex[1]), run_time=0.01),
         )
 
 
@@ -182,6 +185,7 @@ class ProgramInvocation(VMobject):
     def __init__(self, code, stdin, stdout, ok, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.wheels = 0
+        self.text = code
         self.code = ProgramInvocation.make_code(code)
         self.arrow = MathTex(r"\Rightarrow")
         self.stdin = VGroup(
@@ -279,7 +283,7 @@ class ProgramInvocation(VMobject):
             return self.code.become(new_code)
 
 
-program_alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~ \n"
+program_alphabet = "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ \n!\"#$%&'()*+,-./:;<=>?@[\]^_`{|}~"
 
 
 def nth_python_program(n):

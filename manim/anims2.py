@@ -10,24 +10,22 @@ class Intro(Scene):
         # This is a continuation of our previous video, you should watch that one first.
         # As many of you guessed by the date when we published our previous video, it was not completely honest. The fact that the video suggested that we solved one of the biggest open problems of computer science may also have been a clue.
 
-
-
-
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
 
-
-        our_algo_img = ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(14.2) 
+        our_algo_img = ImageMobject(
+            "img/program3x_placeholder.png").scale_to_fit_width(14.2)
         self.play(
             FadeIn(our_algo_img),
         )
         self.wait()
-        
-        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
+
+        badge_img = ImageMobject(
+            "img/badge_text_small.png").scale_to_fit_width(6)
         badge_group = Group(badge_img)
 
-
         badge_group.generate_target()
-        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5*DOWN)
+        badge_group.target.scale(0.85).align_to(
+            our_algo_img, DR).shift(2.5*DOWN)
 
         our_algo = Group(
             our_algo_img,
@@ -38,7 +36,7 @@ class Intro(Scene):
             FadeIn(badge_group)
         )
         self.wait()
-        
+
         self.play(
             MoveToTarget(badge_group)
         )
@@ -49,20 +47,12 @@ class Intro(Scene):
             our_group.animate.scale_to_fit_height(3).move_to(2*UP)
         )
 
-
-
-
-
-
-
-
-
-
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
         # )
         downarrow_tex = (
-            Tex(r"$\Downarrow ?$").scale(2).next_to(statement_tex, DOWN, buff=1)
+            Tex(r"$\Downarrow ?$").scale(2).next_to(
+                statement_tex, DOWN, buff=1)
         )
         prices_img = [
             ImageMobject("img/turing.jpg").scale_to_fit_height(2.5),
@@ -73,7 +63,7 @@ class Intro(Scene):
             Group(*prices_img)
             .arrange(RIGHT)
             .next_to(downarrow_tex, DOWN)
-            .shift(0.1* DOWN)
+            .shift(0.1 * DOWN)
         )
         self.play(FadeIn(downarrow_tex))
         self.wait()
@@ -84,7 +74,8 @@ class Intro(Scene):
         # Well, the only possibility is that although we know the asymptotically optimal algorithm, we unfortunately don’t know what its time complexity is!
         our_group.generate_target()
         our_group.target.scale(0.8).to_edge(LEFT)
-        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(our_group.target, RIGHT, buff = 0.5).shift(1*UP)
+        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(
+            our_group.target, RIGHT, buff=0.5).shift(1*UP)
 
         self.play(
             MoveToTarget(our_group),
@@ -95,8 +86,6 @@ class Intro(Scene):
         self.wait()
 
         # But even if we don’t know the complexity of our algorithm, why not just run it on real instances? If we can solve the factoring problem really fast, it means we can break a huge part of today's cryptography and that sounds interesting even without the math proof that the algorithm works.
-
-
 
         mult_group = horrible_multiplication().scale(0.5).to_edge(DOWN)
         # TODO misto tohohle tam hodit screenshot z předchozího videa
@@ -142,17 +131,19 @@ class Intro(Scene):
                 Tex(r"$=$")
             )
 
-        table = Group(*[o for l in zip(complexities, eq_texs, complexities.copy()) for o in l]).arrange_in_grid(cols = 3).move_to(2 * DOWN)
+        table = Group(*[o for l in zip(complexities, eq_texs, complexities.copy())
+                      for o in l]).arrange_in_grid(cols=3).move_to(2 * DOWN)
 
         for i in range(len(complexities)):
             table[3*i + 2].generate_target()
             table[3*i + 2].move_to(table[3*i].get_center())
             table[3*i + 2].target.shift(
-                table[3*i + 1].get_center() + 1.3 *RIGHT
+                table[3*i + 1].get_center() + 1.3 * RIGHT
                 - table[3*i + 2].target.immovable.get_center()
             )
 
-        self.play(AnimationGroup(*map(FadeIn, complexities[0:3]), lag_ratio=1.5))
+        self.play(AnimationGroup(
+            *map(FadeIn, complexities[0:3]), lag_ratio=1.5))
         self.wait()
 
         self.play(
@@ -186,15 +177,13 @@ class Intro(Scene):
         )
         self.wait()
         self.play(table[11].collapse())
-        self.play(table[11].new_tex.animate.shift((table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])*RIGHT))
+        self.play(table[11].new_tex.animate.shift(
+            (table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])*RIGHT))
         self.wait()
 
         self.play(
             *[FadeOut(o) for o in self.mobjects if o.get_center()[1] < line.get_center()[1]]
         )
-
-
-
 
         self.wait(3)
 
@@ -354,6 +343,13 @@ while True:
     print("Are we there yet?")
 """.strip()
 
+FACTORING_EXAMPLE_PROGRAM = """
+for a in range(2, n):
+    b = n // a
+    if a * b == n:
+        return a, b 
+""".strip()
+
 
 class ProgramsWithoutStepping(MovingCameraScene):
     def construct(self):
@@ -502,15 +498,44 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(5)
 
 
+class BazillionScroll(MovingCameraScene):
+    def construct(self):
+        default()
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
+        p.arrow.fade(1)
+
+        p.add_programs_around("a", "", 0, NUM_AROUND, fade=False)
+        self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
+        p.add_dots(NUM_DOTS)
+        _, (_, bazillion, _) = p.add_programs_around(FACTORING_EXAMPLE_PROGRAM, "",
+                                                     NUM_AROUND, 0, fade=False)
+
+        g = VGroup()
+        for q in p:
+            if q.text == "...":
+                continue
+            num = program_to_number(q.text) + 1
+            tex = Tex("\\hsize=7cm{}\\rightskip=0pt plus 1fill{} " +
+                      allow_breaks(str(num)))
+            if num > 1e10:
+                tex.scale_to_fit_width(6)
+            g.add(tex.next_to(q).align_to(
+                self.camera.frame, RIGHT).shift(.5 * LEFT))
+        self.play(FadeIn(p), FadeIn(g))
+        self.play(
+            self.camera.frame.animate.align_to(
+                bazillion.get_bottom() + 0.1 * DOWN, DOWN),
+            run_time=3,
+        )
+
+        self.wait(1)
+
+
 class TimeComplexityAnalysis(MovingCameraScene):
     def construct(self):
         default()
         p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
         p.arrow.fade(1)
-        p.add_dummy()
-        p[0].restore()
-        self.add(p)
-        self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
         anims = [anim for _ in range(100) for anim in p.step()]
         self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
                   self.camera.frame.animate.scale(2, about_point=self.camera.frame.get_corner(UP + LEFT)), run_time=10)
