@@ -364,8 +364,8 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             our_group.animate.scale_to_fit_height(3).move_to(3*RIGHT)
         )
         self.wait()
-        your_algo_img = ImageMobject(
-            "img/you.png").scale_to_fit_height(3).move_to(3*LEFT)
+        your_algo_img = SVGMobject(
+            "img/you.svg").scale_to_fit_height(3)
         self.play(
             FadeIn(your_algo_img)
         )
