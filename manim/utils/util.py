@@ -427,6 +427,8 @@ class ProgramInvocationList(VGroup):
     def step(self, finish=False):
         anims = []
         oldlen = len(self)
+        if oldlen == 0:
+            return self.add_dummy()
         if self.now_adding:
             anims_dummy = self.add_dummy()
             anims.append(self.point_arrow_at(oldlen))

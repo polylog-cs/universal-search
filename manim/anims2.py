@@ -337,7 +337,7 @@ NUM_AROUND = 5
 # NUM_DOTS = 30
 # NUM_AROUND = 15
 STDIN = "4"
-STDOUT = "2 2"
+STDOUT = "2,2"
 INFINITE_PROGRAM = """
 while True:
     print("Are we there yet?")
@@ -347,7 +347,7 @@ FACTORING_EXAMPLE_PROGRAM = """
 for a in range(2, n):
     b = n // a
     if a * b == n:
-        return a, b 
+        return a, b
 """.strip()
 
 
@@ -471,7 +471,7 @@ class ProgramsWithStepping(MovingCameraScene):
                 *p.step(), lag_ratio=0.5))
 
         prog = p[p.ptr]
-        prog.stdout = "2,2"
+        prog.stdout = STDOUT
         prog.ok = True
         arrow, stdout, tick = p.step(True)
         prog.group[-1].save_state().fade(1)
@@ -485,8 +485,6 @@ class ProgramsWithStepping(MovingCameraScene):
         output = prog.stdout_obj[1]
         tick = prog.group[-1]
         win_group = VGroup(output, tick)
-        win_group.generate_target()
-        win_group.target.move_to(self.camera.frame).scale(2)
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
         self.play(FadeOut(p), FadeOut(p.arrow), win_group.animate.scale(2))
@@ -501,6 +499,9 @@ class ProgramsWithStepping(MovingCameraScene):
 class BazillionScroll(MovingCameraScene):
     def construct(self):
         default()
+        # So, let’s say that you give me some algorithm that needs f(n) time to factor numbers of size n. To have a concrete example in mind, we can think of the naive algorithm that simply tries to divide the input number by 2,3,4 and so on, until it succeeds.
+
+        # The most important observation is that our universal search will at some point start simulating this algorithm. For example, we begin to simulate this code in iteration roughly 10^140. I will call this number L from now on. L is ridiculously huge, but what’s absolutely essential is that it is a constant which does not depend on the length of the input number we want to factor.
         p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
         p.arrow.fade(1)
 
@@ -534,12 +535,62 @@ class BazillionScroll(MovingCameraScene):
 class TimeComplexityAnalysis(MovingCameraScene):
     def construct(self):
         default()
-        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3.7 * UP)
         p.arrow.fade(1)
-        anims = [anim for _ in range(100) for anim in p.step()]
+        L = 5
+        time = 10
+        total = L + time - 1
+        steps_till_appearance = (L + 1) * L // 2
+        steps_till_finished = (total + 1) * (total) // 2 + total - L
+        anims = [anim for _ in range(steps_till_appearance)
+                 for anim in p.step()]
+        ZOOM = 8
         self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
-                  self.camera.frame.animate.scale(2, about_point=self.camera.frame.get_corner(UP + LEFT)), run_time=10)
+                  self.camera.frame.animate.scale(ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT) + RIGHT), run_time=1)
+        our_prog = p[L - 1]
+        t = VGroup(MathTex("L"), Arrow(ORIGIN, RIGHT, stroke_width=.5 * ZOOM)).arrange(buff=SMALL_BUFF).scale(ZOOM).next_to(
+            our_prog, LEFT, buff=ZOOM * SMALL_BUFF)
+        self.play(FadeIn(t))
+        anims = [anim for _ in range(steps_till_appearance, steps_till_finished)
+                 for anim in p.step()]
+        dist = our_prog.group[3].get_center() - our_prog.group[2].get_center()
+        first_wheel = our_prog.group[2].get_center()
+        last_wheel = our_prog.group[-1].get_center()
+
+        color = BLUE
+        line = Line(
+            first_wheel - dist * .5, last_wheel + dist * 1.5, stroke_width=ZOOM, color=BLUE)
+        tick_shape = Line(
+            ORIGIN, (dist[1], dist[0], 0), stroke_width=ZOOM, color=BLUE)
+        tick_left = tick_shape.copy().move_to(line.get_left())
+        tick_right = tick_shape.copy().move_to(line.get_right())
+        arrow = VGroup(line, tick_left, tick_right)
+
+        self.play(FadeIn(arrow))
+        self.play(AnimationGroup(*anims, lag_ratio=0.5,
+                  rate_func=rate_functions.ease_in_out_quart), run_time=1)
+        self.play(*p.step())
+        p.ptr += 1
+        our_prog.stdout = STDOUT
+        our_prog.ok = True
+        self.play(*p.step(finish=True))
+        output = our_prog.stdout_obj[1]
+        tick = our_prog.group[-1]
+        win_group = VGroup(output, tick)
+        our_prog.group.remove(tick)
+        our_prog.stdout_obj.remove(output)
+        to_center = self.camera.frame.get_center() - win_group.get_center()
+        zoom = 10
+        self.play(FadeOut(p), FadeOut(p.arrow), win_group.animate.scale(
+            zoom, about_point=(win_group.get_center() - to_center) / zoom))
         self.wait(5)
+
+        # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
+
+        # So what is the total number of steps we need to make? Well, look at this triangle diagram that shows how many steps were simulated in total. Of course, some of the simulated algorithms may have finished much earlier [ zubatice], but in the worst case, the number of steps of the universal search is proportional to the number of dots in this picture. Since it took f(n) steps before we finished simulating our algorithm, we started the simulation of another f(n) algorithms in the meantime [čára f(n) se orotuje]. So, the area of this triangle is roughly ½ * (L+f(n))^2. Remember, L is just a constant, so this is simply O(f(n)^2) steps.
+
+        # We also need to account for the time we spent by checking whether the outputs of the finished algorithms are correct. Fortunately, if we use the fastest known algorithms for multiplication [*Schonhage 1979] instead of the standard algorithm, the time we spend checking is negligible.
+        # [znova se zjeví pseudokód pro checkování, nějaký zvýraznění multiplikace v něm]
 
 
 class Part1Rest(Scene):
