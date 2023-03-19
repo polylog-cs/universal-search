@@ -327,7 +327,7 @@ class Asymptotics(Scene): # TODO zmenit placeholdery na obrazky
         )
         self.wait()
         
-        badge_img = ImageMobject("img/badge_text.png").scale_to_fit_width(6)
+        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
         #badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
         badge_group = Group(badge_img)
 

@@ -143,7 +143,7 @@ class CollapsibleAsymptotics(VMobject):
         self.tex = MathTex(*[t if t else "{}" for t in tex])
         self.immovable = self.tex[1]
         self.add(self.tex)
-
+        
     def collapse(self):
         fake_tex = Group(
             MathTex("\mathcal{O}("),
@@ -155,13 +155,14 @@ class CollapsibleAsymptotics(VMobject):
                           fake_tex[1].get_center())
         fake_tex[2].next_to(self.tex, RIGHT, buff=SMALL_BUFF)
 
-        new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
-        new_tex.shift(self.immovable.get_center() - new_tex[1].get_center())
+        self.new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
+        self.new_tex.shift(self.immovable.get_center() - self.new_tex[1].get_center())
         return AnimationGroup(
-            *(FadeIn(new_tex[i], target_position=fake_tex[i])
+            *(FadeIn(self.new_tex[i], target_position=fake_tex[i])
               for i in range(3)),
             FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
             FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
+            AnimationGroup(FadeOut(self.tex[1]), run_time = 0.01),
         )
 
 

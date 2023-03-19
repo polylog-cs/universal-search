@@ -10,40 +10,84 @@ class Intro(Scene):
         # This is a continuation of our previous video, you should watch that one first.
         # As many of you guessed by the date when we published our previous video, it was not completely honest. The fact that the video suggested that we solved one of the biggest open problems of computer science may also have been a clue.
 
+
+
+
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
-        statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
-            3 * UP
+
+
+        our_algo_img = ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(14.2) 
+        self.play(
+            FadeIn(our_algo_img),
         )
+        self.wait()
+        
+        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
+        badge_group = Group(badge_img)
+
+
+        badge_group.generate_target()
+        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5*DOWN)
+
+        our_algo = Group(
+            our_algo_img,
+            badge_group
+        )
+
+        self.play(
+            FadeIn(badge_group)
+        )
+        self.wait()
+        
+        self.play(
+            MoveToTarget(badge_group)
+        )
+        self.wait()
+
+        our_group = Group(our_algo_img, badge_group)
+        self.play(
+            our_group.animate.scale_to_fit_height(3).move_to(2*UP)
+        )
+
+
+
+
+
+
+
+
+
+
+        # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
+        #     3 * UP
+        # )
         downarrow_tex = (
-            Tex(r"$\Downarrow ?$").scale(2).next_to(statement_tex, DOWN, buff=1)
+            Tex(r"? \; $\Downarrow$ \; ?").scale(2).next_to(our_group, DOWN, buff=0.3)
         )
         prices_img = [
-            ImageMobject("img/turing.jpg").scale_to_fit_height(3),
-            ImageMobject("img/fields.jpg").scale_to_fit_height(3),
-            ImageMobject("img/abacus.png").scale_to_fit_height(3),
+            ImageMobject("img/turing.jpg").scale_to_fit_height(2.5),
+            ImageMobject("img/fields.jpg").scale_to_fit_height(2.5),
+            ImageMobject("img/abacus.png").scale_to_fit_height(2.5),
         ]
         prices_group = (
             Group(*prices_img)
             .arrange(RIGHT)
             .next_to(downarrow_tex, DOWN)
-            .shift(1 * DOWN)
+            .shift(0.1* DOWN)
         )
-
-        self.play(FadeIn(statement_tex))
-        self.wait()
         self.play(FadeIn(downarrow_tex))
         self.wait()
         self.play(Succession(*[FadeIn(price) for price in prices_group]))
         self.wait()
-        # TODO vtip s mísou?
 
         # Before showing you our algorithm, let’s see how it can even be possible that we know such an algorithm and yet do not have Turing awards for finding out what the complexity of factoring is.
         # Well, the only possibility is that although we know the asymptotically optimal algorithm, we unfortunately don’t know what its time complexity is!
-        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(
-            statement_tex, DOWN, buff=1
-        )
+        our_group.generate_target()
+        our_group.target.scale(0.8).to_edge(LEFT)
+        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(our_group.target, RIGHT, buff = 0.5).shift(1*UP)
 
         self.play(
+            MoveToTarget(our_group),
             FadeOut(downarrow_tex),
             FadeOut(prices_group),
         )
@@ -51,6 +95,8 @@ class Intro(Scene):
         self.wait()
 
         # But even if we don’t know the complexity of our algorithm, why not just run it on real instances? If we can solve the factoring problem really fast, it means we can break a huge part of today's cryptography and that sounds interesting even without the math proof that the algorithm works.
+
+
 
         mult_group = horrible_multiplication().scale(0.5).to_edge(DOWN)
         # TODO misto tohohle tam hodit screenshot z předchozího videa
@@ -63,19 +109,18 @@ class Intro(Scene):
         # The only possible conclusion: Our algorithm is insanely slow [sound effect] in practice.
 
         statement3_tex = (
-            Tex(r"2) The algorithm is insanely slow. ")
+            Tex(r"2) It is insanely slow. ")
             .next_to(statement2_tex, DOWN, buff=0.5)
             .align_to(statement2_tex, LEFT)
         )
         self.play(FadeIn(statement3_tex))
         self.wait()
 
-        self.play(
-            FadeOut(statement_tex),
-            Group(statement2_tex, statement3_tex).animate.to_edge(UP),
-        )
-        line = Line(start=10 * LEFT, end=10 * RIGHT, color=GRAY).next_to(
-            statement3_tex, DOWN
+        # self.play(
+        #     Group(statement2_tex, statement3_tex).animate.to_edge(UP),
+        # )
+        line = Line(start=10 * LEFT, end=20 * RIGHT, color=GRAY).next_to(
+            our_group, DOWN
         )
         self.play(FadeIn(line))
         self.wait()
@@ -85,23 +130,73 @@ class Intro(Scene):
 
         complexities = (
             Group(
-                CollapsibleAsymptotics(["", "n^2", "/2 + 3n + 10"]),
+                CollapsibleAsymptotics(["", "n^2", "/2 + n/2"]),
+                CollapsibleAsymptotics(["3", "n^2", " + 3n + 10"]),
                 CollapsibleAsymptotics(["10", "n^2", "{} + 42"]),
                 CollapsibleAsymptotics(["100000000000", "n^2", ""]),
             )
-            .arrange(DOWN)
-            .move_to(3 * LEFT + 2 * DOWN)
         )
+        eq_texs = []
+        for i in range(len(complexities)):
+            eq_texs.append(
+                Tex(r"$=$")
+            )
 
-        self.play(AnimationGroup(*map(FadeIn, complexities), lag_ratio=1.5))
+        table = Group(*[o for l in zip(complexities, eq_texs, complexities.copy()) for o in l]).arrange_in_grid(cols = 3).move_to(2 * DOWN)
+
+        for i in range(len(complexities)):
+            table[3*i + 2].generate_target()
+            table[3*i + 2].move_to(table[3*i].get_center())
+            table[3*i + 2].target.shift(
+                table[3*i + 1].get_center() + 1.3 *RIGHT
+                - table[3*i + 2].target.immovable.get_center()
+            )
+
+        self.play(AnimationGroup(*map(FadeIn, complexities[0:3]), lag_ratio=1.5))
+        self.wait()
+
+        self.play(
+            FadeIn(table[1]),
+            FadeIn(table[3+1]),
+            FadeIn(table[6+1]),
+            MoveToTarget(table[2]),
+            MoveToTarget(table[3+2]),
+            MoveToTarget(table[6+2]),
+        )
         self.wait()
 
         self.play(
             AnimationGroup(
-                *(complexity.collapse() for complexity in complexities), lag_ratio=1.5
+                table[2].collapse(),
+                table[3+2].collapse(),
+                table[6+2].collapse(),
+                lag_ratio=1.5
             ),
         )
         self.wait()
+
+        self.play(
+            FadeIn(table[3*3])
+        )
+        self.wait()
+        table[11].target.next_to(table[10], RIGHT)
+        self.play(
+            FadeIn(table[10]),
+            MoveToTarget(table[11])
+        )
+        self.wait()
+        self.play(table[11].collapse())
+        self.play(table[11].new_tex.animate.shift((table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])*RIGHT))
+        self.wait()
+
+        self.play(
+            *[FadeOut(o) for o in self.mobjects if o.get_center()[1] < line.get_center()[1]]
+        )
+
+
+
+
+        self.wait(3)
 
         # select_tex = (
         #     Tex("{{Asymptotic time complexity of select sort }}{{$= O(n^2)$. }}")
