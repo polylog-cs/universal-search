@@ -213,8 +213,8 @@ class ProgramInvocation(VMobject):
         self.group.arrange(center=False)
 
     def show_output(self):
+        self.stdout.next_to(self.group)
         self.group.add(self.stdout)
-        self.arrange()
         return FadeIn(self.stdout)
 
     def show_verdict(self):
@@ -222,8 +222,8 @@ class ProgramInvocation(VMobject):
             verdict = Text("✓", color=GREEN, font_size=80)
         else:
             verdict = Text("×", color=RED, font_size=80)
+        verdict.next_to(self.group)
         self.group.add(verdict)
-        self.arrange()
         return FadeIn(self.group[-1], scale=3)
 
     def finish(self, lag_ratio=0.5):
@@ -234,18 +234,20 @@ class ProgramInvocation(VMobject):
     def step(self):
         self.wheels += 1
         target_angle = -math.radians(90)
-        self.group.add(self.wheel.copy())
+        cur = self.wheel.copy().next_to(self.group)
+        self.group.add(cur)
         cur = self.group[-1]
         cur.save_state()
         cur.rotate(target_angle)
-        self.arrange()
+        cur.fade(1)
 
         old_obj = self.wheel.copy().next_to(cur, LEFT)
         old_pos = old_obj.get_center()
         target_pos = cur.get_center()
+        last = self.group[-1]
 
         def update(self, alpha):
-            obj = self.group[-1]
+            obj = last
             obj.restore()
             obj.move_to(alpha * target_pos + (1 - alpha) * old_pos).set_fill(
                 opacity=alpha
@@ -351,14 +353,18 @@ class ProgramInvocationList(VGroup):
             prev = program
 
     def add_program(self, program):
-        self.add(program)
-        if len(self) == 1:
+        if len(self) == 0:
             program.align_to(self.top_pos, UP)
             program.align_to(self.top_pos, LEFT)
         else:
-            program.next_to(self[-2], DOWN)
-        self.arrange()
-        return FadeIn(self[-1])
+            program.next_to(self[-1], DOWN).align_to(self[-1], LEFT)
+        self.add(program)
+        program.save_state()
+        program.stdin.save_state()
+        program.code.save_state()
+        program.stdin.fade(1)
+        program.code.fade(1)
+        return AnimationGroup(program.stdin.animate.restore(), program.code.animate.restore())
 
     def add_dots(self, reps=1):
         return [self.add_program(self.dots.copy()) for _ in range(reps)]
@@ -394,7 +400,7 @@ class ProgramInvocationList(VGroup):
 
     def point_arrow_at(self, i):
         target = self.arrow.copy().next_to(self[i], RIGHT).set_x(6)
-        return self.arrow.animate.become(target)
+        return self.arrow.animate.move_to(target)
 
     def step(self):
         anims = []

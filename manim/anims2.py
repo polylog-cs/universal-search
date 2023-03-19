@@ -15,7 +15,8 @@ class Intro(Scene):
             3 * UP
         )
         downarrow_tex = (
-            Tex(r"$\Downarrow ?$").scale(2).next_to(statement_tex, DOWN, buff=1)
+            Tex(r"$\Downarrow ?$").scale(2).next_to(
+                statement_tex, DOWN, buff=1)
         )
         prices_img = [
             ImageMobject("img/turing.jpg").scale_to_fit_height(3),
@@ -202,7 +203,8 @@ class Polylog(Scene):
         )
         self.wait()
 
-        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3).to_corner(DR)
+        levin_img = ImageMobject(
+            "img/levin.jpg").scale_to_fit_width(3).to_corner(DR)
         quote_txt = (
             Group(
                 Tex(r"\textit{``Only math nerds would call $2^{500}$ finite. ''}"),
@@ -267,7 +269,8 @@ class ProgramsWithoutStepping(MovingCameraScene):
         p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT + 3 * UP)
         self.play(
             AnimationGroup(
-                *p.add_programs_around("a", "SyntaxError", 0, 10)[0], lag_ratio=0.1
+                *p.add_programs_around("a", "SyntaxError",
+                                       0, 10)[0], lag_ratio=0.1
             )
         )
         self.play(AnimationGroup(*(q.finish() for q in p[:3]), lag_ratio=0.8))
@@ -279,11 +282,13 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.add(p)  # To display the newly added programs
 
         self.play(
-            self.camera.frame.animate.align_to(banana.get_bottom() + 0.1 * DOWN, DOWN),
+            self.camera.frame.animate.align_to(
+                banana.get_bottom() + 0.1 * DOWN, DOWN),
             run_time=3,
         )
         self.play(
-            AnimationGroup(*(q.finish() for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
+            AnimationGroup(*(q.finish()
+                           for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
         )
         self.play(banana.finish())
         for q in post:
@@ -333,7 +338,8 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.wait(3, frozen_frame=False)
         self.play(
             FadeOut(p[:-1]),
-            infinite.animate.align_to(self.camera.frame.get_top() + 0.1 * DOWN, UP),
+            infinite.animate.align_to(
+                self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
         self.play(FadeOut(waiting), FadeOut(infinite.stdout))
         self.play(infinite.dumb_down())
@@ -350,11 +356,12 @@ class ProgramsWithStepping(MovingCameraScene):
         p.add_programs_around(INFINITE_PROGRAM, "", 0, 0)
         self.add(p)
         self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
-        p[0].dumb_down(animate=False)
+        p[0].restore().dumb_down(animate=False)
         self.wait(1)
         self.play(FadeIn(p.arrow))
-        for _ in range(20):
-            self.play(AnimationGroup(*p.step(), lag_ratio=0.5))
+        anims = [anim for _ in range(100) for anim in p.step()]
+        self.play(Succession(*anims),
+                  self.camera.frame.animate.scale(2), run_time=10)
 
         # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
 
@@ -417,8 +424,10 @@ class Part1Rest(Scene):
             ["$<$3000BC", "unknown", "straightforward", r"$O(n^2)$"],
             ["1962", "Karatsuba", "divide \& conquer", r"$O(n^{1.58})$"],
             ["1963", "Toom", "divide \& conquer", r"$O(n^{1.01})$"],
-            ["1966", "Schönhage \& Strassen", "FFT", r"$n \cdot \text{polylog}(n)$"],
-            ["1979", "Schönhage", "FFT + tricks", r"$O(n)$ {\tiny (word RAM)}"],
+            ["1966", "Schönhage \& Strassen", "FFT",
+                r"$n \cdot \text{polylog}(n)$"],
+            ["1979", "Schönhage", "FFT + tricks",
+                r"$O(n)$ {\tiny (word RAM)}"],
             [
                 "2019",
                 "Harvey \& van Der Hoeven",
@@ -428,7 +437,8 @@ class Part1Rest(Scene):
         ]
 
         mult_algs_group = (
-            Group(*[Tex(str).scale(0.5) for line in mult_algs_texts for str in line])
+            Group(*[Tex(str).scale(0.5)
+                  for line in mult_algs_texts for str in line])
             .arrange_in_grid(cols=4)
             .to_corner(DR)
         )
@@ -437,7 +447,7 @@ class Part1Rest(Scene):
         self.wait()
 
         self.play(
-            Circumscribe(mult_algs_group[4 * 5 : 4 * 6], color=RED),
+            Circumscribe(mult_algs_group[4 * 5: 4 * 6], color=RED),
         )
         self.wait()
 
