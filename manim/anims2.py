@@ -360,7 +360,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         default()
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
-        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT + 3 * UP)
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3 * UP)
         self.play(
             AnimationGroup(
                 *p.add_programs_around("a", "SyntaxError",
@@ -371,7 +371,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
         p.add_dots(NUM_DOTS),
         _, (pre, banana, post) = p.add_programs_around(
-            'print("banana")', "banana", NUM_AROUND, NUM_AROUND
+            'print("banana")', "banana", NUM_AROUND, NUM_AROUND, fade=False
         )
         self.add(p)  # To display the newly added programs
 
@@ -384,7 +384,14 @@ class ProgramsWithoutStepping(MovingCameraScene):
             AnimationGroup(*(q.finish()
                            for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
         )
-        self.play(banana.finish())
+
+        self.play(banana.show_output())
+        checker = make_checking_code().move_to(self.camera.frame).shift(4.5 * RIGHT)
+        self.play(
+            FadeIn(checker, target_position=banana.get_right(), scale=0))
+        self.wait(5)
+        self.play(FadeOut(checker))
+        self.play(banana.show_verdict())
         for q in post:
             q.finish()
 
@@ -392,7 +399,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
 
         p.add_dots(NUM_DOTS)
         _, (pre, infinite, post) = p.add_programs_around(
-            INFINITE_PROGRAM, "", NUM_AROUND, 0
+            INFINITE_PROGRAM, "", NUM_AROUND, 0, fade=False
         )
         self.add(p)
         for q in pre:
@@ -406,21 +413,12 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.wait(2)
         self.play(infinite.show_output())
         self.wait(2)
-        waiting_big = Circle(color=YELLOW, stroke_width=8, radius=0.2).next_to(
+
+        waiting = rotating_wheel().next_to(
             infinite.group, RIGHT
         )
-        waiting_small = Arc(color=ORANGE, stroke_width=8, radius=0.2).shift(
-            waiting_big.get_center()
-        )
-        waiting = VGroup(waiting_big, waiting_small)
-
-        angle_per_s = math.radians(-120)
-
-        def rotate(obj):
-            obj.rotate(angle_per_s / config.frame_rate)
 
         infinite.add(waiting)
-        waiting.add_updater(rotate)
         self.play(FadeIn(waiting))
         ''' TODO mozna nekam dodat checkovaci algoritmus
         try a,b = output
@@ -436,7 +434,8 @@ class ProgramsWithoutStepping(MovingCameraScene):
                 self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
         self.play(FadeOut(waiting), FadeOut(infinite.stdout))
-        self.play(infinite.dumb_down())
+        self.play(infinite.dumb_down(), self.camera.frame.animate.align_to(
+            infinite.stdin.get_top() + 0.5 * UP, UP))
         infinite.arrange()
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
@@ -446,22 +445,75 @@ class ProgramsWithoutStepping(MovingCameraScene):
 class ProgramsWithStepping(MovingCameraScene):
     def construct(self):
         default()
-        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT)
-        p.add_programs_around(INFINITE_PROGRAM, "", 0, 0)
+        # We will maintain a list of simulated algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then simulate one step of each algorithm in the list. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, then simulate one step of each algorithm in the list, and so on.
+
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
+        p.add_dummy(fade=False)
         self.add(p)
-        self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
-        p[0].restore().dumb_down(animate=False)
+        self.camera.frame.align_to(p[0].stdin.get_top() + 0.5 * UP, UP)
         self.wait(1)
         self.play(FadeIn(p.arrow))
+        for i in range(10):
+            self.play(AnimationGroup(
+                *p.step(), lag_ratio=0.5))
+
+        # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
+        prog = p[p.ptr]
+        arrow, stdout, tick = p.step(True)
+        prog.group[-1].save_state().fade(1)
+        checker = make_checking_code().align_to(
+            self.camera.frame, RIGHT + DOWN).shift(SMALL_BUFF * (LEFT + UP))
+        self.play(arrow, stdout)
+        self.play(FadeIn(checker))
+        self.wait(3)
+        self.play(FadeOut(checker))
+        prog.group[-1].restore()
+        self.play(tick)
+
+        for i in range(10):
+            self.play(AnimationGroup(
+                *p.step(), lag_ratio=0.5))
+
+        prog = p[p.ptr]
+        prog.stdout = "2,2"
+        prog.ok = True
+        arrow, stdout, tick = p.step(True)
+        prog.group[-1].save_state().fade(1)
+        self.play(arrow, stdout)
+        self.play(FadeIn(checker))
+        self.wait(3)
+        self.play(FadeOut(checker))
+        prog.group[-1].restore()
+        self.play(tick)
+
+        output = prog.stdout_obj[1]
+        tick = prog.group[-1]
+        win_group = VGroup(output, tick)
+        win_group.generate_target()
+        win_group.target.move_to(self.camera.frame).scale(2)
+        prog.group.remove(tick)
+        prog.stdout_obj.remove(output)
+        self.play(FadeOut(p), FadeOut(p.arrow), win_group.animate.scale(2))
+
+        # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
+        # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
+        # [A NEBO: tick vedle algoritmu co se zvetsi na celou obrazovku]
+
+        self.wait(5)
+
+
+class TimeComplexityAnalysis(MovingCameraScene):
+    def construct(self):
+        default()
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
+        p.arrow.fade(1)
+        p.add_dummy()
+        p[0].restore()
+        self.add(p)
+        self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
         anims = [anim for _ in range(100) for anim in p.step()]
         self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
                   self.camera.frame.animate.scale(2, about_point=self.camera.frame.get_corner(UP + LEFT)), run_time=10)
-
-        # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
-
-        # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
-
-        # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we use that our problem is factoring and not something else.
         self.wait(5)
 
 

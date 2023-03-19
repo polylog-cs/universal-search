@@ -167,7 +167,7 @@ class CollapsibleAsymptotics(VMobject):
 
 
 class ProgramInvocation(VMobject):
-    def _make_code(text):
+    def make_code(text):
         return Code(
             code=text,
             language="Python",
@@ -182,17 +182,12 @@ class ProgramInvocation(VMobject):
     def __init__(self, code, stdin, stdout, ok, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.wheels = 0
-        self.code = ProgramInvocation._make_code(code)
-        arrow = MathTex(r"\Rightarrow")
-        font_size = 24
+        self.code = ProgramInvocation.make_code(code)
+        self.arrow = MathTex(r"\Rightarrow")
         self.stdin = VGroup(
-            Text(stdin, font="monospace", font_size=font_size), arrow.copy()
+            Text(stdin, font="monospace", font_size=24), self.arrow.copy()
         ).arrange()
-        color = RED if "Error" in stdout else TEXT_COLOR
-        self.stdout = VGroup(
-            arrow.copy(),
-            Text(stdout, font="monospace", font_size=font_size, color=color),
-        ).arrange()
+        self.stdout = stdout
         self.ok = ok
         self.group = VGroup(
             self.stdin,
@@ -209,14 +204,21 @@ class ProgramInvocation(VMobject):
         )
         self.add(self.group)
         self.add_updater(ProgramInvocation.arrange)
+        self.finished = False
 
     def arrange(self):
         self.group.arrange(center=False)
 
     def show_output(self):
-        self.stdout.next_to(self.group)
-        self.group.add(self.stdout)
-        return FadeIn(self.stdout)
+        color = RED if "Error" in self.stdout else TEXT_COLOR
+        self.stdout_obj = VGroup(
+            self.arrow.copy(),
+            Text(self.stdout, font="monospace",
+                 font_size=24, color=color),
+        ).arrange()
+        self.stdout_obj.next_to(self.group)
+        self.group.add(self.stdout_obj)
+        return FadeIn(self.stdout_obj)
 
     def show_verdict(self):
         if self.ok:
@@ -228,11 +230,15 @@ class ProgramInvocation(VMobject):
         return FadeIn(self.group[-1], scale=3)
 
     def finish(self, lag_ratio=0.5):
-        return AnimationGroup(
-            self.show_output(), self.show_verdict(), lag_ratio=lag_ratio
-        )
+        self.finished = True
+        anims = [self.show_output(), self.show_verdict()]
+        if lag_ratio is None:
+            return anims
+        return AnimationGroup(*anims, lag_ratio=lag_ratio)
 
-    def step(self):
+    def step(self, finish=False):
+        if finish:
+            return self.finish(lag_ratio=None)
         self.wheels += 1
         target_angle = -math.radians(90)
         cur = self.wheel.copy().next_to(self.group)
@@ -263,7 +269,7 @@ class ProgramInvocation(VMobject):
 
     def dumb_down(self, animate=True):
         new_code = (
-            ProgramInvocation._make_code("[code]")
+            ProgramInvocation.make_code("[code]")
             .move_to(self.code)
             .align_to(self.code, LEFT)
         )
@@ -328,6 +334,16 @@ def programs_around(code, before=0, after=0):
     return [nth_python_program(i) for i in range(num - before, num + after + 1)]
 
 
+def rotating_wheel():
+    waiting_big = Circle(color=YELLOW, stroke_width=8, radius=0.2)
+    waiting_small = Arc(color=ORANGE, stroke_width=8, radius=0.2).shift(
+        waiting_big.get_center()
+    )
+    waiting = VGroup(waiting_big, waiting_small)
+    always_rotate(waiting, rate=-120 * DEGREES)
+    return waiting
+
+
 class ProgramInvocationList(VGroup):
     def __init__(self, stdin, expected_stdout, top_pos, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -338,7 +354,7 @@ class ProgramInvocationList(VGroup):
         self.arrange()
         self.add_updater(ProgramInvocationList.arrange)
         self.dots = ProgramInvocation("...", self.stdin, "", False)
-        self.dummy = ProgramInvocation("[code]", self.stdin, "", False)
+        self.dummy = ProgramInvocation("[code]", self.stdin, "woo", False)
         self.ptr = 0
         self.arrow = (
             Arrow(start=RIGHT, end=LEFT)
@@ -353,7 +369,7 @@ class ProgramInvocationList(VGroup):
             program.align_to(prev, LEFT)
             prev = program
 
-    def add_program(self, program):
+    def add_program(self, program, fade=True):
         if len(self) == 0:
             program.align_to(self.top_pos, UP)
             program.align_to(self.top_pos, LEFT)
@@ -363,17 +379,18 @@ class ProgramInvocationList(VGroup):
         program.save_state()
         program.stdin.save_state()
         program.code.save_state()
-        program.stdin.fade(1)
-        program.code.fade(1)
+        if fade:
+            program.stdin.fade(1)
+            program.code.fade(1)
         return AnimationGroup(program.stdin.animate.restore(), program.code.animate.restore())
 
     def add_dots(self, reps=1):
-        return [self.add_program(self.dots.copy()) for _ in range(reps)]
+        return [self.add_program(self.dots.copy(), fade=False) for _ in range(reps)]
 
-    def add_dummy(self, reps=1):
-        return [self.add_program(self.dummy.copy()) for _ in range(reps)]
+    def add_dummy(self, reps=1, fade=True):
+        return [self.add_program(self.dummy.copy(), fade=fade) for _ in range(reps)]
 
-    def add_programs_around(self, code, code_stdout, before=0, after=0):
+    def add_programs_around(self, code, code_stdout, before=0, after=0, fade=True):
         anims = []
         num = program_to_number(code)
         pre = []
@@ -388,7 +405,7 @@ class ProgramInvocationList(VGroup):
             anims.append(
                 self.add_program(
                     ProgramInvocation(nth_python_program(i),
-                                      self.stdin, stdout, ok)
+                                      self.stdin, stdout, ok), fade=fade
                 )
             )
             if i < num:
@@ -403,7 +420,7 @@ class ProgramInvocationList(VGroup):
         target = self.arrow.copy().next_to(self[i], RIGHT).set_x(6)
         return self.arrow.animate.move_to(target)
 
-    def step(self):
+    def step(self, finish=False):
         anims = []
         oldlen = len(self)
         if self.now_adding:
@@ -413,12 +430,32 @@ class ProgramInvocationList(VGroup):
             oldlen += 1
             self.now_adding = False
         else:
-            step = self[self.ptr].step()
+            step = self[self.ptr].step(finish)
             anims.append(self.point_arrow_at(self.ptr))
-            anims.append(step)
+            if type(step) != list:
+                step = [step]
+            anims += step
             if self.ptr == 0:
                 self.now_adding = True
                 return anims
 
-        self.ptr = (self.ptr - 1 + oldlen) % oldlen
+        while True:
+            self.ptr = (self.ptr - 1 + oldlen) % oldlen
+            if not self[self.ptr].finished:
+                break
         return anims
+
+
+def make_checking_code():
+    code = ProgramInvocation.make_code("""
+if a * b == n:
+
+✓
+else: # also on error
+
+×
+""".strip())
+    for (i, col) in (2, GREEN), (-1, RED):
+        code.code[i].set_color(col).scale(
+            2.5).shift(.9 * RIGHT + .15 * UP)
+    return code
