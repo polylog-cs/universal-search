@@ -360,8 +360,8 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(1)
         self.play(FadeIn(p.arrow))
         anims = [anim for _ in range(100) for anim in p.step()]
-        self.play(Succession(*anims),
-                  self.camera.frame.animate.scale(2), run_time=10)
+        self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
+                  self.camera.frame.animate.scale(2, about_point=self.camera.frame.get_corner(UP + LEFT)), run_time=10)
 
         # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
 
