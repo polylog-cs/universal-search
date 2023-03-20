@@ -164,9 +164,11 @@ class CollapsibleAsymptotics(VMobject):
         return Succession(
             AnimationGroup(
                 *(FadeIn(self.new_tex[i], target_position=fake_tex[i])
-                for i in range(3)),
-                FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
-                FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
+                  for i in range(3)),
+                FadeOut(self.tex[0],
+                        target_position=self.tex[1], scale=(0, 1, 0)),
+                FadeOut(self.tex[2],
+                        target_position=self.tex[1], scale=(0, 1, 0)),
             ),
             AnimationGroup(FadeOut(self.tex[1]), run_time=0.01),
         )
@@ -243,7 +245,7 @@ class ProgramInvocation(VMobject):
             return anims
         return AnimationGroup(*anims, lag_ratio=lag_ratio)
 
-    def step(self, finish=False):
+    def step(self, finish=False, fade=True):
         if finish:
             return self.finish(lag_ratio=None)
         self.wheels += 1
@@ -253,7 +255,8 @@ class ProgramInvocation(VMobject):
         cur = self.group[-1]
         cur.save_state()
         cur.rotate(target_angle)
-        cur.fade(1)
+        if fade:
+            cur.fade(1)
 
         old_obj = self.wheel.copy().next_to(cur, LEFT)
         old_pos = old_obj.get_center()
@@ -485,6 +488,7 @@ else: # also on error
 
 def our_code_with_badge():
     code_img = ImageMobject("img/program3x.png").scale_to_fit_width(2)
-    badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(0.8).align_to(code_img, RIGHT).shift(0.3*DOWN)
+    badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(
+        0.8).align_to(code_img, RIGHT).shift(0.3*DOWN)
 
     return Group(code_img, badge_img)

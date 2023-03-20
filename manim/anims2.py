@@ -7,6 +7,7 @@ DRAFT = True
 prop1_str = r"1) We don't know its time complexity!"
 prop2_str = r"2) It is insanely slow. "
 
+
 class Intro(Scene):
     def construct(self):
         default()
@@ -330,7 +331,7 @@ $".=chr(hex(join("",splice(@&,0,2))))while(@&); eval$”;
 ($C,$_,@\)=(($a=$/[1]*4)*5+1, q| |x(0x20).q|\||.chr(32)x(0x10).q$*$.
 chr(0x20)x(0x10).(pack("CC",124,10)), sub{s/.\|(\s*?)(\S)./\|$1 $2/},
 sub{s/\|(\s*?).(\S)/ \|$1$2 /}, sub{$2.$1.$3},sub{$tt=(3*$tt+7)%$C},
-sub{$1.$3.$2}); while ($_) {sselect $/, undef, $/, $C/1E3;(sysread(STDIN, 
+sub{$1.$3.$2}); while ($_) {sselect $/, undef, $/, $C/1E3;(sysread(STDIN,
 $k, 1),s/(.)(\*)(.)/(&{$\[(ord($k)-44&2)+2]})/e) if (select($a=chr(1),$/,$/,0));
 print 0x75736520504F5349583B2024743D6E657720504F5349583A3A5465726D696F73
 3B24742D3E676574617474722828303D3E2A5F3D5C2423292F32293B2024742D3E
@@ -383,9 +384,9 @@ E7365746174747228302C544353414E4F57293B24643D224352415348215C6E223B0A;
             """
 for i in range(42):
     print(
-        str(i+1) 
-        + " bananas is better than " 
-        + str(i) 
+        str(i+1)
+        + " bananas is better than "
+        + str(i)
         + " bananas. "
     )
             """.split("\n"),
@@ -400,7 +401,7 @@ for i in range(42):
 import antigravity
 import delorean
 import emoji
-import turtle 
+import turtle
 
 def factor(n):
             """.split("\n")
@@ -614,20 +615,23 @@ class ExplanationBeginning(Scene):
     def construct(self):
         default()
 
-        title_tex = Tex("Universal search", font_size = 3*DEFAULT_FONT_SIZE).to_edge(UP)
+        title_tex = Tex("Universal search", font_size=3 *
+                        DEFAULT_FONT_SIZE).to_edge(UP)
         self.play(FadeIn(title_tex))
         self.wait()
 
         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
         name_txt = Tex("Leonid Levin").scale(0.7).next_to(levin_img, DOWN)
-        levin_group = Group(levin_img, name_txt).arrange(DOWN).to_edge(RIGHT).shift(0.3*DOWN)
+        levin_group = Group(levin_img, name_txt).arrange(
+            DOWN).to_edge(RIGHT).shift(0.3*DOWN)
 
         self.play(FadeIn(levin_group))
         self.wait()
 
         prop1_tex = Tex(prop1_str)
         prop2_tex = Tex(prop2_str)
-        props = Group(prop1_tex, prop2_tex).arrange_in_grid(cols = 1, cell_alignment = LEFT, ).to_edge(LEFT)
+        props = Group(prop1_tex, prop2_tex).arrange_in_grid(
+            cols=1, cell_alignment=LEFT, ).to_edge(LEFT)
 
         self.play(
             FadeIn(props)
@@ -639,25 +643,28 @@ class ExplanationBeginning(Scene):
         )
         self.wait()
 
-
         shft = 1 * DOWN
-        your_algo_img = SVGMobject( # TODO v svg nefunguje tloustka car
+        your_algo_img = SVGMobject(  # TODO v svg nefunguje tloustka car
             "img/you.svg").scale_to_fit_height(3.5)
         fn = Tex(r"$f(n)$")
-        your_algo = Group(your_algo_img, fn).arrange(DOWN).align_to(Dot().to_edge(LEFT), RIGHT).shift(shft)
+        your_algo = Group(your_algo_img, fn).arrange(
+            DOWN).align_to(Dot().to_edge(LEFT), RIGHT).shift(shft)
         self.play(
             your_algo.animate.move_to(3*LEFT).shift(shft)
         )
         self.wait()
 
         our_algo_img = our_code_with_badge().scale_to_fit_height(3)
-        fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}") # TODO fix tečku
-        our_algo = Group(our_algo_img, fn2).arrange(DOWN).align_to(Dot().to_edge(RIGHT), LEFT).align_to(your_algo, DOWN)
+        # TODO fix tečku
+        fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}")
+        our_algo = Group(our_algo_img, fn2).arrange(DOWN).align_to(
+            Dot().to_edge(RIGHT), LEFT).align_to(your_algo, DOWN)
         self.play(
             our_algo.animate.move_to(3*RIGHT).align_to(your_algo, DOWN)
         )
 
-        fn2_new =  Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(fn2.get_center()) # TODO fix tečku
+        fn2_new = Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
+            fn2.get_center())  # TODO fix tečku
         fn2.save_state()
         self.play(
             Transform(fn2, fn2_new)
@@ -668,9 +675,7 @@ class ExplanationBeginning(Scene):
         )
         self.wait()
 
-
-        self.wait(3)        
-
+        self.wait(3)
 
 
 class BazillionScroll(MovingCameraScene):
@@ -821,6 +826,31 @@ class TimeComplexityAnalysis(MovingCameraScene):
 
         # We also need to account for the time we spent by checking whether the outputs of the finished algorithms are correct. Fortunately, if we use the fastest known algorithms for multiplication [*Schonhage 1979] instead of the standard algorithm, the time we spend checking is negligible.
         # [znova se zjeví pseudokód pro checkování, nějaký zvýraznění multiplikace v něm]
+
+
+class TimeComplexityAfterthoughts(MovingCameraScene):
+    def construct(self):
+        default()
+        p = ProgramInvocationList(STDIN, STDOUT, 13 * LEFT + 7 * UP)
+        self.camera.frame.scale(2)
+        p.arrow.fade(1)
+        to_hide = []
+        for i in range(5, -1, -1):
+            p.add_dummy(fade=False)
+            for k in range(1 << i):
+                p[-1].step(fade=False)
+            num_hide = (1 << i) - (i + 1)
+            if num_hide <= 0:
+                continue
+            to_hide += list(p[-1].group[-num_hide:])
+        for cog in to_hide:
+            cog.save_state()
+            cog.fade(1)
+
+        self.add(p)
+        self.play(*(cog.animate.restore() for cog in to_hide))
+        self.play(*(FadeOut(cog) for cog in to_hide))
+        self.wait(5)
 
 
 class Part1Rest(Scene):
