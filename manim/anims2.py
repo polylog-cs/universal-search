@@ -3,6 +3,8 @@ from utils.util import *
 from utils.utilcliparts import *
 from utils.utilgeneral import *
 
+DRAFT = True
+
 
 class Intro(Scene):
     def construct(self):
@@ -10,24 +12,22 @@ class Intro(Scene):
         # This is a continuation of our previous video, you should watch that one first.
         # As many of you guessed by the date when we published our previous video, it was not completely honest. The fact that the video suggested that we solved one of the biggest open problems of computer science may also have been a clue.
 
-
-
-
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
 
-
-        our_algo_img = ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(14.2) 
+        our_algo_img = ImageMobject(
+            "img/program3x_placeholder.png").scale_to_fit_width(14.2)
         self.play(
             FadeIn(our_algo_img),
         )
         self.wait()
-        
-        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
+
+        badge_img = ImageMobject(
+            "img/badge_text_small.png").scale_to_fit_width(6)
         badge_group = Group(badge_img)
 
-
         badge_group.generate_target()
-        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5*DOWN)
+        badge_group.target.scale(0.85).align_to(
+            our_algo_img, DR).shift(2.5*DOWN)
 
         our_algo = Group(
             our_algo_img,
@@ -38,7 +38,7 @@ class Intro(Scene):
             FadeIn(badge_group)
         )
         self.wait()
-        
+
         self.play(
             MoveToTarget(badge_group)
         )
@@ -49,20 +49,12 @@ class Intro(Scene):
             our_group.animate.scale_to_fit_height(3).move_to(2*UP)
         )
 
-
-
-
-
-
-
-
-
-
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
         # )
         downarrow_tex = (
-            Tex(r"$\Downarrow ?$").scale(2).next_to(statement_tex, DOWN, buff=1)
+            Tex(r"$\Downarrow ?$").scale(2).next_to(
+                statement_tex, DOWN, buff=1)
         )
         prices_img = [
             ImageMobject("img/turing.jpg").scale_to_fit_height(2.5),
@@ -73,7 +65,7 @@ class Intro(Scene):
             Group(*prices_img)
             .arrange(RIGHT)
             .next_to(downarrow_tex, DOWN)
-            .shift(0.1* DOWN)
+            .shift(0.1 * DOWN)
         )
         self.play(FadeIn(downarrow_tex))
         self.wait()
@@ -84,7 +76,8 @@ class Intro(Scene):
         # Well, the only possibility is that although we know the asymptotically optimal algorithm, we unfortunately don’t know what its time complexity is!
         our_group.generate_target()
         our_group.target.scale(0.8).to_edge(LEFT)
-        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(our_group.target, RIGHT, buff = 0.5).shift(1*UP)
+        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(
+            our_group.target, RIGHT, buff=0.5).shift(1*UP)
 
         self.play(
             MoveToTarget(our_group),
@@ -95,8 +88,6 @@ class Intro(Scene):
         self.wait()
 
         # But even if we don’t know the complexity of our algorithm, why not just run it on real instances? If we can solve the factoring problem really fast, it means we can break a huge part of today's cryptography and that sounds interesting even without the math proof that the algorithm works.
-
-
 
         mult_group = horrible_multiplication().scale(0.5).to_edge(DOWN)
         # TODO misto tohohle tam hodit screenshot z předchozího videa
@@ -142,17 +133,19 @@ class Intro(Scene):
                 Tex(r"$=$")
             )
 
-        table = Group(*[o for l in zip(complexities, eq_texs, complexities.copy()) for o in l]).arrange_in_grid(cols = 3).move_to(2 * DOWN)
+        table = Group(*[o for l in zip(complexities, eq_texs, complexities.copy())
+                      for o in l]).arrange_in_grid(cols=3).move_to(2 * DOWN)
 
         for i in range(len(complexities)):
             table[3*i + 2].generate_target()
             table[3*i + 2].move_to(table[3*i].get_center())
             table[3*i + 2].target.shift(
-                table[3*i + 1].get_center() + 1.3 *RIGHT
+                table[3*i + 1].get_center() + 1.3 * RIGHT
                 - table[3*i + 2].target.immovable.get_center()
             )
 
-        self.play(AnimationGroup(*map(FadeIn, complexities[0:3]), lag_ratio=1.5))
+        self.play(AnimationGroup(
+            *map(FadeIn, complexities[0:3]), lag_ratio=1.5))
         self.wait()
 
         self.play(
@@ -186,15 +179,13 @@ class Intro(Scene):
         )
         self.wait()
         self.play(table[11].collapse())
-        self.play(table[11].new_tex.animate.shift((table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])*RIGHT))
+        self.play(table[11].new_tex.animate.shift(
+            (table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])*RIGHT))
         self.wait()
 
         self.play(
             *[FadeOut(o) for o in self.mobjects if o.get_center()[1] < line.get_center()[1]]
         )
-
-
-
 
         self.wait(3)
 
@@ -457,13 +448,21 @@ def factor(n):
 # Smaller values for faster preview
 NUM_DOTS = 5
 NUM_AROUND = 5
-# NUM_DOTS = 30
-# NUM_AROUND = 15
+if not DRAFT:
+    NUM_DOTS = 30
+    NUM_AROUND = 15
 STDIN = "4"
-STDOUT = "2 2"
+STDOUT = "2,2"
 INFINITE_PROGRAM = """
 while True:
     print("Are we there yet?")
+""".strip()
+
+FACTORING_EXAMPLE_PROGRAM = """
+for a in range(2, n):
+    b = n // a
+    if a * b == n:
+        return a, b
 """.strip()
 
 
@@ -472,7 +471,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         default()
         # Instead of hiring monkeys, We are going to iterate over all strings in their lexicographical order, try to interpret each one of them as a program in Python, run it for the input number, and then check if by chance the program factored that number into prime factors.
 
-        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT + 3 * UP)
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3 * UP)
         self.play(
             AnimationGroup(
                 *p.add_programs_around("a", "SyntaxError",
@@ -483,7 +482,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
         p.add_dots(NUM_DOTS),
         _, (pre, banana, post) = p.add_programs_around(
-            'print("banana")', "banana", NUM_AROUND, NUM_AROUND
+            'print("banana")', "banana", NUM_AROUND, NUM_AROUND, fade=False
         )
         self.add(p)  # To display the newly added programs
 
@@ -496,7 +495,14 @@ class ProgramsWithoutStepping(MovingCameraScene):
             AnimationGroup(*(q.finish()
                            for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
         )
-        self.play(banana.finish())
+
+        self.play(banana.show_output())
+        checker = make_checking_code().move_to(self.camera.frame).shift(4.5 * RIGHT)
+        self.play(
+            FadeIn(checker, target_position=banana.get_right(), scale=0))
+        self.wait(5)
+        self.play(FadeOut(checker))
+        self.play(banana.show_verdict())
         for q in post:
             q.finish()
 
@@ -504,7 +510,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
 
         p.add_dots(NUM_DOTS)
         _, (pre, infinite, post) = p.add_programs_around(
-            INFINITE_PROGRAM, "", NUM_AROUND, 0
+            INFINITE_PROGRAM, "", NUM_AROUND, 0, fade=False
         )
         self.add(p)
         for q in pre:
@@ -518,21 +524,12 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.wait(2)
         self.play(infinite.show_output())
         self.wait(2)
-        waiting_big = Circle(color=YELLOW, stroke_width=8, radius=0.2).next_to(
+
+        waiting = rotating_wheel().next_to(
             infinite.group, RIGHT
         )
-        waiting_small = Arc(color=ORANGE, stroke_width=8, radius=0.2).shift(
-            waiting_big.get_center()
-        )
-        waiting = VGroup(waiting_big, waiting_small)
-
-        angle_per_s = math.radians(-120)
-
-        def rotate(obj):
-            obj.rotate(angle_per_s / config.frame_rate)
 
         infinite.add(waiting)
-        waiting.add_updater(rotate)
         self.play(FadeIn(waiting))
         ''' TODO mozna nekam dodat checkovaci algoritmus
         try a,b = output
@@ -548,7 +545,8 @@ class ProgramsWithoutStepping(MovingCameraScene):
                 self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
         self.play(FadeOut(waiting), FadeOut(infinite.stdout))
-        self.play(infinite.dumb_down())
+        self.play(infinite.dumb_down(), self.camera.frame.animate.align_to(
+            infinite.stdin.get_top() + 0.5 * UP, UP))
         infinite.arrange()
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
@@ -558,23 +556,181 @@ class ProgramsWithoutStepping(MovingCameraScene):
 class ProgramsWithStepping(MovingCameraScene):
     def construct(self):
         default()
-        p = ProgramInvocationList(STDIN, STDOUT, 6 * LEFT)
-        p.add_programs_around(INFINITE_PROGRAM, "", 0, 0)
+        # We will maintain a list of simulated algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then simulate one step of each algorithm in the list. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, then simulate one step of each algorithm in the list, and so on.
+
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
+        p.add_dummy(fade=False)
         self.add(p)
-        self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
-        p[0].restore().dumb_down(animate=False)
+        self.camera.frame.align_to(p[0].stdin.get_top() + 0.5 * UP, UP)
         self.wait(1)
         self.play(FadeIn(p.arrow))
-        anims = [anim for _ in range(100) for anim in p.step()]
-        self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
-                  self.camera.frame.animate.scale(2, about_point=self.camera.frame.get_corner(UP + LEFT)), run_time=10)
-
-        # We will maintain a list of candidate algorithms. At the beginning, this list will be empty and we will proceed in steps. In the k-th iterationstep, we first add the k-th lexicographically smallest algorithm to this list and then, we simulate one step of each algorithm. After we are done with all the algorithms in our list, we go to the next iteration, add the next algorithm, simulate one step of each algorithm in the list, and so on.
+        for i in range(10):
+            self.play(AnimationGroup(
+                *p.step(), lag_ratio=0.5))
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
+        prog = p[p.ptr]
+        arrow, stdout, tick = p.step(True)
+        prog.group[-1].save_state().fade(1)
+        checker = make_checking_code().align_to(
+            self.camera.frame, RIGHT + DOWN).shift(SMALL_BUFF * (LEFT + UP))
+        self.play(arrow, stdout)
+        self.play(FadeIn(checker))
+        self.wait(3)
+        self.play(FadeOut(checker))
+        prog.group[-1].restore()
+        self.play(tick)
 
-        # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we use that our problem is factoring and not something else.
+        for i in range(10):
+            self.play(AnimationGroup(
+                *p.step(), lag_ratio=0.5))
+
+        prog = p[p.ptr]
+        prog.stdout = STDOUT
+        prog.ok = True
+        arrow, stdout, tick = p.step(True)
+        prog.group[-1].save_state().fade(1)
+        self.play(arrow, stdout)
+        self.play(FadeIn(checker))
+        self.wait(3)
+        self.play(FadeOut(checker))
+        prog.group[-1].restore()
+        self.play(tick)
+
+        output = prog.stdout_obj[1]
+        tick = prog.group[-1]
+        prog.group.remove(tick)
+        prog.stdout_obj.remove(output)
+        win_group = VGroup(output.copy(), tick.copy()).move_to(
+            self.camera.frame).scale_to_fit_width(self.camera.frame.width()).scale(.2)
+        self.play(FadeOut(p), FadeOut(p.arrow), output.animate.become(
+            win_group[0]), tick.animate.become(win_group[1]))
+
+        # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
+        # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
+        # [A NEBO: tick vedle algoritmu co se zvetsi na celou obrazovku]
+
         self.wait(5)
+
+
+class BazillionScroll(MovingCameraScene):
+    def construct(self):
+        default()
+        # So, let’s say that you give me some algorithm that needs f(n) time to factor numbers of size n. To have a concrete example in mind, we can think of the naive algorithm that simply tries to divide the input number by 2,3,4 and so on, until it succeeds.
+
+        # The most important observation is that our universal search will at some point start simulating this algorithm. For example, we begin to simulate this code in iteration roughly 10^140. I will call this number L from now on. L is ridiculously huge, but what’s absolutely essential is that it is a constant which does not depend on the length of the input number we want to factor.
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT)
+        p.arrow.fade(1)
+
+        p.add_programs_around("a", "", 0, NUM_AROUND, fade=False)
+        self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
+        p.add_dots(NUM_DOTS)
+        _, (_, bazillion, _) = p.add_programs_around(FACTORING_EXAMPLE_PROGRAM, "",
+                                                     NUM_AROUND, 0, fade=False)
+
+        g = VGroup()
+        for q in p:
+            if q.text == "...":
+                continue
+            num = program_to_number(q.text) + 1
+            tex = Tex("\\hsize=7cm{}\\rightskip=0pt plus 1fill{} " +
+                      allow_breaks(str(num)))
+            if num > 1e10:
+                tex.scale_to_fit_width(6)
+            g.add(tex.next_to(q).align_to(
+                self.camera.frame, RIGHT).shift(.5 * LEFT))
+        self.play(FadeIn(p), FadeIn(g))
+        self.play(
+            self.camera.frame.animate.align_to(
+                bazillion.get_bottom() + 0.1 * DOWN, DOWN),
+            run_time=3,
+        )
+
+        self.wait(1)
+
+
+class TimeComplexityAnalysis(MovingCameraScene):
+    def construct(self):
+        default()
+        p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3.7 * UP)
+        p.arrow.fade(1)
+        L = 5
+        time = 10
+        ZOOM = 4
+        if not DRAFT:
+            L = 20
+            time = 40
+            ZOOM = 8
+        total = L + time - 1
+        steps_till_appearance = (L + 1) * L // 2
+        steps_till_finished = (total + 1) * (total) // 2 + total - L
+        anims = [anim for _ in range(steps_till_appearance)
+                 for anim in p.step()]
+        zoomed_out = self.camera.frame.copy().scale(
+            ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT))
+        zoomed_out.shift(LEFT * zoomed_out.width * .1)
+        self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
+                  self.camera.frame.animate.become(zoomed_out), run_time=1)
+        our_prog = p[L - 1]
+
+        color_line = BLUE
+
+        t = VGroup(MathTex("L", color=color_line), Arrow(ORIGIN, RIGHT, stroke_width=.5 * ZOOM, color=color_line)).arrange(buff=SMALL_BUFF).scale(ZOOM).next_to(
+            our_prog, LEFT, buff=ZOOM * SMALL_BUFF)
+        self.play(FadeIn(t))
+        anims = [anim for _ in range(steps_till_appearance, steps_till_finished)
+                 for anim in p.step()]
+        dist = our_prog.group[3].get_center() - our_prog.group[2].get_center()
+        first_wheel = our_prog.group[2].get_center()
+        last_wheel = our_prog.group[-1].get_center()
+
+        color = BLUE
+        line = Line(
+            first_wheel - dist * .55, last_wheel + dist * 1.55, stroke_width=4 * ZOOM, color=BLUE)
+        tick_shape = Line(
+            ORIGIN, (dist[1], dist[0], 0), stroke_width=2 * ZOOM, color=BLUE).scale(.5)
+        tick_left = tick_shape.copy().move_to(line.get_left())
+        tick_right = tick_shape.copy().move_to(line.get_right())
+        arrow = VGroup(line, tick_left, tick_right)
+
+        self.play(FadeIn(arrow))
+        self.play(AnimationGroup(*anims, lag_ratio=0.5,
+                  rate_func=rate_functions.ease_in_out_quart), run_time=1)
+        self.play(*p.step())
+        p.ptr += 1
+        our_prog.stdout = STDOUT
+        our_prog.ok = True
+        self.play(*p.step(finish=True))
+
+        output = our_prog.stdout_obj[1]
+        tick = our_prog.group[-1]
+        our_prog.group.remove(tick)
+        our_prog.stdout_obj.remove(output)
+        win_group = VGroup(output.copy(), tick.copy()).move_to(
+            self.camera.frame).scale_to_fit_width(self.camera.frame.width).scale(.2)
+        self.play(FadeOut(our_prog.stdout_obj), output.animate.become(
+            win_group[0]), tick.animate.become(win_group[1]))
+        triangle = Polygon(p[0].group[2].get_center(), p[-1].group[2].get_center(),
+                           p[0].group[-1].get_center() + dist, color=GREEN, stroke_width=4 * ZOOM)
+        self.play(FadeIn(triangle))
+        jag = p.return_for_jagging(L - 1)
+        self.play(*map(FadeOut, jag))
+        self.wait(2)
+        self.play(*map(FadeIn, jag))
+        self.wait(2)
+        arrow_down = arrow.copy()
+        arrow_down.generate_target()
+        arrow_down.target.rotate(
+            -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
+        self.play(MoveToTarget(arrow_down))
+        self.wait(5)
+
+        # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
+
+        # So what is the total number of steps we need to make? Well, look at this triangle diagram that shows how many steps were simulated in total. Of course, some of the simulated algorithms may have finished much earlier [ zubatice], but in the worst case, the number of steps of the universal search is proportional to the number of dots in this picture. Since it took f(n) steps before we finished simulating our algorithm, we started the simulation of another f(n) algorithms in the meantime [čára f(n) se orotuje]. So, the area of this triangle is roughly ½ * (L+f(n))^2. Remember, L is just a constant, so this is simply O(f(n)^2) steps.
+
+        # We also need to account for the time we spent by checking whether the outputs of the finished algorithms are correct. Fortunately, if we use the fastest known algorithms for multiplication [*Schonhage 1979] instead of the standard algorithm, the time we spend checking is negligible.
+        # [znova se zjeví pseudokód pro checkování, nějaký zvýraznění multiplikace v něm]
 
 
 class Part1Rest(Scene):
