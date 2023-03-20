@@ -161,11 +161,13 @@ class CollapsibleAsymptotics(VMobject):
             "\mathcal{O}(", self.immovable.get_tex_string(), ")")
         self.new_tex.shift(self.immovable.get_center() -
                            self.new_tex[1].get_center())
-        return AnimationGroup(
-            *(FadeIn(self.new_tex[i], target_position=fake_tex[i])
-              for i in range(3)),
-            FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
-            FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
+        return Succession(
+            AnimationGroup(
+                *(FadeIn(self.new_tex[i], target_position=fake_tex[i])
+                for i in range(3)),
+                FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
+                FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
+            ),
             AnimationGroup(FadeOut(self.tex[1]), run_time=0.01),
         )
 
@@ -479,3 +481,10 @@ else: # also on error
         code.code[i].set_color(col).scale(
             2.5).shift(.9 * RIGHT + .15 * UP)
     return code
+
+
+def our_code_with_badge():
+    code_img = ImageMobject("img/program3x.png").scale_to_fit_width(2)
+    badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(0.8).align_to(code_img, RIGHT).shift(0.3*DOWN)
+
+    return Group(code_img, badge_img)

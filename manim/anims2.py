@@ -4,7 +4,8 @@ from utils.utilcliparts import *
 from utils.utilgeneral import *
 
 DRAFT = True
-
+prop1_str = r"1) We don't know its time complexity!"
+prop2_str = r"2) It is insanely slow. "
 
 class Intro(Scene):
     def construct(self):
@@ -54,7 +55,7 @@ class Intro(Scene):
         # )
         downarrow_tex = (
             Tex(r"$\Downarrow ?$").scale(2).next_to(
-                statement_tex, DOWN, buff=1)
+                our_group, DOWN, buff=0.5)
         )
         prices_img = [
             ImageMobject("img/turing.jpg").scale_to_fit_height(2.5),
@@ -76,7 +77,7 @@ class Intro(Scene):
         # Well, the only possibility is that although we know the asymptotically optimal algorithm, we unfortunately don’t know what its time complexity is!
         our_group.generate_target()
         our_group.target.scale(0.8).to_edge(LEFT)
-        statement2_tex = Tex(r"1) We don't know its time complexity!").next_to(
+        statement2_tex = Tex(prop1_str).next_to(
             our_group.target, RIGHT, buff=0.5).shift(1*UP)
 
         self.play(
@@ -100,7 +101,7 @@ class Intro(Scene):
         # The only possible conclusion: Our algorithm is insanely slow [sound effect] in practice.
 
         statement3_tex = (
-            Tex(r"2) It is insanely slow. ")
+            Tex(prop2_str)
             .next_to(statement2_tex, DOWN, buff=0.5)
             .align_to(statement2_tex, LEFT)
         )
@@ -611,6 +612,69 @@ class ProgramsWithStepping(MovingCameraScene):
         # [A NEBO: tick vedle algoritmu co se zvetsi na celou obrazovku]
 
         self.wait(5)
+
+
+class ExplanationBeginning(Scene):
+    def construct(self):
+        default()
+
+        title_tex = Tex("Universal search", font_size = 3*DEFAULT_FONT_SIZE).to_edge(UP)
+        self.play(FadeIn(title_tex))
+        self.wait()
+
+        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
+        name_txt = Tex("Leonid Levin").scale(0.7).next_to(levin_img, DOWN)
+        levin_group = Group(levin_img, name_txt).arrange(DOWN).to_edge(RIGHT).shift(0.3*DOWN)
+
+        self.play(FadeIn(levin_group))
+        self.wait()
+
+        prop1_tex = Tex(prop1_str)
+        prop2_tex = Tex(prop2_str)
+        props = Group(prop1_tex, prop2_tex).arrange_in_grid(cols = 1, cell_alignment = LEFT, ).to_edge(LEFT)
+
+        self.play(
+            FadeIn(props)
+        )
+        self.wait()
+        self.play(
+            FadeOut(props),
+            FadeOut(levin_group)
+        )
+        self.wait()
+
+
+        shft = 1 * DOWN
+        your_algo_img = SVGMobject( # TODO v svg nefunguje tloustka car
+            "img/you.svg").scale_to_fit_height(3.5)
+        fn = Tex(r"$f(n)$")
+        your_algo = Group(your_algo_img, fn).arrange(DOWN).align_to(Dot().to_edge(LEFT), RIGHT).shift(shft)
+        self.play(
+            your_algo.animate.move_to(3*LEFT).shift(shft)
+        )
+        self.wait()
+
+        our_algo_img = our_code_with_badge().scale_to_fit_height(3)
+        fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}") # TODO fix tečku
+        our_algo = Group(our_algo_img, fn2).arrange(DOWN).align_to(Dot().to_edge(RIGHT), LEFT).align_to(your_algo, DOWN)
+        self.play(
+            our_algo.animate.move_to(3*RIGHT).align_to(your_algo, DOWN)
+        )
+
+        fn2_new =  Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(fn2.get_center()) # TODO fix tečku
+        fn2.save_state()
+        self.play(
+            Transform(fn2, fn2_new)
+        )
+        self.wait()
+        self.play(
+            fn2.animate.restore()
+        )
+        self.wait()
+
+
+        self.wait(3)        
+
 
 
 class BazillionScroll(MovingCameraScene):

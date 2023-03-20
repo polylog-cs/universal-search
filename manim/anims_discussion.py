@@ -494,43 +494,10 @@ class Discussion3(Scene):
         # TODO zopakovat pěknout trojúhelníkovou animaci?
 
 
-'''
-class Hilbert(Scene):
+
+class Discussion3(Scene):
     def construct(self):
-        from hilbertcurve.hilbertcurve import HilbertCurve
+        default()
+        self.add(vasek_head)
 
-        side_length = 4
-        bounding_square = (
-            Square(color=GRAY).scale_to_fit_width(
-                side_length).shift(0)
-        )
-
-        def create_curve(iter):
-            distances = list(range(4**iter))
-            points = HilbertCurve(iter, 2).points_from_distances(distances)
-            points = [[p[0], p[1], 0] for p in points]
-            curve = VMobject()
-            curve.set_points_as_corners(points)
-            curve.set_color(RED).scale_to_fit_width(
-               side_length * (1 - 2 ** (-iter))
-            ).move_to(bounding_square.get_center())
-            return curve
-
-        self.play(
-            FadeIn(bounding_square),
-        )
-        self.wait()
-
-        curve1 = create_curve(1)
-        self.play(
-            FadeIn(curve1)
-        )
-        self.wait()
-
-        for i in range(2, 5):
-            curve2 = create_curve(i)
-            self.play(
-                Transform(curve1, curve2)
-            )        
-            self.wait()
-'''
+        faster_tex = Tex()
