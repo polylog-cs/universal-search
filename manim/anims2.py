@@ -542,7 +542,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
             infinite.animate.align_to(
                 self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
-        self.play(FadeOut(waiting), FadeOut(infinite.stdout))
+        self.play(FadeOut(waiting), FadeOut(infinite.stdout_obj))
         self.play(infinite.dumb_down(), self.camera.frame.animate.align_to(
             infinite.stdin.get_top() + 0.5 * UP, UP))
         infinite.arrange()
