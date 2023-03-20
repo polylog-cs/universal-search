@@ -364,7 +364,7 @@ class ProgramInvocationList(VGroup):
         self.arrange()
         self.add_updater(ProgramInvocationList.arrange)
         self.dots = ProgramInvocation("...", self.stdin, "", False)
-        self.dummy = ProgramInvocation("[code]", self.stdin, "woo", False)
+        self.dummy = ProgramInvocation("[code]", self.stdin, "foo", False)
         self.ptr = 0
         self.arrow = (
             Arrow(start=RIGHT, end=LEFT)
@@ -476,7 +476,7 @@ def make_checking_code():
 if a * b == n:
 
 ✓
-else: # also on error
+else:
 
 ×
 """.strip())
@@ -492,3 +492,7 @@ def our_code_with_badge():
         0.8).align_to(code_img, RIGHT).shift(0.3*DOWN)
 
     return Group(code_img, badge_img)
+
+
+def you_image():
+    return SVGMobject("img/you.svg").set_stroke(BLACK, 3)

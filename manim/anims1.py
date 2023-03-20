@@ -1,7 +1,7 @@
 from manim import *
 import manim as m  # hack for type hinting
 from utils import *
-# -r 
+# -r
 # ^ also imports manim and changes some of its defaults
 
 
@@ -42,6 +42,8 @@ soft_color = BASE02
 soft_opacity = 0.0
 
 K = 5
+
+
 class Intro(Scene):
     def construct(self):
         default()
@@ -214,7 +216,6 @@ class Intro(Scene):
             FadeIn(Group(div_sign, eq_sign)),
         )
 
-
         divisors = []
         divisors += list(range(2, 8))
         for l in range(1, len(num_tex[0])):
@@ -240,13 +241,12 @@ class Intro(Scene):
                 str(num2)).scale(sc).next_to(eq_sign, RIGHT).set_color(GREEN)]
         )
 
-
         def f(i):
             if i <= 10:
                 return i/10.0
             else:
                 return 0.1
-            
+
         fst = True
         for i in range(len(pairs)):
             if fst == True:
@@ -260,9 +260,10 @@ class Intro(Scene):
                     pairs[i][j].save_state()
                 g.shift(1*DOWN).set_color(BACKGROUND_COLOR)
                 self.play(
-                    Group(*pairs[i-1]).animate.shift(1 * UP).set_color(BACKGROUND_COLOR),
+                    Group(*pairs[i-1]).animate.shift(1 *
+                                                     UP).set_color(BACKGROUND_COLOR),
                     *[pairs[i][j].animate.restore() for j in [0, 1]],
-                    run_time = f(i)
+                    run_time=f(i)
                 )
 
         self.wait(2)
@@ -372,8 +373,8 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             our_group.animate.scale_to_fit_height(3).move_to(3*RIGHT)
         )
         self.wait()
-        your_algo = SVGMobject(
-            "img/you.svg").scale_to_fit_height(3).align_to(Dot().to_edge(LEFT), RIGHT)
+        your_algo = you_image().scale_to_fit_height(
+            3).align_to(Dot().to_edge(LEFT), RIGHT)
         self.play(
             your_algo.animate.move_to(3*LEFT)
         )
@@ -448,7 +449,6 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         # our_algo = VGroup(our_algo_placeholder, badge)
         # self.add(our_algo)
 
-
         # Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor.
         # For example, perhaps my algorithm is twice as slow as yours, but it is at most twice as slow for all inputs, even very large ones.
         # TODO obrazek pro your algo
@@ -460,7 +460,6 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         # self.play(FadeOut(our_algo_full), FadeIn(badge), FadeIn(your_algo))
 
         self.play(Write(axes), Write(labels))
-
 
         plot_good = axes.plot(f_good, color=COLOR_GOOD)
         plot_bad = axes.plot(f_bad, color=COLOR_BAD)
@@ -484,7 +483,6 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             our_algo.copy().scale(0.3), MathTex(), your_algo.copy().scale(0.3)
         )
 
-
         self.play(
             our_algo.animate.scale(0.3).align_to(axes, DL),
             your_algo.animate.scale(0.3).align_to(axes, DL),
@@ -494,16 +492,14 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         your_algo.add_updater(make_updater(plot_yours))
         our_algo.add_updater(make_updater(plot_ours))
 
-        self.play(Write(plot_ours), Write(plot_yours), run_time = 3)
+        self.play(Write(plot_ours), Write(plot_yours), run_time=3)
         self.wait()
-
 
         zero = axes.coords_to_point(0, 0)
         arrow = Arrow(zero + DOWN, zero)
         self.play(Write(arrow))
         self.wait()
 
-        
         def ptr_updater(obj):
             x = axes.point_to_coords(arrow.get_center())[0]
             x = max(x, 1e-5)
@@ -543,7 +539,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
 
         self.play(arrow.animate.shift(9 * RIGHT), run_time=4)
         self.wait(1)
-        self.play(arrow.animate.shift(4 * LEFT), run_time = 2)
+        self.play(arrow.animate.shift(4 * LEFT), run_time=2)
         self.wait(1)
 
         # So it is not possible that you could come up with an algorithm such that as the input size increases, my algorithm would get slower and slower relative to yours.
@@ -558,6 +554,3 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         # Or just run the algorithm on some real data! In that case be careful, our implementation is in Python, so it’s a bit slow. Good luck and see you in a few days with the follow-up video!
 
         self.wait(5)
-
-
-
