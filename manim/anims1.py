@@ -1,7 +1,6 @@
 from manim import *
 import manim as m  # hack for type hinting
 from utils import *
-# -r 
 # ^ also imports manim and changes some of its defaults
 
 class Polylogo(Scene):
