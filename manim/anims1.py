@@ -41,7 +41,7 @@ class Polylogo(Scene):
 soft_color = BASE02
 soft_opacity = 0.0
 
-
+K = 5
 class Intro(Scene):
     def construct(self):
         default()
@@ -214,10 +214,11 @@ class Intro(Scene):
             FadeIn(Group(div_sign, eq_sign)),
         )
 
+
         divisors = []
         divisors += list(range(2, 8))
         for l in range(1, len(num_tex[0])):
-            for _ in range(5):
+            for _ in range(K):
                 div = random.randrange(10**l, 10**(l+1)-1)
                 if div < num1:
                     divisors.append(div)
@@ -226,7 +227,7 @@ class Intro(Scene):
         pairs = []
         for div in divisors:
             tex1 = Tex(str(div)).scale(sc).next_to(eq_sign, LEFT)
-            n = '{:.2f}'.format(round(num/div, 3))
+            n = '{:.3f}'.format(round(num/div, 4))
             tex2 = Tex(r"{{" + n.split(".")[0] + r"}}{{." + n.split(".")[1] + r"$\dots$}}").scale(
                 sc if len(str(round(num/div))) <= 12 else 1).next_to(eq_sign, RIGHT)
             pairs.append([tex1, tex2])
@@ -239,6 +240,13 @@ class Intro(Scene):
                 str(num2)).scale(sc).next_to(eq_sign, RIGHT).set_color(GREEN)]
         )
 
+
+        def f(i):
+            if i <= 10:
+                return i/10.0
+            else:
+                return 0.1
+            
         fst = True
         for i in range(len(pairs)):
             if fst == True:
@@ -252,9 +260,9 @@ class Intro(Scene):
                     pairs[i][j].save_state()
                 g.shift(1*DOWN).set_color(BACKGROUND_COLOR)
                 self.play(
-                    Group(*pairs[i-1]).animate.shift(1 *
-                                                     UP).set_color(BACKGROUND_COLOR),
-                    *[pairs[i][j].animate.restore() for j in [0, 1]]
+                    Group(*pairs[i-1]).animate.shift(1 * UP).set_color(BACKGROUND_COLOR),
+                    *[pairs[i][j].animate.restore() for j in [0, 1]],
+                    run_time = f(i)
                 )
 
         self.wait(2)
@@ -367,7 +375,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         your_algo = SVGMobject(
             "img/you.svg").scale_to_fit_height(3).align_to(Dot().to_edge(LEFT), RIGHT)
         self.play(
-            your_algo.animate.move_to(2*LEFT)
+            your_algo.animate.move_to(3*LEFT)
         )
         self.wait()
         self.play(
@@ -486,14 +494,16 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         your_algo.add_updater(make_updater(plot_yours))
         our_algo.add_updater(make_updater(plot_ours))
 
-        self.play(Write(plot_ours), Write(plot_yours))
-
+        self.play(Write(plot_ours), Write(plot_yours), run_time = 3)
+        self.wait()
 
 
         zero = axes.coords_to_point(0, 0)
         arrow = Arrow(zero + DOWN, zero)
         self.play(Write(arrow))
+        self.wait()
 
+        
         def ptr_updater(obj):
             x = axes.point_to_coords(arrow.get_center())[0]
             x = max(x, 1e-5)
@@ -548,3 +558,6 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         # Or just run the algorithm on some real data! In that case be careful, our implementation is in Python, so it’s a bit slow. Good luck and see you in a few days with the follow-up video!
 
         self.wait(5)
+
+
+

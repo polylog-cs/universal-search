@@ -18,16 +18,42 @@ class Discussion1(Scene):
         # First of all, what I don’t want you to take away, is that asymptotic complexity is a broken concept. Let’s say we want to analyze some algorithm like selectsort. There are a bunch of approaches you could take. First, you could code the algorithm and empirically measure its complexity.
 
 
+
+
+
         sl = 2
-        empirical_img = (
-            Square(sl)
+        op = 0.1
+
+        def make_range(max):
+            return [0, max, max]
+
+        x_range, y_range = make_range(5), make_range(10)
+
+        def f_q(x):
+            return x**1.8 / 2
+
+        axes = (
+            Axes(
+                x_range=x_range,
+                y_range=y_range,
+                x_length = sl,
+                y_length = sl,
+            )
+        )
+        plot = axes.plot(f_q, color=BLUE)
+
+
+
+
+        empirical_img = Group(
+            axes, plot
         )
         empirical_group = Group(Square(sl), empirical_img)
 
         # Or you could count how many steps the algorithm needs to solve any input of size n, but compute this number exactly, with all constants and lower order terms.
         # Or you can compute the asymptotic complexity. Or you can just check whether it's a polynomial time algorithm or not.
 
-        asymptotic_tex = Tex("$O(n^2)$")
+        asymptotic_tex = Tex(r"$\mathcal{O}\left(n^2 \right)$")
         asymptotic_group = Group(Square(sl), asymptotic_tex)
         poly_tex = Tex(r"polynomial \\ time?")
         poly_group = Group(Square(sl), poly_tex)
@@ -41,8 +67,11 @@ class Discussion1(Scene):
 
         self.play(
             Succession(
-                FadeIn(empirical_img),
+                Create(axes),
+                Write(plot),
+                Wait(),
                 FadeIn(asymptotic_tex),
+                Wait(),
                 FadeIn(poly_tex),
             )
         )
@@ -60,14 +89,14 @@ class Discussion1(Scene):
         self.play(Create(arrow1), Write(label1))
         self.wait()
 
-        highlight_rec = SurroundingRectangle(empirical_group, color = RED)
+        highlight_rec = SurroundingRectangle(empirical_group, fill_opacity = op, fill_color = RED, color = RED)
         self.play(
             Succession(
             FadeIn(highlight_rec),
             Wait(),
-            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, color = RED)),
+            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, fill_opacity = op, fill_color = RED, color = RED)),
             Wait(),
-            Transform(highlight_rec, SurroundingRectangle(poly_group, color = RED)),
+            Transform(highlight_rec, SurroundingRectangle(poly_group, fill_opacity = op, fill_color = RED, color = RED)),
             Wait()
             )
         )
@@ -87,9 +116,9 @@ class Discussion1(Scene):
 
         self.play(
             Succession(
-            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, color = RED)),
+            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, fill_opacity = op, fill_color = RED, color = RED)),
             Wait(),
-            Transform(highlight_rec, SurroundingRectangle(empirical_group, color = RED)),
+            Transform(highlight_rec, SurroundingRectangle(empirical_group, fill_opacity = op, fill_color = RED, color = RED)),
             Wait()
             )
         )
@@ -97,11 +126,11 @@ class Discussion1(Scene):
         sl = 3.0
         self.play(
             Succession(
-            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, color = RED)),
+            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, fill_opacity = op, fill_color = RED, color = RED)),
             Wait(),
-            Transform(highlight_rec, SurroundingRectangle(Group(asymptotic_group, label1), color = RED)),
+            Transform(highlight_rec, SurroundingRectangle(Group(asymptotic_group, label1), fill_opacity = op, fill_color = RED, color = RED)),
             Wait(),
-            Transform(highlight_rec, SurroundingRectangle(Group(asymptotic_group, label1, label2), color = RED)),
+            Transform(highlight_rec, SurroundingRectangle(Group(asymptotic_group, label1, label2), fill_opacity = op, fill_color = RED, color = RED)),
             Wait(),
             )
         )
@@ -301,25 +330,24 @@ class Discussion2(Scene):
             .next_to(hilberttitle_tex, DOWN)
         )
 
+
+        curve1 = create_curve(1)
         self.play(
             FadeIn(bounding_square),
             FadeIn(hilberttitle_tex),
             anims[1][1],
-        )
-        self.wait()
-
-        curve1 = create_curve(1)
-        self.play(
             *[FadeIn(line) for line in curve1]
         )
+        self.wait()
         self.wait()
 
         for i in range(2, 9):
             curve2 = create_curve(i)
             self.play(
-                Transform(curve1, curve2)
+                Transform(curve1, curve2),
+                run_time = 0.5
             )        
-            self.wait()
+            self.wait(0.5)
 
         red_square = Square(
                     color=RED, fill_opacity=1, fill_color=RED
