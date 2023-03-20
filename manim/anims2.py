@@ -324,10 +324,7 @@ class MonkeyTyping(Scene):
         # http://www.foo.be/docs/tpj/issues/vol3_2/tpj0302-0012.html
         # ]
 
-
-
-
-        def perl_program(randomize = True):
+        def perl_program(randomize=True):
             str = r"""undef $/;open(_,$0);/ \dx([\dA-F]*)/while(<_>);@&=split(//,$1);@/=@&;
 $".=chr(hex(join("",splice(@&,0,2))))while(@&); eval$”;
 ($C,$_,@\)=(($a=$/[1]*4)*5+1, q| |x(0x20).q|\||.chr(32)x(0x10).q$*$.
@@ -345,9 +342,9 @@ E7365746174747228302C544353414E4F57293B24643D224352415348215C6E223B0A;
 (by David Powell, Obfuscated Perl Contest) """
             if not randomize:
                 return str.split("\n")
-            return [''.join(random.sample(line, len(line)))  for line in str.splitlines()]
+            return [''.join(random.sample(line, len(line))) for line in str.splitlines()]
 
-        def random_text(num_of_lines, line_length = 30):
+        def random_text(num_of_lines, line_length=30):
             from string import ascii_lowercase, ascii_uppercase, digits
             choices = ascii_lowercase + ascii_uppercase + digits + "              /.,"
 
@@ -357,7 +354,7 @@ E7365746174747228302C544353414E4F57293B24643D224352415348215C6E223B0A;
                     ''.join(random.choices(choices, k=line_length))
                 )
             return ret
-    
+
         texts = [
             random_text(5),
             random_text(4),
@@ -397,7 +394,7 @@ for i in range(42):
             perl_program(False),
             random_text(10, 50),
             random_text(5),
-"""
+            """
 #Absolutely amazing factoring algorithm
 
 import antigravity
@@ -409,13 +406,12 @@ def factor(n):
             """.split("\n")
         ]
 
-
-        chimp_img = ImageMobject("img/chimp.jpg", z_index = 100).scale_to_fit_width(6).to_corner(UR, buff = 0.2)
+        chimp_img = ImageMobject(
+            "img/chimp.jpg", z_index=100).scale_to_fit_width(6).to_corner(UR, buff=0.2)
         self.play(
             FadeIn(chimp_img)
         )
         self.wait()
-
 
         texts_group = Group()
 
@@ -424,24 +420,24 @@ def factor(n):
             text_group = Group()
             for j in range(len(text)):
                 text_group.add(
-                    Text(text[j], z_index = 0).scale(0.5)
+                    Text(text[j], z_index=0).scale(0.5)
                 )
-            text_group.arrange_in_grid(cols = 1, cell_alignment=LEFT)
+            text_group.arrange_in_grid(cols=1, cell_alignment=LEFT)
             texts_group.add(text_group)
 
-        texts_group.arrange_in_grid(cols = 1, cell_alignment=LEFT, buff = 1).align_to(
+        texts_group.arrange_in_grid(cols=1, cell_alignment=LEFT, buff=1).align_to(
             Dot().to_edge(DOWN), UP
         )
 
         t = 0
         for i in range(120):
             t += 0.2 + random.uniform(0, 0.2)
-            self.add_sound(random_typewriter_file(), time_offset = t)
+            self.add_sound(random_typewriter_file(), time_offset=t)
 
         self.play(
-            texts_group.animate.to_edge(DOWN, buff = 0),
-            run_time = 30,
-            rate_func = linear,
+            texts_group.animate.to_edge(DOWN, buff=0),
+            run_time=30,
+            rate_func=linear,
         )
         self.wait(3)
 
@@ -732,35 +728,37 @@ class TimeComplexityAnalysis(MovingCameraScene):
                  for anim in p.step()]
         zoomed_out = self.camera.frame.copy().scale(
             ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT))
-        zoomed_out.shift(LEFT * zoomed_out.width * .1)
+        zoomed_out.shift(LEFT * zoomed_out.width * .1 +
+                         UP * zoomed_out.height * .1)
         self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
                   self.camera.frame.animate.become(zoomed_out), run_time=1)
         our_prog = p[L - 1]
 
-        color_line = BLUE
+        def mkbrace(*args, **kwargs):
+            kwargs["stroke_width"] = kwargs.get("stroke_width", 2 * ZOOM)
+            kwargs["font_size"] = kwargs.get("font_size", 48 * ZOOM)
+            kwargs["buff"] = kwargs.get("buff", 0.2 * ZOOM)
+            return BraceLabel(*args, **kwargs).set_color(kwargs["color"])
 
-        t = VGroup(MathTex("L", color=color_line), Arrow(ORIGIN, RIGHT, stroke_width=.5 * ZOOM, color=color_line)).arrange(buff=SMALL_BUFF).scale(ZOOM).next_to(
-            our_prog, LEFT, buff=ZOOM * SMALL_BUFF)
-        self.play(FadeIn(t))
+        color_l = RED
+        color_fn = BLUE
+
+        l_label = mkbrace(p, "L", LEFT, color=color_l)
+        self.play(FadeIn(l_label))
         anims = [anim for _ in range(steps_till_appearance, steps_till_finished)
                  for anim in p.step()]
+        anim_last = p.step()
         dist = our_prog.group[3].get_center() - our_prog.group[2].get_center()
-        first_wheel = our_prog.group[2].get_center()
-        last_wheel = our_prog.group[-1].get_center()
+        first_wheel = our_prog.group[2]
+        last_wheel = our_prog.group[-1]
 
-        color = BLUE
-        line = Line(
-            first_wheel - dist * .55, last_wheel + dist * 1.55, stroke_width=4 * ZOOM, color=BLUE)
-        tick_shape = Line(
-            ORIGIN, (dist[1], dist[0], 0), stroke_width=2 * ZOOM, color=BLUE).scale(.5)
-        tick_left = tick_shape.copy().move_to(line.get_left())
-        tick_right = tick_shape.copy().move_to(line.get_right())
-        arrow = VGroup(line, tick_left, tick_right)
+        fn_label_horiz = mkbrace(Group(Point(first_wheel.get_bottom()), Point(
+            last_wheel.get_bottom())), "f(n)", DOWN, buff=0.05 * ZOOM, z_index=100, color=color_fn)
 
-        self.play(FadeIn(arrow))
+        self.play(FadeIn(fn_label_horiz))
         self.play(AnimationGroup(*anims, lag_ratio=0.5,
                   rate_func=rate_functions.ease_in_out_quart), run_time=1)
-        self.play(*p.step())
+        self.play(*anim_last)
         p.ptr += 1
         our_prog.stdout = STDOUT
         our_prog.ok = True
@@ -774,6 +772,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             self.camera.frame).scale_to_fit_width(self.camera.frame.width).scale(.2)
         self.play(FadeOut(our_prog.stdout_obj), output.animate.become(
             win_group[0]), tick.animate.become(win_group[1]))
+        self.play(FadeOut(output), FadeOut(tick))
         triangle = Polygon(p[0].group[2].get_center(), p[-1].group[2].get_center(),
                            p[0].group[-1].get_center() + dist, color=GREEN, stroke_width=4 * ZOOM)
         self.play(FadeIn(triangle))
@@ -782,11 +781,38 @@ class TimeComplexityAnalysis(MovingCameraScene):
         self.wait(2)
         self.play(*map(FadeIn, jag))
         self.wait(2)
-        arrow_down = arrow.copy()
-        arrow_down.generate_target()
-        arrow_down.target.rotate(
-            -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
-        self.play(MoveToTarget(arrow_down))
+        # arrow_down = arrow.copy()
+        # arrow_down.generate_target()
+        # arrow_down.target.rotate(
+        #    -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
+        # self.play(MoveToTarget(arrow_down))
+        fn_label_horiz_copy = fn_label_horiz.copy()
+
+        vg = VGroup(p[L:])
+        fn_label = mkbrace(vg, "f(n) ", LEFT, color=color_fn)
+        self.play(fn_label_horiz_copy.animate.become(fn_label))
+        fn_label = fn_label_horiz_copy
+        triangle_top = triangle.get_corner(UP + LEFT)
+        triangle_bot = triangle.get_corner(DOWN + LEFT)
+        alpha = L / (L + time)
+        triangle_vmid = (1 - alpha) * triangle_top + alpha * triangle_bot
+        l_relabel = mkbrace(
+            Group(Line(triangle_top, triangle_vmid)), "L", LEFT, color=color_l)
+        fn_relabel = mkbrace(
+            Group(Line(triangle_vmid, triangle_bot)), "f(n)", LEFT, color=color_fn)
+        self.play(fn_label.animate.become(fn_relabel),
+                  l_label.animate.become(l_relabel), FadeOut(p), FadeOut(fn_label_horiz), triangle.animate.set_fill(GREEN, 1))
+
+        triangle_left = triangle.get_corner(UP + LEFT)
+        triangle_right = triangle.get_corner(UP + RIGHT)
+        triangle_hmid = (1 - alpha) * triangle_left + alpha * triangle_right
+        l_rehor = mkbrace(
+            Group(Line(triangle_left, triangle_hmid)), "L", UP, color=color_l)
+        fn_rehor = mkbrace(
+            Group(Line(triangle_hmid, triangle_right)), "f(n)", UP, color=color_fn)
+        self.play(fn_label.copy().animate.become(fn_rehor),
+                  l_label.copy().animate.become(l_rehor))
+
         self.wait(5)
 
         # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.

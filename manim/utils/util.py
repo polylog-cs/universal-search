@@ -182,7 +182,7 @@ class ProgramInvocation(VMobject):
             font="monospace",
             insert_line_no=False,
             font_size=24,
-            margin=0.2,
+            margin=0.15,
         )
 
     def __init__(self, code, stdin, stdout, ok, *args, **kwargs):
