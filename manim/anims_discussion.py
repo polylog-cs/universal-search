@@ -500,4 +500,43 @@ class Discussion3(Scene):
         default()
         self.add(vasek_head)
 
-        faster_tex = Tex()
+        question_tex = Tex("Why don't we have algorithms with complexities")
+        faster_tex = Tex(r"{{$\mathcal{O}\left(2^n \right)$, }}{{$\mathcal{O}\left(2^{0.1n} \right)$, }}{{$\mathcal{O}\left(2^{0.01n} \right)$, }}{{$\dots$}}")
+        question2_tex = Tex("but no asymptotically fastest algorithm? ")
+        quest_group = Group(question_tex, faster_tex, question2_tex).arrange_in_grid(cols = 1, cell_alignment=LEFT).shift(1.5*UP)
+        faster_tex.shift(1*RIGHT)
+
+        self.play(
+            Succession(
+                Write(question_tex),
+                Write(faster_tex[0]),
+                Write(faster_tex[1]),
+                Write(faster_tex[2]),
+                Write(faster_tex[3]),
+                Write(question2_tex),
+            )
+        )
+        self.wait()
+
+        uni_tex = Tex("Universal search!", font_size = DEFAULT_FONT_SIZE*1.4).shift(2*DOWN + 3*LEFT/2)
+        self.play(
+            Write(uni_tex),
+        )
+        self.wait()
+        self.remove(vasek_head)
+        self.play(
+            *[FadeOut(o) for o in self.mobjects if o not in [vasek_head]]
+        )
+        uni_tex = Tex(
+            r"{{Universal search \\}}{{an explicit asymptotically optimal algorithm for many problems}}"
+        )
+        uni_tex[0].scale(2).shift(0.4 * UP)
+        uni_tex[1].scale(0.9)
+        uni_tex.to_edge(UP).shift(1 * DOWN)
+
+        self.play(
+            Write(uni_tex),
+        )
+
+
+        self.wait(3)
