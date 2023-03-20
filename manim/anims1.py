@@ -364,10 +364,10 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             our_group.animate.scale_to_fit_height(3).move_to(3*RIGHT)
         )
         self.wait()
-        your_algo_img = SVGMobject(
-            "img/you.svg").scale_to_fit_height(3)
+        your_algo = SVGMobject(
+            "img/you.svg").scale_to_fit_height(3).align_to(Dot().to_edge(LEFT), RIGHT)
         self.play(
-            FadeIn(your_algo_img)
+            your_algo.animate.move_to(2*LEFT)
         )
         self.wait()
         self.play(
@@ -398,7 +398,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             return x**1.5 * 2
 
         def f_bad(x):
-            return x**4 / 4e7
+            return x**3.5 / 2e6 * 1.25
 
         def f_yours(x):
             return x**1.5
@@ -415,42 +415,44 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             x_label=r"\text{input size}", y_label=r"\text{time}"
         )
 
-        self.play(
-            our_algo.animate.scale(
-                (scale_width * 1.05, scale_height * 1.05, 1)
-            ).next_to(axes, RIGHT)
-        )
-        our_algo_placeholder = (
-            Square(
-                color=COLOR_GOOD,
-                fill_opacity=1,
-            )
-            .scale(0.5)
-            .scale(target_size)
-            .move_to(our_algo)
-        )
-        self.bring_to_back(our_algo_placeholder)
-        badge = (
-            Circle(color=ORANGE, fill_opacity=1)
-            .scale(0.15 * target_size)
-            .move_to(our_algo)
-            .shift(0.15 * DOWN + 0.15 * RIGHT)
-        )
-        our_algo_full = our_algo
-        our_algo = VGroup(our_algo_placeholder, badge)
-        self.add(our_algo)
+        # self.play(
+        #     our_algo.animate.scale(
+        #         (scale_width * 1.05, scale_height * 1.05, 1)
+        #     ).next_to(axes, RIGHT)
+        # )
+        # our_algo_placeholder = (
+        #     Square(
+        #         color=COLOR_GOOD,
+        #         fill_opacity=1,
+        #     )
+        #     .scale(0.5)
+        #     .scale(target_size)
+        #     .move_to(our_algo)
+        # )
+        # self.bring_to_back(our_algo_placeholder)
+        # badge = (
+        #     Circle(color=ORANGE, fill_opacity=1)
+        #     .scale(0.15 * target_size)
+        #     .move_to(our_algo)
+        #     .shift(0.15 * DOWN + 0.15 * RIGHT)
+        # )
+        # our_algo_full = our_algo
+        # our_algo = VGroup(our_algo_placeholder, badge)
+        # self.add(our_algo)
+
 
         # Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor.
         # For example, perhaps my algorithm is twice as slow as yours, but it is at most twice as slow for all inputs, even very large ones.
         # TODO obrazek pro your algo
-        your_algo = (
-            Triangle(color=COLOR_YOURS, fill_opacity=1)
-            .scale(0.5 * target_size)
-            .next_to(our_algo, DOWN)
-        )
-        self.play(FadeOut(our_algo_full), FadeIn(badge), FadeIn(your_algo))
+        # your_algo = (
+        #     Triangle(color=COLOR_YOURS, fill_opacity=1)
+        #     .scale(0.5 * target_size)
+        #     .next_to(our_algo, DOWN)
+        # )
+        # self.play(FadeOut(our_algo_full), FadeIn(badge), FadeIn(your_algo))
 
         self.play(Write(axes), Write(labels))
+
 
         plot_good = axes.plot(f_good, color=COLOR_GOOD)
         plot_bad = axes.plot(f_bad, color=COLOR_BAD)
@@ -466,17 +468,27 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         def make_updater(plot):
             def updater(obj):
                 obj.next_to(plot, RIGHT + UP)
-                obj.shift(0.4 * DOWN)
+                obj.shift(0.7 * DOWN)
 
             return updater
 
-        ptr_group = VGroup(
-            our_algo.copy().scale(0.7), MathTex(), your_algo.copy().scale(0.7)
+        ptr_group = Group(
+            our_algo.copy().scale(0.3), MathTex(), your_algo.copy().scale(0.3)
         )
+
+
+        self.play(
+            our_algo.animate.scale(0.3).align_to(axes, DL),
+            your_algo.animate.scale(0.3).align_to(axes, DL),
+        )
+        self.wait()
+
         your_algo.add_updater(make_updater(plot_yours))
         our_algo.add_updater(make_updater(plot_ours))
 
         self.play(Write(plot_ours), Write(plot_yours))
+
+
 
         zero = axes.coords_to_point(0, 0)
         arrow = Arrow(zero + DOWN, zero)
@@ -491,7 +503,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             our, tex, your = obj
             tex.become(MathTex(r" = {:.2f}\times".format(ratio)))
             obj.arrange()
-            obj.next_to(arrow, RIGHT)
+            obj.next_to(arrow, RIGHT).shift(0.3*DOWN)
 
         def lines_updater(obj):
             ctp = axes.coords_to_point
@@ -519,9 +531,9 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         ptr_group.add_updater(ptr_updater)
         lines_group.add_updater(lines_updater)
 
-        self.play(arrow.animate.shift(10 * RIGHT), run_time=2)
+        self.play(arrow.animate.shift(9 * RIGHT), run_time=4)
         self.wait(1)
-        self.play(arrow.animate.shift(5 * LEFT))
+        self.play(arrow.animate.shift(4 * LEFT), run_time = 2)
         self.wait(1)
 
         # So it is not possible that you could come up with an algorithm such that as the input size increases, my algorithm would get slower and slower relative to yours.
@@ -530,8 +542,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
 
         self.play(plot_ours.animate.become(plot_bad))
 
-        self.play(arrow.animate.shift(5 * LEFT))
-        self.play(arrow.animate.shift(10 * RIGHT), run_time=4)
+        self.play(arrow.animate.shift(4 * RIGHT), run_time=4)
 
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing!
         # Or just run the algorithm on some real data! In that case be careful, our implementation is in Python, so it’s a bit slow. Good luck and see you in a few days with the follow-up video!
