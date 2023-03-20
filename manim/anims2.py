@@ -414,6 +414,7 @@ def factor(n):
 
         texts_group = Group()
 
+        # TODO (high effort): make this appear as if written on a typewriter
         for i in range(len(texts)):
             text = texts[i]
             text_group = Paragraph(
