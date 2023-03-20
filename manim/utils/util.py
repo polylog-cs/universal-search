@@ -1,4 +1,5 @@
 import math
+import hashlib
 
 from manim import *
 
@@ -450,6 +451,19 @@ class ProgramInvocationList(VGroup):
             if not self[self.ptr].finished:
                 break
         return anims
+
+    def return_for_jagging(self, ignore=None):
+        cogs = []
+        for i, p in enumerate(self):
+            if i == ignore or p.wheels <= 2:
+                continue
+            hsh = hashlib.md5(str(i).encode()).digest()
+            hsh = hsh[0] + (hsh[1] << 8) + (hsh[2] << 16)
+            if hsh % 2 != 0:
+                continue
+            num = hsh % (p.wheels - 1) + 1
+            cogs += list(p.group[-num:])
+        return cogs
 
 
 def make_checking_code():

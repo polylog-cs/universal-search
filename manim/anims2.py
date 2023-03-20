@@ -3,6 +3,8 @@ from utils.util import *
 from utils.utilcliparts import *
 from utils.utilgeneral import *
 
+DRAFT = True
+
 
 class Intro(Scene):
     def construct(self):
@@ -334,8 +336,9 @@ class MonkeyTyping(Scene):
 # Smaller values for faster preview
 NUM_DOTS = 5
 NUM_AROUND = 5
-# NUM_DOTS = 30
-# NUM_AROUND = 15
+if not DRAFT:
+    NUM_DOTS = 30
+    NUM_AROUND = 15
 STDIN = "4"
 STDOUT = "2,2"
 INFINITE_PROGRAM = """
@@ -484,10 +487,12 @@ class ProgramsWithStepping(MovingCameraScene):
 
         output = prog.stdout_obj[1]
         tick = prog.group[-1]
-        win_group = VGroup(output, tick)
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
-        self.play(FadeOut(p), FadeOut(p.arrow), win_group.animate.scale(2))
+        win_group = VGroup(output.copy(), tick.copy()).move_to(
+            self.camera.frame).scale_to_fit_width(self.camera.frame.width()).scale(.2)
+        self.play(FadeOut(p), FadeOut(p.arrow), output.animate.become(
+            win_group[0]), tick.animate.become(win_group[1]))
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
         # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
@@ -539,16 +544,26 @@ class TimeComplexityAnalysis(MovingCameraScene):
         p.arrow.fade(1)
         L = 5
         time = 10
+        ZOOM = 4
+        if not DRAFT:
+            L = 20
+            time = 40
+            ZOOM = 8
         total = L + time - 1
         steps_till_appearance = (L + 1) * L // 2
         steps_till_finished = (total + 1) * (total) // 2 + total - L
         anims = [anim for _ in range(steps_till_appearance)
                  for anim in p.step()]
-        ZOOM = 8
+        zoomed_out = self.camera.frame.copy().scale(
+            ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT))
+        zoomed_out.shift(LEFT * zoomed_out.width * .1)
         self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
-                  self.camera.frame.animate.scale(ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT) + RIGHT), run_time=1)
+                  self.camera.frame.animate.become(zoomed_out), run_time=1)
         our_prog = p[L - 1]
-        t = VGroup(MathTex("L"), Arrow(ORIGIN, RIGHT, stroke_width=.5 * ZOOM)).arrange(buff=SMALL_BUFF).scale(ZOOM).next_to(
+
+        color_line = BLUE
+
+        t = VGroup(MathTex("L", color=color_line), Arrow(ORIGIN, RIGHT, stroke_width=.5 * ZOOM, color=color_line)).arrange(buff=SMALL_BUFF).scale(ZOOM).next_to(
             our_prog, LEFT, buff=ZOOM * SMALL_BUFF)
         self.play(FadeIn(t))
         anims = [anim for _ in range(steps_till_appearance, steps_till_finished)
@@ -559,9 +574,9 @@ class TimeComplexityAnalysis(MovingCameraScene):
 
         color = BLUE
         line = Line(
-            first_wheel - dist * .5, last_wheel + dist * 1.5, stroke_width=ZOOM, color=BLUE)
+            first_wheel - dist * .55, last_wheel + dist * 1.55, stroke_width=4 * ZOOM, color=BLUE)
         tick_shape = Line(
-            ORIGIN, (dist[1], dist[0], 0), stroke_width=ZOOM, color=BLUE)
+            ORIGIN, (dist[1], dist[0], 0), stroke_width=2 * ZOOM, color=BLUE).scale(.5)
         tick_left = tick_shape.copy().move_to(line.get_left())
         tick_right = tick_shape.copy().move_to(line.get_right())
         arrow = VGroup(line, tick_left, tick_right)
@@ -574,15 +589,28 @@ class TimeComplexityAnalysis(MovingCameraScene):
         our_prog.stdout = STDOUT
         our_prog.ok = True
         self.play(*p.step(finish=True))
+
         output = our_prog.stdout_obj[1]
         tick = our_prog.group[-1]
-        win_group = VGroup(output, tick)
         our_prog.group.remove(tick)
         our_prog.stdout_obj.remove(output)
-        to_center = self.camera.frame.get_center() - win_group.get_center()
-        zoom = 10
-        self.play(FadeOut(p), FadeOut(p.arrow), win_group.animate.scale(
-            zoom, about_point=(win_group.get_center() - to_center) / zoom))
+        win_group = VGroup(output.copy(), tick.copy()).move_to(
+            self.camera.frame).scale_to_fit_width(self.camera.frame.width).scale(.2)
+        self.play(FadeOut(our_prog.stdout_obj), output.animate.become(
+            win_group[0]), tick.animate.become(win_group[1]))
+        triangle = Polygon(p[0].group[2].get_center(), p[-1].group[2].get_center(),
+                           p[0].group[-1].get_center() + dist, color=GREEN, stroke_width=4 * ZOOM)
+        self.play(FadeIn(triangle))
+        jag = p.return_for_jagging(L - 1)
+        self.play(*map(FadeOut, jag))
+        self.wait(2)
+        self.play(*map(FadeIn, jag))
+        self.wait(2)
+        arrow_down = arrow.copy()
+        arrow_down.generate_target()
+        arrow_down.target.rotate(
+            -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
+        self.play(MoveToTarget(arrow_down))
         self.wait(5)
 
         # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
