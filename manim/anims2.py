@@ -786,8 +786,13 @@ class TimeComplexityAnalysis(MovingCameraScene):
             z_index=100,
             color=color_fn,
         )
+        fn_tex = fn_label_horiz[1]
+        fn_tex.set_z_index(100)
+        behind = BackgroundRectangle(
+            fn_tex, z_index=99, buff=SMALL_BUFF * ZOOM, corner_radius=0.2 * ZOOM
+        )
 
-        self.play(FadeIn(fn_label_horiz))
+        self.play(FadeIn(fn_label_horiz), FadeIn(behind))
         self.play(
             AnimationGroup(
                 *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
@@ -837,7 +842,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         fn_label_horiz_copy = fn_label_horiz.copy()
 
         vg = VGroup(p[L:])
-        fn_label = mkbrace(vg, "f(n) ", LEFT, color=color_fn)
+        fn_label = mkbrace(vg, "f(n)", LEFT, color=color_fn)
         self.play(fn_label_horiz_copy.animate.become(fn_label))
         fn_label = fn_label_horiz_copy
         triangle_top = triangle.get_corner(UP + LEFT)
@@ -855,6 +860,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             l_label.animate.become(l_relabel),
             FadeOut(p),
             FadeOut(fn_label_horiz),
+            FadeOut(behind),
             triangle.animate.set_fill(GREEN, 1),
         )
 
