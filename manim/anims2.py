@@ -16,47 +16,36 @@ class Intro(Scene):
 
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
 
-        our_algo_img = ImageMobject(
-            "img/program3x_placeholder.png").scale_to_fit_width(14.2)
+        our_algo_img = ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(
+            14.2
+        )
         self.play(
             FadeIn(our_algo_img),
         )
         self.wait()
 
-        badge_img = ImageMobject(
-            "img/badge_text_small.png").scale_to_fit_width(6)
+        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
         badge_group = Group(badge_img)
 
         badge_group.generate_target()
-        badge_group.target.scale(0.85).align_to(
-            our_algo_img, DR).shift(2.5*DOWN)
+        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
 
-        our_algo = Group(
-            our_algo_img,
-            badge_group
-        )
+        our_algo = Group(our_algo_img, badge_group)
 
-        self.play(
-            FadeIn(badge_group)
-        )
+        self.play(FadeIn(badge_group))
         self.wait()
 
-        self.play(
-            MoveToTarget(badge_group)
-        )
+        self.play(MoveToTarget(badge_group))
         self.wait()
 
         our_group = Group(our_algo_img, badge_group)
-        self.play(
-            our_group.animate.scale_to_fit_height(3).move_to(2*UP)
-        )
+        self.play(our_group.animate.scale_to_fit_height(3).move_to(2 * UP))
 
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
         # )
         downarrow_tex = (
-            Tex(r"$\Downarrow ?$").scale(2).next_to(
-                our_group, DOWN, buff=0.5)
+            Tex(r"$\Downarrow ?$").scale(2).next_to(our_group, DOWN, buff=0.5)
         )
         prices_img = [
             ImageMobject("img/turing.png").scale_to_fit_height(2.5),
@@ -78,8 +67,9 @@ class Intro(Scene):
         # Well, the only possibility is that although we know the asymptotically optimal algorithm, we unfortunately don’t know what its time complexity is!
         our_group.generate_target()
         our_group.target.scale(0.8).to_edge(LEFT)
-        statement2_tex = Tex(prop1_str).next_to(
-            our_group.target, RIGHT, buff=0.5).shift(1*UP)
+        statement2_tex = (
+            Tex(prop1_str).next_to(our_group.target, RIGHT, buff=0.5).shift(1 * UP)
+        )
 
         self.play(
             MoveToTarget(our_group),
@@ -121,72 +111,76 @@ class Intro(Scene):
         # This is totally possible according to the definition of asymptotic optimality.
         # In computer science, we are doing asymptotic statements all the time, like when we say that select sort has time complexity O(n^2), this big O simply hides some constant in front of the function, plus some lower order terms. [objeví se opravdová komplexita select sortu a u toho “actual complexity”]
 
-        complexities = (
-            Group(
-                CollapsibleAsymptotics(["", "n^2", "/2 + n/2"]),
-                CollapsibleAsymptotics(["3", "n^2", " + 3n + 10"]),
-                CollapsibleAsymptotics(["10", "n^2", "{} + 42"]),
-                CollapsibleAsymptotics(["100000000000", "n^2", ""]),
-            )
+        complexities = Group(
+            CollapsibleAsymptotics(["", "n^2", "/2 + n/2"]),
+            CollapsibleAsymptotics(["3", "n^2", " + 3n + 10"]),
+            CollapsibleAsymptotics(["10", "n^2", "{} + 42"]),
+            CollapsibleAsymptotics(["100000000000", "n^2", ""]),
         )
         eq_texs = []
         for i in range(len(complexities)):
-            eq_texs.append(
-                Tex(r"$=$")
-            )
+            eq_texs.append(Tex(r"$=$"))
 
-        table = Group(*[o for l in zip(complexities, eq_texs, complexities.copy())
-                      for o in l]).arrange_in_grid(cols=3).move_to(2 * DOWN)
+        table = (
+            Group(
+                *[o for l in zip(complexities, eq_texs, complexities.copy()) for o in l]
+            )
+            .arrange_in_grid(cols=3)
+            .move_to(2 * DOWN)
+        )
 
         for i in range(len(complexities)):
-            table[3*i + 2].generate_target()
-            table[3*i + 2].move_to(table[3*i].get_center())
-            table[3*i + 2].target.shift(
-                table[3*i + 1].get_center() + 1.3 * RIGHT
-                - table[3*i + 2].target.immovable.get_center()
+            table[3 * i + 2].generate_target()
+            table[3 * i + 2].move_to(table[3 * i].get_center())
+            table[3 * i + 2].target.shift(
+                table[3 * i + 1].get_center()
+                + 1.3 * RIGHT
+                - table[3 * i + 2].target.immovable.get_center()
             )
 
-        self.play(AnimationGroup(
-            *map(FadeIn, complexities[0:3]), lag_ratio=1.5))
+        self.play(AnimationGroup(*map(FadeIn, complexities[0:3]), lag_ratio=1.5))
         self.wait()
 
         self.play(
             FadeIn(table[1]),
-            FadeIn(table[3+1]),
-            FadeIn(table[6+1]),
+            FadeIn(table[3 + 1]),
+            FadeIn(table[6 + 1]),
             MoveToTarget(table[2]),
-            MoveToTarget(table[3+2]),
-            MoveToTarget(table[6+2]),
+            MoveToTarget(table[3 + 2]),
+            MoveToTarget(table[6 + 2]),
         )
         self.wait()
 
         self.play(
             AnimationGroup(
                 table[2].collapse(),
-                table[3+2].collapse(),
-                table[6+2].collapse(),
-                lag_ratio=1.5
+                table[3 + 2].collapse(),
+                table[6 + 2].collapse(),
+                lag_ratio=1.5,
             ),
         )
         self.wait()
 
-        self.play(
-            FadeIn(table[3*3])
-        )
+        self.play(FadeIn(table[3 * 3]))
         self.wait()
         table[11].target.next_to(table[10], RIGHT)
-        self.play(
-            FadeIn(table[10]),
-            MoveToTarget(table[11])
-        )
+        self.play(FadeIn(table[10]), MoveToTarget(table[11]))
         self.wait()
         self.play(table[11].collapse())
-        self.play(table[11].new_tex.animate.shift(
-            (table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])*RIGHT))
+        self.play(
+            table[11].new_tex.animate.shift(
+                (table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])
+                * RIGHT
+            )
+        )
         self.wait()
 
         self.play(
-            *[FadeOut(o) for o in self.mobjects if o.get_center()[1] < line.get_center()[1]]
+            *[
+                FadeOut(o)
+                for o in self.mobjects
+                if o.get_center()[1] < line.get_center()[1]
+            ]
         )
 
         self.wait(3)
@@ -290,8 +284,7 @@ class Polylog(Scene):
         )
         self.wait()
 
-        levin_img = ImageMobject(
-            "img/levin.jpg").scale_to_fit_width(3).to_corner(DR)
+        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3).to_corner(DR)
         quote_txt = (
             Group(
                 Tex(r"\textit{``Only math nerds would call $2^{500}$ finite. ''}"),
@@ -343,17 +336,18 @@ E7365746174747228302C544353414E4F57293B24643D224352415348215C6E223B0A;
 (by David Powell, Obfuscated Perl Contest) """
             if not randomize:
                 return str.split("\n")
-            return [''.join(random.sample(line, len(line))) for line in str.splitlines()]
+            return [
+                "".join(random.sample(line, len(line))) for line in str.splitlines()
+            ]
 
         def random_text(num_of_lines, line_length=30):
             from string import ascii_lowercase, ascii_uppercase, digits
+
             choices = ascii_lowercase + ascii_uppercase + digits + "              /.,"
 
             ret = []
             for _ in range(num_of_lines):
-                ret.append(
-                    ''.join(random.choices(choices, k=line_length))
-                )
+                ret.append("".join(random.choices(choices, k=line_length)))
             return ret
 
         texts = [
@@ -376,7 +370,9 @@ Within thine own bud buriest thy content,
 And, tender churl, mak’st waste in niggarding.
 Pity the world, or else this glutton be,
 To eat world’s bananas, by the grave and thee.
-            """.strip().split("\n"),
+            """.strip().split(
+                "\n"
+            ),
             random_text(5),
             random_text(4),
             random_text(6),
@@ -387,7 +383,9 @@ for i in range(42):
         f"{i+1} bananas is better",
         "than {i} bananas."
     )
-            """.strip().split("\n"),
+            """.strip().split(
+                "\n"
+            ),
             random_text(5),
             random_text(10, 50),
             perl_program(False),
@@ -403,14 +401,17 @@ import this
 import turtle
 
 def factor(n):
-            """.split("\n")
+            """.split(
+                "\n"
+            ),
         ]
 
-        chimp_img = ImageMobject(
-            "img/chimp.jpg", z_index=100).scale_to_fit_width(6).to_corner(UR, buff=0.2)
-        self.play(
-            FadeIn(chimp_img)
+        chimp_img = (
+            ImageMobject("img/chimp.jpg", z_index=100)
+            .scale_to_fit_width(6)
+            .to_corner(UR, buff=0.2)
         )
+        self.play(FadeIn(chimp_img))
         self.wait()
 
         texts_group = Group()
@@ -419,7 +420,12 @@ def factor(n):
         for i in range(len(texts)):
             text = texts[i]
             text_group = Paragraph(
-                *text, z_index=0, font="monospace", line_spacing=1.2, font_size=0.7 * DEFAULT_FONT_SIZE).scale(0.5)
+                *text,
+                z_index=0,
+                font="monospace",
+                line_spacing=1.2,
+                font_size=0.7 * DEFAULT_FONT_SIZE
+            ).scale(0.5)
             texts_group.add(text_group)
 
         texts_group.arrange_in_grid(cols=1, cell_alignment=LEFT, buff=1).align_to(
@@ -468,15 +474,14 @@ class ProgramsWithoutStepping(MovingCameraScene):
         p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3 * UP)
         self.play(
             AnimationGroup(
-                *p.add_programs_around("a", "SyntaxError",
-                                       0, 10, show_stdin=False)[0], lag_ratio=0.1
+                *p.add_programs_around("a", "SyntaxError", 0, 10, show_stdin=False)[0],
+                lag_ratio=0.1
             )
         )
         for q in p:
             q.stdin.foo.move_to(q.stdin)
         self.wait(1)
-        self.play(AnimationGroup(*(FadeIn(q.stdin.foo)
-                  for q in p), lag_ratio=0.2))
+        self.play(AnimationGroup(*(FadeIn(q.stdin.foo) for q in p), lag_ratio=0.2))
         self.play(AnimationGroup(*(q.finish() for q in p[:3]), lag_ratio=0.8))
         self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
         p.add_dots(NUM_DOTS),
@@ -486,19 +491,16 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.add(p)  # To display the newly added programs
 
         self.play(
-            self.camera.frame.animate.align_to(
-                banana.get_bottom() + 0.1 * DOWN, DOWN),
+            self.camera.frame.animate.align_to(banana.get_bottom() + 0.1 * DOWN, DOWN),
             run_time=3,
         )
         self.play(
-            AnimationGroup(*(q.finish()
-                           for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
+            AnimationGroup(*(q.finish() for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
         )
 
         self.play(banana.show_output())
         checker = make_checking_code().move_to(self.camera.frame).shift(4.5 * RIGHT)
-        self.play(
-            FadeIn(checker, target_position=banana.get_right(), scale=0))
+        self.play(FadeIn(checker, target_position=banana.get_right(), scale=0))
         self.wait(5)
         self.play(FadeOut(checker))
         self.play(banana.show_verdict())
@@ -524,28 +526,27 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.play(infinite.show_output())
         self.wait(2)
 
-        waiting = rotating_wheel().next_to(
-            infinite.group, RIGHT
-        )
+        waiting = rotating_wheel().next_to(infinite.group, RIGHT)
 
         infinite.add(waiting)
         self.play(FadeIn(waiting))
-        ''' TODO mozna nekam dodat checkovaci algoritmus
+        """ TODO mozna nekam dodat checkovaci algoritmus
         try a,b = output
         if a*b == n: tick
         else krizek
         nebo tak neco
-        '''
+        """
 
         self.wait(3, frozen_frame=False)
         self.play(
             FadeOut(p[:-1]),
-            infinite.animate.align_to(
-                self.camera.frame.get_top() + 0.1 * DOWN, UP),
+            infinite.animate.align_to(self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
         self.play(FadeOut(waiting), FadeOut(infinite.stdout_obj))
-        self.play(infinite.dumb_down(), self.camera.frame.animate.align_to(
-            infinite.stdin.get_top() + 0.5 * UP, UP))
+        self.play(
+            infinite.dumb_down(),
+            self.camera.frame.animate.align_to(infinite.stdin.get_top() + 0.5 * UP, UP),
+        )
         infinite.arrange()
 
         # The naive sequential simulation would get stuck at these algorithms forever [kolečko se na jednom algoritmu furt točí], so we’ll be a bit smarter and do something similar to the diagonalization trick you may know from mathematics.
@@ -564,15 +565,17 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(1)
         self.play(FadeIn(p.arrow))
         for i in range(10):
-            self.play(AnimationGroup(
-                *p.step(), lag_ratio=0.5))
+            self.play(AnimationGroup(*p.step(), lag_ratio=0.5))
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
         prog = p[p.ptr]
         arrow, stdout, tick = p.step(True)
         prog.group[-1].save_state().fade(1)
-        checker = make_checking_code().align_to(
-            self.camera.frame, RIGHT + DOWN).shift(SMALL_BUFF * (LEFT + UP))
+        checker = (
+            make_checking_code()
+            .align_to(self.camera.frame, RIGHT + DOWN)
+            .shift(SMALL_BUFF * (LEFT + UP))
+        )
         self.play(arrow, stdout)
         self.play(FadeIn(checker))
         self.wait(3)
@@ -581,8 +584,7 @@ class ProgramsWithStepping(MovingCameraScene):
         self.play(tick)
 
         for i in range(10):
-            self.play(AnimationGroup(
-                *p.step(), lag_ratio=0.5))
+            self.play(AnimationGroup(*p.step(), lag_ratio=0.5))
 
         prog = p[p.ptr]
         prog.stdout = STDOUT
@@ -600,10 +602,18 @@ class ProgramsWithStepping(MovingCameraScene):
         tick = prog.group[-1]
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
-        win_group = VGroup(output.copy(), tick.copy()).move_to(
-            self.camera.frame).scale_to_fit_width(self.camera.frame.width()).scale(.2)
-        self.play(FadeOut(p), FadeOut(p.arrow), output.animate.become(
-            win_group[0]), tick.animate.become(win_group[1]))
+        win_group = (
+            VGroup(output.copy(), tick.copy())
+            .move_to(self.camera.frame)
+            .scale_to_fit_width(self.camera.frame.width())
+            .scale(0.2)
+        )
+        self.play(
+            FadeOut(p),
+            FadeOut(p.arrow),
+            output.animate.become(win_group[0]),
+            tick.animate.become(win_group[1]),
+        )
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
         # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
@@ -616,63 +626,65 @@ class ExplanationBeginning(Scene):
     def construct(self):
         default()
 
-        title_tex = Tex("Universal search", font_size=3 *
-                        DEFAULT_FONT_SIZE).to_edge(UP)
+        title_tex = Tex("Universal search", font_size=3 * DEFAULT_FONT_SIZE).to_edge(UP)
         self.play(FadeIn(title_tex))
         self.wait()
 
         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
         name_txt = Tex("Leonid Levin").scale(0.7).next_to(levin_img, DOWN)
-        levin_group = Group(levin_img, name_txt).arrange(
-            DOWN).to_edge(RIGHT).shift(0.3*DOWN)
+        levin_group = (
+            Group(levin_img, name_txt).arrange(DOWN).to_edge(RIGHT).shift(0.3 * DOWN)
+        )
 
         self.play(FadeIn(levin_group))
         self.wait()
 
         prop1_tex = Tex(prop1_str)
         prop2_tex = Tex(prop2_str)
-        props = Group(prop1_tex, prop2_tex).arrange_in_grid(
-            cols=1, cell_alignment=LEFT, ).to_edge(LEFT)
+        props = (
+            Group(prop1_tex, prop2_tex)
+            .arrange_in_grid(
+                cols=1,
+                cell_alignment=LEFT,
+            )
+            .to_edge(LEFT)
+        )
 
-        self.play(
-            FadeIn(props)
-        )
+        self.play(FadeIn(props))
         self.wait()
-        self.play(
-            FadeOut(props),
-            FadeOut(levin_group)
-        )
+        self.play(FadeOut(props), FadeOut(levin_group))
         self.wait()
 
         shft = 1 * DOWN
         your_algo_img = you_image().scale_to_fit_height(3.5)
         fn = Tex(r"$f(n)$")
-        your_algo = Group(your_algo_img, fn).arrange(
-            DOWN).align_to(Dot().to_edge(LEFT), RIGHT).shift(shft)
-        self.play(
-            your_algo.animate.move_to(3*LEFT).shift(shft)
+        your_algo = (
+            Group(your_algo_img, fn)
+            .arrange(DOWN)
+            .align_to(Dot().to_edge(LEFT), RIGHT)
+            .shift(shft)
         )
+        self.play(your_algo.animate.move_to(3 * LEFT).shift(shft))
         self.wait()
 
         our_algo_img = our_code_with_badge().scale_to_fit_height(3)
         # TODO fix tečku
         fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}")
-        our_algo = Group(our_algo_img, fn2).arrange(DOWN).align_to(
-            Dot().to_edge(RIGHT), LEFT).align_to(your_algo, DOWN)
-        self.play(
-            our_algo.animate.move_to(3*RIGHT).align_to(your_algo, DOWN)
+        our_algo = (
+            Group(our_algo_img, fn2)
+            .arrange(DOWN)
+            .align_to(Dot().to_edge(RIGHT), LEFT)
+            .align_to(your_algo, DOWN)
         )
+        self.play(our_algo.animate.move_to(3 * RIGHT).align_to(your_algo, DOWN))
 
         fn2_new = Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
-            fn2.get_center())  # TODO fix tečku
+            fn2.get_center()
+        )  # TODO fix tečku
         fn2.save_state()
-        self.play(
-            Transform(fn2, fn2_new)
-        )
+        self.play(Transform(fn2, fn2_new))
         self.wait()
-        self.play(
-            fn2.animate.restore()
-        )
+        self.play(fn2.animate.restore())
         self.wait()
 
         self.wait(3)
@@ -690,24 +702,26 @@ class BazillionScroll(MovingCameraScene):
         p.add_programs_around("a", "", 0, NUM_AROUND, fade=False)
         self.camera.frame.align_to(p.get_top() + 0.1 * UP, UP)
         p.add_dots(NUM_DOTS)
-        _, (_, bazillion, _) = p.add_programs_around(FACTORING_EXAMPLE_PROGRAM, "",
-                                                     NUM_AROUND, 0, fade=False)
+        _, (_, bazillion, _) = p.add_programs_around(
+            FACTORING_EXAMPLE_PROGRAM, "", NUM_AROUND, 0, fade=False
+        )
 
         g = VGroup()
         for q in p:
             if q.text == "...":
                 continue
             num = program_to_number(q.text) + 1
-            tex = Tex("\\hsize=7cm{}\\rightskip=0pt plus 1fill{} " +
-                      allow_breaks(str(num)))
+            tex = Tex(
+                "\\hsize=7cm{}\\rightskip=0pt plus 1fill{} " + allow_breaks(str(num))
+            )
             if num > 1e10:
                 tex.scale_to_fit_width(6)
-            g.add(tex.next_to(q).align_to(
-                self.camera.frame, RIGHT).shift(.5 * LEFT))
+            g.add(tex.next_to(q).align_to(self.camera.frame, RIGHT).shift(0.5 * LEFT))
         self.play(FadeIn(p), FadeIn(g))
         self.play(
             self.camera.frame.animate.align_to(
-                bazillion.get_bottom() + 0.1 * DOWN, DOWN),
+                bazillion.get_bottom() + 0.1 * DOWN, DOWN
+            ),
             run_time=3,
         )
 
@@ -729,14 +743,18 @@ class TimeComplexityAnalysis(MovingCameraScene):
         total = L + time - 1
         steps_till_appearance = (L + 1) * L // 2
         steps_till_finished = (total + 1) * (total) // 2 + total - L
-        anims = [anim for _ in range(steps_till_appearance)
-                 for anim in p.step()]
+        anims = [anim for _ in range(steps_till_appearance) for anim in p.step()]
         zoomed_out = self.camera.frame.copy().scale(
-            ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT))
-        zoomed_out.shift(LEFT * zoomed_out.width * .1 +
-                         UP * zoomed_out.height * .1)
-        self.play(AnimationGroup(*anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad),
-                  self.camera.frame.animate.become(zoomed_out), run_time=1)
+            ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT)
+        )
+        zoomed_out.shift(LEFT * zoomed_out.width * 0.1 + UP * zoomed_out.height * 0.1)
+        self.play(
+            AnimationGroup(
+                *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
+            ),
+            self.camera.frame.animate.become(zoomed_out),
+            run_time=1,
+        )
         our_prog = p[L - 1]
 
         def mkbrace(*args, **kwargs):
@@ -750,19 +768,32 @@ class TimeComplexityAnalysis(MovingCameraScene):
 
         l_label = mkbrace(p, "L", LEFT, color=color_l)
         self.play(FadeIn(l_label))
-        anims = [anim for _ in range(steps_till_appearance, steps_till_finished)
-                 for anim in p.step()]
+        anims = [
+            anim
+            for _ in range(steps_till_appearance, steps_till_finished)
+            for anim in p.step()
+        ]
         anim_last = p.step()
         dist = our_prog.group[3].get_center() - our_prog.group[2].get_center()
         first_wheel = our_prog.group[2]
         last_wheel = our_prog.group[-1]
 
-        fn_label_horiz = mkbrace(Group(Point(first_wheel.get_bottom()), Point(
-            last_wheel.get_bottom())), "f(n)", DOWN, buff=0.05 * ZOOM, z_index=100, color=color_fn)
+        fn_label_horiz = mkbrace(
+            Group(Point(first_wheel.get_bottom()), Point(last_wheel.get_bottom())),
+            "f(n)",
+            DOWN,
+            buff=0.05 * ZOOM,
+            z_index=100,
+            color=color_fn,
+        )
 
         self.play(FadeIn(fn_label_horiz))
-        self.play(AnimationGroup(*anims, lag_ratio=0.5,
-                  rate_func=rate_functions.ease_in_out_quart), run_time=1)
+        self.play(
+            AnimationGroup(
+                *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
+            ),
+            run_time=1,
+        )
         self.play(*anim_last)
         p.ptr += 1
         our_prog.stdout = STDOUT
@@ -773,13 +804,25 @@ class TimeComplexityAnalysis(MovingCameraScene):
         tick = our_prog.group[-1]
         our_prog.group.remove(tick)
         our_prog.stdout_obj.remove(output)
-        win_group = VGroup(output.copy(), tick.copy()).move_to(
-            self.camera.frame).scale_to_fit_width(self.camera.frame.width).scale(.2)
-        self.play(FadeOut(our_prog.stdout_obj), output.animate.become(
-            win_group[0]), tick.animate.become(win_group[1]))
+        win_group = (
+            VGroup(output.copy(), tick.copy())
+            .move_to(self.camera.frame)
+            .scale_to_fit_width(self.camera.frame.width)
+            .scale(0.2)
+        )
+        self.play(
+            FadeOut(our_prog.stdout_obj),
+            output.animate.become(win_group[0]),
+            tick.animate.become(win_group[1]),
+        )
         self.play(FadeOut(output), FadeOut(tick))
-        triangle = Polygon(p[0].group[2].get_center(), p[-1].group[2].get_center(),
-                           p[0].group[-1].get_center() + dist, color=GREEN, stroke_width=4 * ZOOM)
+        triangle = Polygon(
+            p[0].group[2].get_center(),
+            p[-1].group[2].get_center(),
+            p[0].group[-1].get_center() + dist,
+            color=GREEN,
+            stroke_width=4 * ZOOM,
+        )
         self.play(FadeIn(triangle))
         jag = p.return_for_jagging(L - 1)
         self.play(*map(FadeOut, jag))
@@ -802,21 +845,32 @@ class TimeComplexityAnalysis(MovingCameraScene):
         alpha = L / (L + time)
         triangle_vmid = (1 - alpha) * triangle_top + alpha * triangle_bot
         l_relabel = mkbrace(
-            Group(Line(triangle_top, triangle_vmid)), "L", LEFT, color=color_l)
+            Group(Line(triangle_top, triangle_vmid)), "L", LEFT, color=color_l
+        )
         fn_relabel = mkbrace(
-            Group(Line(triangle_vmid, triangle_bot)), "f(n)", LEFT, color=color_fn)
-        self.play(fn_label.animate.become(fn_relabel),
-                  l_label.animate.become(l_relabel), FadeOut(p), FadeOut(fn_label_horiz), triangle.animate.set_fill(GREEN, 1))
+            Group(Line(triangle_vmid, triangle_bot)), "f(n)", LEFT, color=color_fn
+        )
+        self.play(
+            fn_label.animate.become(fn_relabel),
+            l_label.animate.become(l_relabel),
+            FadeOut(p),
+            FadeOut(fn_label_horiz),
+            triangle.animate.set_fill(GREEN, 1),
+        )
 
         triangle_left = triangle.get_corner(UP + LEFT)
         triangle_right = triangle.get_corner(UP + RIGHT)
         triangle_hmid = (1 - alpha) * triangle_left + alpha * triangle_right
         l_rehor = mkbrace(
-            Group(Line(triangle_left, triangle_hmid)), "L", UP, color=color_l)
+            Group(Line(triangle_left, triangle_hmid)), "L", UP, color=color_l
+        )
         fn_rehor = mkbrace(
-            Group(Line(triangle_hmid, triangle_right)), "f(n)", UP, color=color_fn)
-        self.play(fn_label.copy().animate.become(fn_rehor),
-                  l_label.copy().animate.become(l_rehor))
+            Group(Line(triangle_hmid, triangle_right)), "f(n)", UP, color=color_fn
+        )
+        self.play(
+            fn_label.copy().animate.become(fn_rehor),
+            l_label.copy().animate.become(l_rehor),
+        )
 
         self.wait(5)
 
@@ -859,13 +913,9 @@ class Part1Rest(Scene):
         # And that’s basically the whole algorithm. In the actual code we shared with you, we simulated Brainfuck programs instead of Python programs because it was suggested to us by a higher authority [konverzace s ChatGPT], but in this explanation, let’s stick with Python.
 
         gpt_img = ImageMobject("img/chatgpt.png").scale_to_fit_height(8)
-        self.play(
-            FadeIn(gpt_img)
-        )
+        self.play(FadeIn(gpt_img))
         self.wait()
-        self.play(
-            FadeOut(gpt_img)
-        )
+        self.play(FadeOut(gpt_img))
         self.wait()
 
         return
@@ -906,10 +956,8 @@ class Part1Rest(Scene):
             ["$<$3000BC", "unknown", "straightforward", r"$O(n^2)$"],
             ["1962", "Karatsuba", "divide \& conquer", r"$O(n^{1.58})$"],
             ["1963", "Toom", "divide \& conquer", r"$O(n^{1.01})$"],
-            ["1966", "Schönhage \& Strassen", "FFT",
-                r"$n \cdot \text{polylog}(n)$"],
-            ["1979", "Schönhage", "FFT + tricks",
-                r"$O(n)$ {\tiny (word RAM)}"],
+            ["1966", "Schönhage \& Strassen", "FFT", r"$n \cdot \text{polylog}(n)$"],
+            ["1979", "Schönhage", "FFT + tricks", r"$O(n)$ {\tiny (word RAM)}"],
             [
                 "2019",
                 "Harvey \& van Der Hoeven",
@@ -919,8 +967,7 @@ class Part1Rest(Scene):
         ]
 
         mult_algs_group = (
-            Group(*[Tex(str).scale(0.5)
-                  for line in mult_algs_texts for str in line])
+            Group(*[Tex(str).scale(0.5) for line in mult_algs_texts for str in line])
             .arrange_in_grid(cols=4)
             .to_corner(DR)
         )
@@ -929,7 +976,7 @@ class Part1Rest(Scene):
         self.wait()
 
         self.play(
-            Circumscribe(mult_algs_group[4 * 5: 4 * 6], color=RED),
+            Circumscribe(mult_algs_group[4 * 5 : 4 * 6], color=RED),
         )
         self.wait()
 

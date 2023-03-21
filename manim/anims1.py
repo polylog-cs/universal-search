@@ -1,6 +1,7 @@
 from manim import *
 import manim as m  # hack for type hinting
 from utils import *
+
 # -r
 # ^ also imports manim and changes some of its defaults
 
@@ -64,21 +65,18 @@ class Intro(Scene):
         num1_tex = Tex(str(num1))
         num2_tex = Tex(str(num2))
 
-        self.play(FadeIn(Group(num1_tex, num2_tex).arrange(
-            RIGHT, buff=1).move_to(ORIGIN)))
+        self.play(
+            FadeIn(Group(num1_tex, num2_tex).arrange(RIGHT, buff=1).move_to(ORIGIN))
+        )
         brace_groups = []
         for obj in [num1_tex, num2_tex]:
             brace = Brace(obj, DOWN)
             n_tex = Tex(r"$n$ digits").next_to(brace, DOWN)
             brace_groups.append(Group(brace, n_tex))
 
-        self.play(
-            *[FadeIn(g) for g in brace_groups]
-        )
+        self.play(*[FadeIn(g) for g in brace_groups])
         self.wait()
-        self.play(
-            *[FadeOut(g) for g in brace_groups]
-        )
+        self.play(*[FadeOut(g) for g in brace_groups])
         self.wait()
 
         nums_intermediate = []
@@ -90,11 +88,11 @@ class Intro(Scene):
         num = num1 * num2
 
         num_tex = Tex(str(num))
-        nums_intermediate_tex = [Tex(str(n), z_index=10)
-                                 for n in nums_intermediate]
+        nums_intermediate_tex = [Tex(str(n), z_index=10) for n in nums_intermediate]
 
-        line1 = Line(start=num2_tex.get_left() + 0.3*LEFT,
-                     end=num2_tex.get_right(), color=GRAY)
+        line1 = Line(
+            start=num2_tex.get_left() + 0.3 * LEFT, end=num2_tex.get_right(), color=GRAY
+        )
         line2 = line1.copy()
         num1_tex_target = num1_tex.copy()
         num2_tex_target = num2_tex.copy()
@@ -111,9 +109,20 @@ class Intro(Scene):
 
         for i in range(1, len(nums_intermediate_tex)):
             nums_intermediate_tex[i].align_to(
-                nums_intermediate_tex[i - 1][0][-2], RIGHT)
-        nums_intermediate_rec = [SurroundingRectangle(num, buff=0.1, color=soft_color,  stroke_opacity=soft_opacity,
-                                                      fill_color=soft_color, fill_opacity=soft_opacity, z_index=0) for num in nums_intermediate_tex]
+                nums_intermediate_tex[i - 1][0][-2], RIGHT
+            )
+        nums_intermediate_rec = [
+            SurroundingRectangle(
+                num,
+                buff=0.1,
+                color=soft_color,
+                stroke_opacity=soft_opacity,
+                fill_color=soft_color,
+                fill_opacity=soft_opacity,
+                z_index=0,
+            )
+            for num in nums_intermediate_tex
+        ]
 
         objects.remove(line2)
         line2 = Line(
@@ -130,13 +139,17 @@ class Intro(Scene):
             Transform(num1_tex, num1_tex_target),
             Transform(num2_tex, num2_tex_target),
         )
-        self.play(
-            FadeIn(times_tex),
-            FadeIn(line1)
-        )
+        self.play(FadeIn(times_tex), FadeIn(line1))
 
-        rec = SurroundingRectangle(num2_tex[0][-1], buff=0.1, color=soft_color,
-                                   stroke_opacity=soft_opacity, fill_opacity=soft_opacity, fill_color=soft_color, z_index=0)
+        rec = SurroundingRectangle(
+            num2_tex[0][-1],
+            buff=0.1,
+            color=soft_color,
+            stroke_opacity=soft_opacity,
+            fill_opacity=soft_opacity,
+            fill_color=soft_color,
+            z_index=0,
+        )
         rec2 = nums_intermediate_rec[0]
 
         for i in range(len(str(num2))):
@@ -145,21 +158,19 @@ class Intro(Scene):
                     # FadeIn(rec),
                     FadeIn(nums_intermediate_tex[i]),
                     # FadeIn(rec2),
-                    run_time=0.3
+                    run_time=0.3,
                 )
             else:
                 self.play(
                     # rec.animate.move_to(num2_tex[0][-i-1].get_center()),
                     FadeIn(nums_intermediate_tex[i]),
                     # Transform(rec2, nums_intermediate_rec[i]),
-                    run_time=0.3
+                    run_time=0.3,
                 )
         # self.play(FadeOut(rec), FadeOut(rec2))
         self.wait()
 
-        self.play(
-            Create(line2)
-        )
+        self.play(Create(line2))
         self.play(
             Succession(
                 *[
@@ -173,7 +184,8 @@ class Intro(Scene):
         # it takes only roughly n^2 steps to compute the result.
 
         border = SurroundingRectangle(
-            Group(*nums_intermediate_tex), color=RED, fill_opacity=0.1, fill_color=RED)
+            Group(*nums_intermediate_tex), color=RED, fill_opacity=0.1, fill_color=RED
+        )
         # brace = Brace(border, RIGHT)
         n2_tex = Tex(r"$n^2$ operations").next_to(brace, RIGHT)
 
@@ -201,11 +213,9 @@ class Intro(Scene):
 
         sc = 1.2
         num_tex.generate_target()
-        num_tex.target = Tex(num).scale(sc).to_edge(
-            LEFT).shift(0.3*RIGHT + 1.5*UP)
+        num_tex.target = Tex(num).scale(sc).to_edge(LEFT).shift(0.3 * RIGHT + 1.5 * UP)
         div_sign = Tex(r"/").scale(sc).next_to(num_tex.target, RIGHT)
-        eq_sign = Tex(r"=").scale(sc).next_to(
-            num_tex.target, RIGHT).shift(2.8 * RIGHT)
+        eq_sign = Tex(r"=").scale(sc).next_to(num_tex.target, RIGHT).shift(2.8 * RIGHT)
 
         objects = Group(num_tex)
 
@@ -220,7 +230,7 @@ class Intro(Scene):
         divisors += list(range(2, 8))
         for l in range(1, len(num_tex[0])):
             for _ in range(K):
-                div = random.randrange(10**l, 10**(l+1)-1)
+                div = random.randrange(10**l, 10 ** (l + 1) - 1)
                 if div < num1:
                     divisors.append(div)
         divisors.sort()
@@ -228,22 +238,27 @@ class Intro(Scene):
         pairs = []
         for div in divisors:
             tex1 = Tex(str(div)).scale(sc).next_to(eq_sign, LEFT)
-            n = '{:.3f}'.format(round(num/div, 4))
-            tex2 = Tex(r"{{" + n.split(".")[0] + r"}}{{." + n.split(".")[1] + r"$\dots$}}").scale(
-                sc if len(str(round(num/div))) <= 12 else 1).next_to(eq_sign, RIGHT)
+            n = "{:.3f}".format(round(num / div, 4))
+            tex2 = (
+                Tex(r"{{" + n.split(".")[0] + r"}}{{." + n.split(".")[1] + r"$\dots$}}")
+                .scale(sc if len(str(round(num / div))) <= 12 else 1)
+                .next_to(eq_sign, RIGHT)
+            )
             pairs.append([tex1, tex2])
 
         for pair in pairs:
             pair[1][1].set_color(RED)
 
         pairs.append(
-            [Tex(str(num1)).scale(sc).next_to(eq_sign, LEFT).set_color(GREEN), Tex(
-                str(num2)).scale(sc).next_to(eq_sign, RIGHT).set_color(GREEN)]
+            [
+                Tex(str(num1)).scale(sc).next_to(eq_sign, LEFT).set_color(GREEN),
+                Tex(str(num2)).scale(sc).next_to(eq_sign, RIGHT).set_color(GREEN),
+            ]
         )
 
         def f(i):
             if i <= 10:
-                return i/10.0
+                return i / 10.0
             else:
                 return 0.1
 
@@ -258,19 +273,20 @@ class Intro(Scene):
                 g = Group(*pairs[i])
                 for j in [0, 1]:
                     pairs[i][j].save_state()
-                g.shift(1*DOWN).set_color(BACKGROUND_COLOR)
+                g.shift(1 * DOWN).set_color(BACKGROUND_COLOR)
                 self.play(
-                    Group(*pairs[i-1]).animate.shift(1 *
-                                                     UP).set_color(BACKGROUND_COLOR),
+                    Group(*pairs[i - 1])
+                    .animate.shift(1 * UP)
+                    .set_color(BACKGROUND_COLOR),
                     *[pairs[i][j].animate.restore() for j in [0, 1]],
-                    run_time=f(i)
+                    run_time=f(i),
                 )
 
         self.wait(2)
 
         self.next_section(skip_animations=False)
 
-        brace = Brace(num_tex, DOWN).shift(0.3*DOWN)
+        brace = Brace(num_tex, DOWN).shift(0.3 * DOWN)
         sqrt_tex = Tex(
             r"{{$n$ digits}}{{$\Rightarrow$ size up to $10^n$}}{{$\Rightarrow$ up to $\sqrt{10^n}$ steps}}"
         )
@@ -288,11 +304,10 @@ class Intro(Scene):
 
         # This is much slower than the time n^2 it takes to multiply two numbers.
         formula_tex = Tex(r"{{$\sqrt{10^n}$}}{{$\gg n^2$}}").next_to(
-            sqrt_tex[1], RIGHT, buff=3)
+            sqrt_tex[1], RIGHT, buff=3
+        )
         self.play(
-            sqrt_tex[2][5:10]
-            .copy()
-            .animate.move_to(formula_tex[0][0].get_center()),
+            sqrt_tex[2][5:10].copy().animate.move_to(formula_tex[0][0].get_center()),
         )
         self.play(
             FadeIn(formula_tex[1]),
@@ -334,59 +349,42 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
         # TODO nezapomenout vyprintscreenovat final verzi v solarized barvach
         our_algo_img = m.ImageMobject(
-            "img/program3x_placeholder.png").scale_to_fit_width(14.2)
+            "img/program3x_placeholder.png"
+        ).scale_to_fit_width(14.2)
         # our_algo.width = 16 * 0.75
         self.play(
             FadeIn(our_algo_img),
         )
         self.wait()
 
-        badge_img = ImageMobject(
-            "img/badge_text_small.png").scale_to_fit_width(6)
+        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
         # badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
         badge_group = Group(badge_img)
 
         badge_group.generate_target()
-        badge_group.target.scale(0.85).align_to(
-            our_algo_img, DR).shift(2.5*DOWN)
+        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
 
-        our_algo = Group(
-            our_algo_img,
-            badge_group
-        )
+        our_algo = Group(our_algo_img, badge_group)
 
         # TODO double check it is ok to use this image: https://gallery.yopriceville.com/Free-Clipart-Pictures/Badges-and-Labels-PNG/Green_Classic_Seal_Badge_PNG_Clipart#.ZAaV6dLMJkg
 
         self.add_sound("audio/tada_success.mp3")
-        self.play(
-            FadeIn(badge_group)
-        )
+        self.play(FadeIn(badge_group))
         self.wait()
 
-        self.play(
-            MoveToTarget(badge_group)
-        )
+        self.play(MoveToTarget(badge_group))
         self.wait()
 
         our_group = Group(our_algo_img, badge_group)
-        self.play(
-            our_group.animate.scale_to_fit_height(3).move_to(3*RIGHT)
-        )
+        self.play(our_group.animate.scale_to_fit_height(3).move_to(3 * RIGHT))
         self.wait()
-        your_algo = you_image().scale_to_fit_height(
-            3).align_to(Dot().to_edge(LEFT), RIGHT)
-        self.play(
-            your_algo.animate.move_to(3*LEFT)
+        your_algo = (
+            you_image().scale_to_fit_height(3).align_to(Dot().to_edge(LEFT), RIGHT)
         )
+        self.play(your_algo.animate.move_to(3 * LEFT))
         self.wait()
-        self.play(
-            our_group.animate.scale(1.3),
-            run_time=0.5
-        )
-        self.play(
-            our_group.animate.scale(1/1.3),
-            run_time=0.5
-        )
+        self.play(our_group.animate.scale(1.3), run_time=0.5)
+        self.play(our_group.animate.scale(1 / 1.3), run_time=0.5)
         self.wait()
 
         target_size = 0.5
@@ -509,7 +507,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             our, tex, your = obj
             tex.become(MathTex(r" = {:.2f}\times".format(ratio)))
             obj.arrange()
-            obj.next_to(arrow, RIGHT).shift(0.3*DOWN)
+            obj.next_to(arrow, RIGHT).shift(0.3 * DOWN)
 
         def lines_updater(obj):
             ctp = axes.coords_to_point
@@ -527,8 +525,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             point_yours.move_to(ctp(x, y_yours))
 
         lines_group = VGroup(
-            DashedLine(stroke_width=1), Dot(
-                color=COLOR_OURS), Dot(color=COLOR_YOURS)
+            DashedLine(stroke_width=1), Dot(color=COLOR_OURS), Dot(color=COLOR_YOURS)
         )
         ptr_updater(ptr_group)
         lines_updater(lines_group)

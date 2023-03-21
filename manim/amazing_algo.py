@@ -1,11 +1,9 @@
-#Absolutely amazing factoring algorithm
+# Absolutely amazing factoring algorithm
 
 import antigravity
 import delorean
 import emoji
-import turtle 
-
-
+import turtle
 
 
 def factor(n):
@@ -13,9 +11,4 @@ def factor(n):
 
 
 for i in range(42):
-    print(
-        str(i+1) 
-        + " bananas is better than " 
-        + str(i) 
-        + " bananas. "
-    )
+    print(str(i + 1) + " bananas is better than " + str(i) + " bananas. ")

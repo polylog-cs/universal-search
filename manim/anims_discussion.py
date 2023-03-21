@@ -4,9 +4,11 @@ from manim import *
 from utils.utilcliparts import *
 
 
-vasek_head = Square(
-    side_length=3.5, fill_opacity=1, fill_color=BLACK, color=BLACK
-).to_edge(RIGHT, buff = 0).to_edge(DOWN, buff = 0) 
+vasek_head = (
+    Square(side_length=3.5, fill_opacity=1, fill_color=BLACK, color=BLACK)
+    .to_edge(RIGHT, buff=0)
+    .to_edge(DOWN, buff=0)
+)
 
 
 class Discussion1(Scene):
@@ -16,10 +18,6 @@ class Discussion1(Scene):
         # So this was Levin’s universal search and I expect that many of you are now a bit confused, shocked, or even disgusted. None of these are the purpose of this video, so let me finish with a bunch of thoughts on how to understand the universal search and what is the lesson you should take away.
 
         # First of all, what I don’t want you to take away, is that asymptotic complexity is a broken concept. Let’s say we want to analyze some algorithm like selectsort. There are a bunch of approaches you could take. First, you could code the algorithm and empirically measure its complexity.
-
-
-
-
 
         sl = 2
         op = 0.1
@@ -32,22 +30,15 @@ class Discussion1(Scene):
         def f_q(x):
             return x**1.8 / 2
 
-        axes = (
-            Axes(
-                x_range=x_range,
-                y_range=y_range,
-                x_length = sl,
-                y_length = sl,
-            )
+        axes = Axes(
+            x_range=x_range,
+            y_range=y_range,
+            x_length=sl,
+            y_length=sl,
         )
         plot = axes.plot(f_q, color=BLUE)
 
-
-
-
-        empirical_img = Group(
-            axes, plot
-        )
+        empirical_img = Group(axes, plot)
         empirical_group = Group(Square(sl), empirical_img)
 
         # Or you could count how many steps the algorithm needs to solve any input of size n, but compute this number exactly, with all constants and lower order terms.
@@ -59,11 +50,11 @@ class Discussion1(Scene):
         poly_group = Group(Square(sl), poly_tex)
         tick = clipart_yes_no_maybe("yes", 0.5).next_to(poly_tex, DR)
 
-        table = Group(
-            empirical_group,
-            asymptotic_group,
-            poly_group
-        ).arrange(DOWN).shift(2*LEFT)
+        table = (
+            Group(empirical_group, asymptotic_group, poly_group)
+            .arrange(DOWN)
+            .shift(2 * LEFT)
+        )
 
         self.play(
             Succession(
@@ -79,33 +70,45 @@ class Discussion1(Scene):
         # You can see how these options get increasingly abstract and as they are getting more abstract, they are also getting easier to work with. In one extreme, analyzing an algorithm empirically is pretty hard and even impossible to do for nontrivial values of n, because there are too many inputs to check. On the other hand, understanding whether an algorithm runs in polynomial time is often really easy.
 
         arrow1 = Arrow(
-            start=empirical_img.get_top(), 
-            end=poly_tex.get_bottom(), 
+            start=empirical_img.get_top(),
+            end=poly_tex.get_bottom(),
             buff=0,
-        ).next_to(table, LEFT, buff = 1)
+        ).next_to(table, LEFT, buff=1)
         arrow1.set_color(color=[GREEN, GREEN, YELLOW, RED])
         arrow1.tip.set_color(GREEN)
         label1 = Tex(r"easy \\to use").next_to(arrow1, LEFT)
         self.play(Create(arrow1), Write(label1))
         self.wait()
 
-        highlight_rec = SurroundingRectangle(empirical_group, fill_opacity = op, fill_color = RED, color = RED)
+        highlight_rec = SurroundingRectangle(
+            empirical_group, fill_opacity=op, fill_color=RED, color=RED
+        )
         self.play(
             Succession(
-            FadeIn(highlight_rec),
-            Wait(),
-            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, fill_opacity = op, fill_color = RED, color = RED)),
-            Wait(),
-            Transform(highlight_rec, SurroundingRectangle(poly_group, fill_opacity = op, fill_color = RED, color = RED)),
-            Wait()
+                FadeIn(highlight_rec),
+                Wait(),
+                Transform(
+                    highlight_rec,
+                    SurroundingRectangle(
+                        asymptotic_group, fill_opacity=op, fill_color=RED, color=RED
+                    ),
+                ),
+                Wait(),
+                Transform(
+                    highlight_rec,
+                    SurroundingRectangle(
+                        poly_group, fill_opacity=op, fill_color=RED, color=RED
+                    ),
+                ),
+                Wait(),
             )
         )
 
         arrow2 = Arrow(
-            end=empirical_img.get_top(), 
-            start=poly_tex.get_bottom(), 
+            end=empirical_img.get_top(),
+            start=poly_tex.get_bottom(),
             buff=0,
-        ).next_to(table, RIGHT, buff = 1)
+        ).next_to(table, RIGHT, buff=1)
         arrow2.set_color(color=[RED, YELLOW, GREEN, GREEN])
         arrow2.tip.set_color(GREEN)
 
@@ -113,38 +116,65 @@ class Discussion1(Scene):
         self.play(Create(arrow2), Write(label2))
         self.wait()
 
-
         self.play(
             Succession(
-            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, fill_opacity = op, fill_color = RED, color = RED)),
-            Wait(),
-            Transform(highlight_rec, SurroundingRectangle(empirical_group, fill_opacity = op, fill_color = RED, color = RED)),
-            Wait()
+                Transform(
+                    highlight_rec,
+                    SurroundingRectangle(
+                        asymptotic_group, fill_opacity=op, fill_color=RED, color=RED
+                    ),
+                ),
+                Wait(),
+                Transform(
+                    highlight_rec,
+                    SurroundingRectangle(
+                        empirical_group, fill_opacity=op, fill_color=RED, color=RED
+                    ),
+                ),
+                Wait(),
             )
         )
 
         sl = 3.0
         self.play(
             Succession(
-            Transform(highlight_rec, SurroundingRectangle(asymptotic_group, fill_opacity = op, fill_color = RED, color = RED)),
-            Wait(),
-            Transform(highlight_rec, SurroundingRectangle(Group(asymptotic_group, label1), fill_opacity = op, fill_color = RED, color = RED)),
-            Wait(),
-            Transform(highlight_rec, SurroundingRectangle(Group(asymptotic_group, label1, label2), fill_opacity = op, fill_color = RED, color = RED)),
-            Wait(),
+                Transform(
+                    highlight_rec,
+                    SurroundingRectangle(
+                        asymptotic_group, fill_opacity=op, fill_color=RED, color=RED
+                    ),
+                ),
+                Wait(),
+                Transform(
+                    highlight_rec,
+                    SurroundingRectangle(
+                        Group(asymptotic_group, label1),
+                        fill_opacity=op,
+                        fill_color=RED,
+                        color=RED,
+                    ),
+                ),
+                Wait(),
+                Transform(
+                    highlight_rec,
+                    SurroundingRectangle(
+                        Group(asymptotic_group, label1, label2),
+                        fill_opacity=op,
+                        fill_color=RED,
+                        color=RED,
+                    ),
+                ),
+                Wait(),
             )
         )
 
         self.wait(3)
-        
 
         return
 
-
         self.play(
             Circumscribe(
-                Group(empirical_img, Dot().move_to(
-                    empirical_img.get_bottom() + DOWN)),
+                Group(empirical_img, Dot().move_to(empirical_img.get_bottom() + DOWN)),
                 color=RED,
             ),
         )
@@ -232,13 +262,13 @@ class Discussion2(Scene):
 
         # Going back to the universal search, knowing a bunch of weird examples is often extremely useful if you are a researcher in the area, because it helps you to build intuition and quickly disprove some hypotheses.
 
-        
-        shft = 1*LEFT
+        shft = 1 * LEFT
         width = 6
         explanation_scale = 0.5
 
-        weier_img = ImageMobject(
-            "img/weierstrass.png").scale_to_fit_width(width).shift(shft)
+        weier_img = (
+            ImageMobject("img/weierstrass.png").scale_to_fit_width(width).shift(shft)
+        )
         weiertitle_tex = Tex("Weierstrass function").next_to(weier_img, DOWN)
         weierexplanation_tex = (
             Tex("Continuous everywhere, yet differentiable nowhere. ")
@@ -247,9 +277,7 @@ class Discussion2(Scene):
         )
 
         cantor_img = (
-            ImageMobject("img/cantor.png")
-            .scale_to_fit_width(width * 0.8)
-            .shift(shft)
+            ImageMobject("img/cantor.png").scale_to_fit_width(width * 0.8).shift(shft)
         )
         cantortitle_tex = Tex("Cantor function").next_to(cantor_img, DOWN)
         cantorexplanation_tex = (
@@ -260,13 +288,10 @@ class Discussion2(Scene):
             .next_to(cantortitle_tex, DOWN)
         )
 
-
         anims = [
             [
-                AnimationGroup(FadeIn(img), FadeIn(
-                    title)),
-                AnimationGroup(FadeOut(img), FadeOut(
-                    title)),
+                AnimationGroup(FadeIn(img), FadeIn(title)),
+                AnimationGroup(FadeOut(img), FadeOut(title)),
             ]
             for img, title, explanation in [
                 [weier_img, weiertitle_tex, weierexplanation_tex],
@@ -290,8 +315,7 @@ class Discussion2(Scene):
 
         side_length = 4
         bounding_square = (
-            Square(color=GRAY, z_index = 10).scale_to_fit_width(
-                side_length).shift(shft)
+            Square(color=GRAY, z_index=10).scale_to_fit_width(side_length).shift(shft)
         )
 
         def create_curve(iter):
@@ -305,31 +329,31 @@ class Discussion2(Scene):
             points = [[p[0], p[1], 0] for p in points]
             print(points)
 
-            curve = VMobject(z_index = 0)
+            curve = VMobject(z_index=0)
             curve.set_points_as_corners(points)
             curve.set_color(RED).scale_to_fit_width(
-               side_length * (1 - 2 ** (-iter))
+                side_length * (1 - 2 ** (-iter))
             ).move_to(bounding_square.get_center())
-            
+
             if iter >= 8:
                 curve.stroke_width = curve.stroke_width * 2
             # curve = []
             # for i in range(len(points) - 1):
             #     curve.append(Line(
-            #         start = points[i], 
+            #         start = points[i],
             #         end = points[i+1],
             #         color = RED
             #         )
             #     )
             # Group(*curve).scale_to_fit_width(3 * (1 - 2 ** (-iter))).move_to(bounding_square.get_center())
             return curve
+
         hilberttitle_tex = Tex("Hilbert curve").next_to(bounding_square, DOWN)
         hilbertexplanation_tex = (
             Tex("A continuous curve with positive area. ")
             .scale(explanation_scale)
             .next_to(hilberttitle_tex, DOWN)
         )
-
 
         curve1 = create_curve(1)
         self.play(
@@ -343,18 +367,15 @@ class Discussion2(Scene):
 
         for i in range(2, 9):
             curve2 = create_curve(i)
-            self.play(
-                Transform(curve1, curve2),
-                run_time = 0.5
-            )        
+            self.play(Transform(curve1, curve2), run_time=0.5)
             self.wait(0.5)
 
-        red_square = Square(
-                    color=RED, fill_opacity=1, fill_color=RED
-                ).scale_to_fit_width(side_length).move_to(bounding_square.get_center())
-        self.play(
-            FadeIn(red_square)
+        red_square = (
+            Square(color=RED, fill_opacity=1, fill_color=RED)
+            .scale_to_fit_width(side_length)
+            .move_to(bounding_square.get_center())
         )
+        self.play(FadeIn(red_square))
         self.wait()
 
         return
@@ -370,7 +391,6 @@ class Discussion2(Scene):
             .to_corner(UL)
         )
         curves[2:].next_to(curves[0], DOWN).align_to(curves[0], LEFT)
-
 
         run_time = 2
         self.play(
@@ -575,17 +595,22 @@ class Discussion2(Scene):
 #         # TODO zopakovat pěknout trojúhelníkovou animaci?
 
 
-
 class Discussion3(Scene):
     def construct(self):
         default()
         self.add(vasek_head)
 
         question_tex = Tex("Why don't we have algorithms with complexities")
-        faster_tex = Tex(r"{{$\mathcal{O}\left(2^n \right)$, }}{{$\mathcal{O}\left(2^{0.1n} \right)$, }}{{$\mathcal{O}\left(2^{0.01n} \right)$, }}{{$\dots$}}")
+        faster_tex = Tex(
+            r"{{$\mathcal{O}\left(2^n \right)$, }}{{$\mathcal{O}\left(2^{0.1n} \right)$, }}{{$\mathcal{O}\left(2^{0.01n} \right)$, }}{{$\dots$}}"
+        )
         question2_tex = Tex("but no asymptotically fastest algorithm? ")
-        quest_group = Group(question_tex, faster_tex, question2_tex).arrange_in_grid(cols = 1, cell_alignment=LEFT).shift(1.5*UP)
-        faster_tex.shift(1*RIGHT)
+        quest_group = (
+            Group(question_tex, faster_tex, question2_tex)
+            .arrange_in_grid(cols=1, cell_alignment=LEFT)
+            .shift(1.5 * UP)
+        )
+        faster_tex.shift(1 * RIGHT)
 
         self.play(
             Succession(
@@ -599,15 +624,15 @@ class Discussion3(Scene):
         )
         self.wait()
 
-        uni_tex = Tex("Universal search!", font_size = DEFAULT_FONT_SIZE*1.4).shift(2*DOWN + 3*LEFT/2)
+        uni_tex = Tex("Universal search!", font_size=DEFAULT_FONT_SIZE * 1.4).shift(
+            2 * DOWN + 3 * LEFT / 2
+        )
         self.play(
             Write(uni_tex),
         )
         self.wait()
         self.remove(vasek_head)
-        self.play(
-            *[FadeOut(o) for o in self.mobjects if o not in [vasek_head]]
-        )
+        self.play(*[FadeOut(o) for o in self.mobjects if o not in [vasek_head]])
         uni_tex = Tex(
             r"{{Universal search \\}}{{an explicit asymptotically optimal algorithm for many problems}}"
         )
@@ -618,6 +643,5 @@ class Discussion3(Scene):
         self.play(
             Write(uni_tex),
         )
-
 
         self.wait(3)
