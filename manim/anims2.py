@@ -468,9 +468,14 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.play(
             AnimationGroup(
                 *p.add_programs_around("a", "SyntaxError",
-                                       0, 10)[0], lag_ratio=0.1
+                                       0, 10, show_stdin=False)[0], lag_ratio=0.1
             )
         )
+        for q in p:
+            q.stdin.foo.move_to(q.stdin)
+        self.wait(1)
+        self.play(AnimationGroup(*(FadeIn(q.stdin.foo)
+                  for q in p), lag_ratio=0.2))
         self.play(AnimationGroup(*(q.finish() for q in p[:3]), lag_ratio=0.8))
         self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
         p.add_dots(NUM_DOTS),
