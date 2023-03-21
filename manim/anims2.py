@@ -59,7 +59,7 @@ class Intro(Scene):
                 our_group, DOWN, buff=0.5)
         )
         prices_img = [
-            ImageMobject("img/turing.jpg").scale_to_fit_height(2.5),
+            ImageMobject("img/turing.png").scale_to_fit_height(2.5),
             ImageMobject("img/fields.jpg").scale_to_fit_height(2.5),
             ImageMobject("img/abacus.png").scale_to_fit_height(2.5),
         ]
