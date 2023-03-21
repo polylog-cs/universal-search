@@ -16,9 +16,8 @@ class Intro(Scene):
 
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
 
-        our_algo_img = ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(
-            14.2
-        )
+        img_path = "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
+        our_algo_img = ImageMobject(img_path).scale_to_fit_width(14.2)
         self.play(
             FadeIn(our_algo_img),
         )
