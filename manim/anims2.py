@@ -59,7 +59,7 @@ class Intro(Scene):
                 our_group, DOWN, buff=0.5)
         )
         prices_img = [
-            ImageMobject("img/turing.jpg").scale_to_fit_height(2.5),
+            ImageMobject("img/turing.png").scale_to_fit_height(2.5),
             ImageMobject("img/fields.jpg").scale_to_fit_height(2.5),
             ImageMobject("img/abacus.png").scale_to_fit_height(2.5),
         ]
@@ -361,22 +361,22 @@ E7365746174747228302C544353414E4F57293B24643D224352415348215C6E223B0A;
             random_text(4),
             random_text(6),
             random_text(5),
-            r""" SONNET 1:
-                From fairest creatures we desire increase,
-                That thereby beauty’s rose might never die,
-                But as the riper should by time decease,
-                His tender heir might bear his memory;
-                But thou, contracted to thine own bright eyes,
-                Feed’st thy light’s flame with self-substantial fuel,
-                Making a famine where abundance lies,
-                Thyself thy foe, to thy sweet self too cruel.
-                Thou that art now the world’s fresh ornament
-                And only herald to the gaudy spring,
-                Within thine own bud buriest thy content,
-                And, tender churl, mak’st waste in niggarding.
-                Pity the world, or else this glutton be,
-                To eat world’s bananas, by the grave and thee.
-            """.split("\n"),
+            r"""SONNET 1:
+From fairest creatures we desire increase,
+That thereby beauty’s rose might never die,
+But as the riper should by time decease,
+His tender heir might bear his memory;
+But thou, contracted to thine own bright eyes,
+Feed’st thy light’s flame with self-substantial fuel,
+Making a famine where abundance lies,
+Thyself thy foe, to thy sweet self too cruel.
+Thou that art now the world’s fresh ornament
+And only herald to the gaudy spring,
+Within thine own bud buriest thy content,
+And, tender churl, mak’st waste in niggarding.
+Pity the world, or else this glutton be,
+To eat world’s bananas, by the grave and thee.
+            """.strip().split("\n"),
             random_text(5),
             random_text(4),
             random_text(6),
@@ -384,19 +384,17 @@ E7365746174747228302C544353414E4F57293B24643D224352415348215C6E223B0A;
             """
 for i in range(42):
     print(
-        str(i+1)
-        + " bananas is better than "
-        + str(i)
-        + " bananas. "
+        f"{i+1} bananas is better",
+        "than {i} bananas."
     )
-            """.split("\n"),
+            """.strip().split("\n"),
             random_text(5),
             random_text(10, 50),
             perl_program(False),
             random_text(10, 50),
             random_text(5),
             """
-#Absolutely amazing factoring algorithm
+# Absolutely amazing factoring algorithm
 
 import antigravity
 import delorean
@@ -417,28 +415,25 @@ def factor(n):
 
         texts_group = Group()
 
+        # TODO (high effort): make this appear as if written on a typewriter
         for i in range(len(texts)):
             text = texts[i]
-            text_group = Group()
-            for j in range(len(text)):
-                text_group.add(
-                    Text(text[j], z_index=0).scale(0.5)
-                )
-            text_group.arrange_in_grid(cols=1, cell_alignment=LEFT)
+            text_group = Paragraph(
+                *text, z_index=0, font="monospace", line_spacing=1.2, font_size=0.7 * DEFAULT_FONT_SIZE).scale(0.5)
             texts_group.add(text_group)
 
         texts_group.arrange_in_grid(cols=1, cell_alignment=LEFT, buff=1).align_to(
             Dot().to_edge(DOWN), UP
-        )
+        ).align_to(Dot().to_edge(LEFT), LEFT)
 
-        t = 0
-        for i in range(120):
-            t += 0.2 + random.uniform(0, 0.2)
-            self.add_sound(random_typewriter_file(), time_offset=t)
+        # t = 0
+        # for i in range(120):
+        #    t += 0.2 + random.uniform(0, 0.2)
+        #    self.add_sound(random_typewriter_file(), time_offset=t)
 
         self.play(
             texts_group.animate.to_edge(DOWN, buff=0),
-            run_time=30,
+            run_time=5,
             rate_func=linear,
         )
         self.wait(3)
@@ -474,9 +469,14 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.play(
             AnimationGroup(
                 *p.add_programs_around("a", "SyntaxError",
-                                       0, 10)[0], lag_ratio=0.1
+                                       0, 10, show_stdin=False)[0], lag_ratio=0.1
             )
         )
+        for q in p:
+            q.stdin.foo.move_to(q.stdin)
+        self.wait(1)
+        self.play(AnimationGroup(*(FadeIn(q.stdin.foo)
+                  for q in p), lag_ratio=0.2))
         self.play(AnimationGroup(*(q.finish() for q in p[:3]), lag_ratio=0.8))
         self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
         p.add_dots(NUM_DOTS),
@@ -543,7 +543,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
             infinite.animate.align_to(
                 self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
-        self.play(FadeOut(waiting), FadeOut(infinite.stdout))
+        self.play(FadeOut(waiting), FadeOut(infinite.stdout_obj))
         self.play(infinite.dumb_down(), self.camera.frame.animate.align_to(
             infinite.stdin.get_top() + 0.5 * UP, UP))
         infinite.arrange()
@@ -645,8 +645,7 @@ class ExplanationBeginning(Scene):
         self.wait()
 
         shft = 1 * DOWN
-        your_algo_img = SVGMobject(  # TODO v svg nefunguje tloustka car
-            "img/you.svg").scale_to_fit_height(3.5)
+        your_algo_img = you_image().scale_to_fit_height(3.5)
         fn = Tex(r"$f(n)$")
         your_algo = Group(your_algo_img, fn).arrange(
             DOWN).align_to(Dot().to_edge(LEFT), RIGHT).shift(shft)

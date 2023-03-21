@@ -187,7 +187,7 @@ class ProgramInvocation(VMobject):
             margin=0.15,
         )
 
-    def __init__(self, code, stdin, stdout, ok, *args, **kwargs):
+    def __init__(self, code, stdin, stdout, ok, show_stdin=True, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.wheels = 0
         self.text = code
@@ -196,6 +196,9 @@ class ProgramInvocation(VMobject):
         self.stdin = VGroup(
             Text(stdin, font="monospace", font_size=24), self.arrow.copy()
         ).arrange()
+        self.stdin.foo = self.stdin.copy()
+        if not show_stdin:
+            self.stdin.fade(1)
         self.stdout = stdout
         self.ok = ok
         self.group = VGroup(
@@ -364,7 +367,7 @@ class ProgramInvocationList(VGroup):
         self.arrange()
         self.add_updater(ProgramInvocationList.arrange)
         self.dots = ProgramInvocation("...", self.stdin, "", False)
-        self.dummy = ProgramInvocation("[code]", self.stdin, "woo", False)
+        self.dummy = ProgramInvocation("[code]", self.stdin, "foo", False)
         self.ptr = 0
         self.arrow = (
             Arrow(start=RIGHT, end=LEFT)
@@ -400,7 +403,7 @@ class ProgramInvocationList(VGroup):
     def add_dummy(self, reps=1, fade=True):
         return [self.add_program(self.dummy.copy(), fade=fade) for _ in range(reps)]
 
-    def add_programs_around(self, code, code_stdout, before=0, after=0, fade=True):
+    def add_programs_around(self, code, code_stdout, before=0, after=0, fade=True, show_stdin=True):
         anims = []
         num = program_to_number(code)
         pre = []
@@ -414,8 +417,7 @@ class ProgramInvocationList(VGroup):
                 ok = False
             anims.append(
                 self.add_program(
-                    ProgramInvocation(nth_python_program(i),
-                                      self.stdin, stdout, ok), fade=fade
+                    ProgramInvocation(nth_python_program(i), self.stdin, stdout, ok, show_stdin=show_stdin), fade=fade
                 )
             )
             if i < num:
@@ -476,7 +478,7 @@ def make_checking_code():
 if a * b == n:
 
 ✓
-else: # also on error
+else:
 
 ×
 """.strip())
@@ -492,3 +494,7 @@ def our_code_with_badge():
         0.8).align_to(code_img, RIGHT).shift(0.3*DOWN)
 
     return Group(code_img, badge_img)
+
+
+def you_image():
+    return SVGMobject("img/you.svg").set_stroke(BLACK, 3)
