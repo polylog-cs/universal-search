@@ -5,7 +5,7 @@ from utils.utilgeneral import *
 
 DRAFT = True
 prop1_str = r"1) We don't know its time complexity!"
-prop2_str = r"2) It is insanely slow. "
+prop2_str = r"2) It's insanely slow. "
 
 
 class Intro(Scene):
@@ -401,6 +401,7 @@ for i in range(42):
 import antigravity
 import delorean
 import emoji
+import this
 import turtle
 
 def factor(n):
