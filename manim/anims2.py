@@ -376,7 +376,6 @@ To eat world’s bananas, by the grave and thee.
             random_text(5),
             random_text(4),
             random_text(6),
-            random_text(5),
             """
 for i in range(42):
     print(
@@ -386,11 +385,11 @@ for i in range(42):
             """.strip().split(
                 "\n"
             ),
-            random_text(5),
             random_text(10, 50),
             perl_program(False),
             random_text(10, 50),
             random_text(5),
+            random_text(4),
             """
 # Absolutely amazing factoring algorithm
 
@@ -401,6 +400,9 @@ import this
 import turtle
 
 def factor(n):
+    \"\"\" This incredible factoring function works as follows:
+
+
             """.split(
                 "\n"
             ),
@@ -436,7 +438,7 @@ def factor(n):
 
         self.play(
             texts_group.animate.to_edge(DOWN, buff=0),
-            run_time=5,
+            run_time=40,
             rate_func=linear,
         )
         self.wait(3)
@@ -889,7 +891,8 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
     def construct(self):
         default()
         p = ProgramInvocationList(STDIN, STDOUT, 13 * LEFT + 7 * UP)
-        self.camera.frame.scale(2)
+        sc = 2
+        self.camera.frame.scale(sc)
         p.arrow.fade(1)
         to_hide = []
         for i in range(5, -1, -1):
@@ -904,9 +907,34 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
             cog.save_state()
             cog.fade(1)
 
-        self.add(p)
-        self.play(*(cog.animate.restore() for cog in to_hide))
-        self.play(*(FadeOut(cog) for cog in to_hide))
+        
+        og_tex = Tex(r"{{Original complexity: }}{{$(L + f(n))^2 $}}{{$=$}}{{$O(f(n)^2). $}}")
+        new_tex = Tex(r"{{New complexity: }}{{$2^L \cdot f(n) $}}{{$=$}}{{$O(f(n)). $}}")
+        Group(*og_tex, *new_tex).scale(sc).arrange_in_grid(
+            rows = 2,
+            buff = MED_SMALL_BUFF * 2
+        ).move_to(
+            3*DOWN
+        )
+        new_tex.shift(0.3*DOWN)
+
+        self.add(p, og_tex)
+        self.wait()
+
+        self.play(
+            *(cog.animate.restore() for cog in to_hide),
+        )
+        self.wait()
+        self.play(
+            FadeIn(new_tex[0:2]),
+                  )
+        self.wait()
+        self.play(
+            FadeIn(new_tex[2:]),
+                  )
+        
+        
+        #self.play(*(FadeOut(cog) for cog in to_hide))
         self.wait(5)
 
 
