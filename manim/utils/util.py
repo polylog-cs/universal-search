@@ -22,8 +22,7 @@ def multiplication_animation(scene, num1, num2, obj1, obj2):
     nums_intermediate_tex = [Tex(str(n)) for n in nums_intermediate]
     num2_tex = Tex(r"$\times$" + str(num2))
 
-    line1 = Line(start=num2_tex.get_left(),
-                 end=num2_tex.get_right(), color=GRAY)
+    line1 = Line(start=num2_tex.get_left(), end=num2_tex.get_right(), color=GRAY)
     line2 = line1.copy()
 
     objects = Group(
@@ -36,8 +35,7 @@ def multiplication_animation(scene, num1, num2, obj1, obj2):
     ).arrange_in_grid(cols=1, cell_alignment=RIGHT)
 
     for i in range(1, len(nums_intermediate_tex)):
-        nums_intermediate_tex[i].align_to(
-            nums_intermediate_tex[i - 1][0][-2], RIGHT)
+        nums_intermediate_tex[i].align_to(nums_intermediate_tex[i - 1][0][-2], RIGHT)
 
     objects.remove(line2)
     line2 = Line(
@@ -53,7 +51,7 @@ def multiplication_animation(scene, num1, num2, obj1, obj2):
     anims1 = [
         ReplacementTransform(obj1, num1_tex),
         ReplacementTransform(obj2, num2_tex),
-        FadeIn(line1)
+        FadeIn(line1),
     ]
 
     rec = SurroundingRectangle(num2_tex[0][-1], buff=0.1, color=RED)
@@ -69,14 +67,12 @@ def multiplication_animation(scene, num1, num2, obj1, obj2):
         else:
             anims1.append(
                 AnimationGroup(
-                    rec.animate.move_to(num2_tex[0][-i-1].get_center()),
-                    FadeIn(nums_intermediate_tex[i])
+                    rec.animate.move_to(num2_tex[0][-i - 1].get_center()),
+                    FadeIn(nums_intermediate_tex[i]),
                 )
             )
-            rec.move_to(num2_tex[0][-i-1].get_center()),
-    anims1.append(
-        FadeOut(rec)
-    )
+            rec.move_to(num2_tex[0][-i - 1].get_center()),
+    anims1.append(FadeOut(rec))
     anims1.append(Wait())
     rec.move_to(num2_tex[0][-1].get_center())
 
@@ -121,8 +117,7 @@ def horrible_multiplication():
     b = 33372027594978156556226010605355114227940760344767554666784520987023841729210037080257448673296881877565718986258036932062711
 
     n_tex, a_tex, b_tex = [
-        Tex("\\hsize=9cm{}" + allow_breaks(str(k)),
-            tex_environment=None).scale(0.8)
+        Tex("\\hsize=9cm{}" + allow_breaks(str(k)), tex_environment=None).scale(0.8)
         for k in [n, a, b]
     ]
     eq_tex = Tex(str(r"="))
@@ -153,22 +148,19 @@ class CollapsibleAsymptotics(VMobject):
             MathTex(")"),
         )
         fake_tex[0].next_to(self.tex, LEFT, buff=SMALL_BUFF)
-        fake_tex[1].shift(self.immovable.get_center() -
-                          fake_tex[1].get_center())
+        fake_tex[1].shift(self.immovable.get_center() - fake_tex[1].get_center())
         fake_tex[2].next_to(self.tex, RIGHT, buff=SMALL_BUFF)
 
-        self.new_tex = MathTex(
-            "\mathcal{O}(", self.immovable.get_tex_string(), ")")
-        self.new_tex.shift(self.immovable.get_center() -
-                           self.new_tex[1].get_center())
+        self.new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
+        self.new_tex.shift(self.immovable.get_center() - self.new_tex[1].get_center())
         return Succession(
             AnimationGroup(
-                *(FadeIn(self.new_tex[i], target_position=fake_tex[i])
-                  for i in range(3)),
-                FadeOut(self.tex[0],
-                        target_position=self.tex[1], scale=(0, 1, 0)),
-                FadeOut(self.tex[2],
-                        target_position=self.tex[1], scale=(0, 1, 0)),
+                *(
+                    FadeIn(self.new_tex[i], target_position=fake_tex[i])
+                    for i in range(3)
+                ),
+                FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
+                FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
             ),
             AnimationGroup(FadeOut(self.tex[1]), run_time=0.01),
         )
@@ -196,8 +188,8 @@ class ProgramInvocation(VMobject):
         self.stdin = VGroup(
             Text(stdin, font="monospace", font_size=24), self.arrow.copy()
         ).arrange()
-        self.stdin.foo = self.stdin.copy()
         if not show_stdin:
+            self.stdin.foo = self.stdin.copy()
             self.stdin.fade(1)
         self.stdout = stdout
         self.ok = ok
@@ -225,8 +217,7 @@ class ProgramInvocation(VMobject):
         color = RED if "Error" in self.stdout else TEXT_COLOR
         self.stdout_obj = VGroup(
             self.arrow.copy(),
-            Text(self.stdout, font="monospace",
-                 font_size=24, color=color),
+            Text(self.stdout, font="monospace", font_size=24, color=color),
         ).arrange()
         self.stdout_obj.next_to(self.group)
         self.group.add(self.stdout_obj)
@@ -395,7 +386,9 @@ class ProgramInvocationList(VGroup):
         if fade:
             program.stdin.fade(1)
             program.code.fade(1)
-        return AnimationGroup(program.stdin.animate.restore(), program.code.animate.restore())
+        return AnimationGroup(
+            program.stdin.animate.restore(), program.code.animate.restore()
+        )
 
     def add_dots(self, reps=1):
         return [self.add_program(self.dots.copy(), fade=False) for _ in range(reps)]
@@ -403,7 +396,9 @@ class ProgramInvocationList(VGroup):
     def add_dummy(self, reps=1, fade=True):
         return [self.add_program(self.dummy.copy(), fade=fade) for _ in range(reps)]
 
-    def add_programs_around(self, code, code_stdout, before=0, after=0, fade=True, show_stdin=True):
+    def add_programs_around(
+        self, code, code_stdout, before=0, after=0, fade=True, show_stdin=True
+    ):
         anims = []
         num = program_to_number(code)
         pre = []
@@ -417,7 +412,14 @@ class ProgramInvocationList(VGroup):
                 ok = False
             anims.append(
                 self.add_program(
-                    ProgramInvocation(nth_python_program(i), self.stdin, stdout, ok, show_stdin=show_stdin), fade=fade
+                    ProgramInvocation(
+                        nth_python_program(i),
+                        self.stdin,
+                        stdout,
+                        ok,
+                        show_stdin=show_stdin,
+                    ),
+                    fade=fade,
                 )
             )
             if i < num:
@@ -474,24 +476,29 @@ class ProgramInvocationList(VGroup):
 
 
 def make_checking_code():
-    code = ProgramInvocation.make_code("""
+    code = ProgramInvocation.make_code(
+        """
 if a * b == n:
 
 ✓
 else:
 
 ×
-""".strip())
-    for (i, col) in (2, GREEN), (-1, RED):
-        code.code[i].set_color(col).scale(
-            2.5).shift(.9 * RIGHT + .15 * UP)
+""".strip()
+    )
+    for i, col in (2, GREEN), (-1, RED):
+        code.code[i].set_color(col).scale(2.5).shift(0.9 * RIGHT + 0.15 * UP)
     return code
 
 
 def our_code_with_badge():
     code_img = ImageMobject("img/program3x.png").scale_to_fit_width(2)
-    badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(
-        0.8).align_to(code_img, RIGHT).shift(0.3*DOWN)
+    badge_img = (
+        ImageMobject("img/badge_text_small.png")
+        .scale_to_fit_width(0.8)
+        .align_to(code_img, RIGHT)
+        .shift(0.3 * DOWN)
+    )
 
     return Group(code_img, badge_img)
 
