@@ -1,8 +1,7 @@
 from manim import *
 import manim as m  # hack for type hinting
 from utils import *
-
-# -r
+from utils.utilcliparts import *
 # ^ also imports manim and changes some of its defaults
 
 
@@ -71,7 +70,7 @@ class Intro(Scene):
         brace_groups = []
         for obj in [num1_tex, num2_tex]:
             brace = Brace(obj, DOWN)
-            n_tex = Tex(r"$n$ digits").next_to(brace, DOWN)
+            n_tex = Tex(r"$d$ digits").next_to(brace, DOWN)
             brace_groups.append(Group(brace, n_tex))
 
         self.play(*[FadeIn(g) for g in brace_groups])
@@ -187,7 +186,7 @@ class Intro(Scene):
             Group(*nums_intermediate_tex), color=RED, fill_opacity=0.1, fill_color=RED
         )
         # brace = Brace(border, RIGHT)
-        n2_tex = Tex(r"$n^2$ operations").next_to(brace, RIGHT)
+        n2_tex = Tex(r"$d^2$ operations").next_to(brace, RIGHT)
 
         self.play(
             FadeIn(border),
@@ -288,7 +287,7 @@ class Intro(Scene):
 
         brace = Brace(num_tex, DOWN).shift(0.3 * DOWN)
         sqrt_tex = Tex(
-            r"{{$n$ digits}}{{$\Rightarrow$ size up to $10^n$}}{{$\Rightarrow$ up to $\sqrt{10^n}$ steps}}"
+            r"{{$d$ digits}}{{$\Rightarrow$ size up to $10^d$}}{{$\Rightarrow$ up to $\sqrt{10^d}$ steps}}"
         )
         sqrt_tex[0].next_to(brace, DOWN)
         sqrt_tex[1].next_to(sqrt_tex[0], DOWN, buff=0.5)
@@ -303,7 +302,7 @@ class Intro(Scene):
         self.wait()
 
         # This is much slower than the time n^2 it takes to multiply two numbers.
-        formula_tex = Tex(r"{{$\sqrt{10^n}$}}{{$\gg n^2$}}").next_to(
+        formula_tex = Tex(r"{{$\sqrt{10^d}$}}{{$\gg d^2$}}").next_to(
             sqrt_tex[1], RIGHT, buff=3
         )
         self.play(
@@ -405,7 +404,7 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             return x**1.5 * 2
 
         def f_bad(x):
-            return x**3.5 / 2e6 * 1.25
+            return x**3.5 / 2e6 * 1.2
 
         def f_yours(x):
             return x**1.5
@@ -481,9 +480,10 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
             our_algo.copy().scale(0.3), MathTex(), your_algo.copy().scale(0.3)
         )
 
+        sc = 0.4
         self.play(
-            our_algo.animate.scale(0.3).align_to(axes, DL),
-            your_algo.animate.scale(0.3).align_to(axes, DL),
+            our_algo.animate.scale(sc).align_to(axes, DL),
+            your_algo.animate.scale(sc).align_to(axes, DL),
         )
         self.wait()
 
@@ -543,7 +543,13 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
 
         # In other words, up to constant factors, our algorithm completely nails it.
 
-        self.play(plot_ours.animate.become(plot_bad))
+        self.play(
+            plot_ours.animate.become(plot_bad),
+            FadeIn(
+                clipart_yes_no_maybe("no", 2).scale_to_fit_height(2).move_to(2*UP + 1*LEFT)
+            )
+        )
+        self.wait()
 
         self.play(arrow.animate.shift(4 * RIGHT), run_time=4)
 
@@ -551,3 +557,15 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         # Or just run the algorithm on some real data! In that case be careful, our implementation is in Python, so it’s a bit slow. Good luck and see you in a few days with the follow-up video!
 
         self.wait(5)
+
+
+class FinalScene(Scene):
+    def construct(self):
+        default()
+        code_img = ImageMobject("img/program_placeholder.png").scale_to_fit_width(14.2).align_to(Dot().to_edge(DOWN), UP)
+        self.play(
+            code_img.animate.to_edge(DOWN),
+            run_time = 20,
+            rate_func = linear,
+        )
+        self.wait()

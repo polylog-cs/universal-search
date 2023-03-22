@@ -432,10 +432,7 @@ def factor(n):
             Dot().to_edge(DOWN), UP
         ).align_to(Dot().to_edge(LEFT), LEFT)
 
-        # t = 0
-        # for i in range(120):
-        #    t += 0.2 + random.uniform(0, 0.2)
-        #    self.add_sound(random_typewriter_file(), time_offset=t)
+        self.add_sound("audio/typewriter/typewriter_long.mp3", time_offset=0)
 
         self.play(
             texts_group.animate.to_edge(DOWN, buff=0),
