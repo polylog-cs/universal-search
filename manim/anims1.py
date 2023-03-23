@@ -285,9 +285,11 @@ class Intro(Scene):
                     )
                 )
 
-        self.play(Succession(*anims))
-
         self.wait(2)
+        self.play(Succession(*anims))
+        for pair in pairs[:-1]:
+            for one in pair:
+                self.remove(one)
 
         self.next_section(skip_animations=False)
 
