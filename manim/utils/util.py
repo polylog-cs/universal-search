@@ -143,28 +143,35 @@ class CollapsibleAsymptotics(VMobject):
         self.immovable = self.tex[1]
         self.add(self.tex)
 
-    def collapse(self):
+    def collapse(self, target=None):
         fake_tex = Group(
             MathTex("\mathcal{O}("),
             MathTex(self.immovable.get_tex_string()),
             MathTex(")"),
         )
+        if target is None:
+            target = self.immovable.get_center()
         fake_tex[0].next_to(self.tex, LEFT, buff=SMALL_BUFF)
-        fake_tex[1].shift(self.immovable.get_center() - fake_tex[1].get_center())
+        fake_tex[1].shift(target - fake_tex[1].get_center())
         fake_tex[2].next_to(self.tex, RIGHT, buff=SMALL_BUFF)
 
         self.new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
-        self.new_tex.shift(self.immovable.get_center() - self.new_tex[1].get_center())
+        self.new_tex.shift(target - self.new_tex[1].get_center())
+        self.new_tex[1].save_state()
+        self.new_tex[1].move_to(self.tex[1])
         return Succession(
             AnimationGroup(
+                *(FadeIn(self.new_tex[i], target_position=fake_tex[i]) for i in (0, 2)),
                 *(
-                    FadeIn(self.new_tex[i], target_position=fake_tex[i])
-                    for i in range(3)
+                    FadeOut(
+                        self.tex[i],
+                        target_position=target,
+                        scale=(0, 1, 0) if i != 1 else (1, 1, 0),
+                    )
+                    for i in (0, 1, 2)
                 ),
-                FadeOut(self.tex[0], target_position=self.tex[1], scale=(0, 1, 0)),
-                FadeOut(self.tex[2], target_position=self.tex[1], scale=(0, 1, 0)),
+                self.new_tex[1].animate.restore(),
             ),
-            AnimationGroup(FadeOut(self.tex[1]), run_time=0.01),
         )
 
 

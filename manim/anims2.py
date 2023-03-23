@@ -164,11 +164,13 @@ class Intro(Scene):
         table[11].target.next_to(table[10], RIGHT)
         self.play(FadeIn(table[10]), MoveToTarget(table[11]))
         self.wait()
-        self.play(table[11].collapse())
         self.play(
-            table[11].new_tex.animate.shift(
-                (table[8].new_tex.get_center()[0] - table[11].new_tex.get_center()[0])
-                * RIGHT
+            table[11].collapse(
+                table[11]
+                .tex[1]
+                .copy()
+                .align_to(table[8].new_tex[1], RIGHT)
+                .get_center()
             )
         )
         self.wait()
