@@ -22,31 +22,32 @@ class Discussion1(Scene):
         sl = 2
         op = 0.1
 
-        def make_range(max):
-            return [0, max, max]
+        # def make_range(max):
+        #     return [0, max, max]
 
-        x_range, y_range = make_range(5), make_range(10)
+        # x_range, y_range = make_range(5), make_range(10)
 
-        def f_q(x):
-            return x**1.8 / 2
+        # def f_q(x):
+        #     return x**1.8 / 2
 
-        axes = Axes(
-            x_range=x_range,
-            y_range=y_range,
-            x_length=sl,
-            y_length=sl,
-        )
-        plot = axes.plot(f_q, color=BLUE)
+        # axes = Axes(
+        #     x_range=x_range,
+        #     y_range=y_range,
+        #     x_length=sl,
+        #     y_length=sl,
+        # )
+        # plot = axes.plot(f_q, color=BLUE)
 
-        empirical_img = Group(axes, plot)
-        empirical_group = Group(Square(sl), empirical_img)
+        # empirical_img = Group(axes, plot)
+        empirical_tex = Tex(r"Empirical \\ analysis")
+        empirical_group = Group(Square(sl), empirical_tex)
 
         # Or you could count how many steps the algorithm needs to solve any input of size n, but compute this number exactly, with all constants and lower order terms.
         # Or you can compute the asymptotic complexity. Or you can just check whether it's a polynomial time algorithm or not.
 
-        asymptotic_tex = Tex(r"$\mathcal{O}\left(n^2 \right)$")
+        asymptotic_tex = Tex(r"Asymptotic \\ complexity")
         asymptotic_group = Group(Square(sl), asymptotic_tex)
-        poly_tex = Tex(r"polynomial \\ time?")
+        poly_tex = Tex(r"Polynomial \\ time?")
         poly_group = Group(Square(sl), poly_tex)
         tick = clipart_yes_no_maybe("yes", 0.5).next_to(poly_tex, DR)
 
@@ -58,8 +59,8 @@ class Discussion1(Scene):
 
         self.play(
             Succession(
-                Create(axes),
-                Write(plot),
+                Wait(),
+                FadeIn(empirical_tex),
                 Wait(),
                 FadeIn(asymptotic_tex),
                 Wait(),
@@ -70,14 +71,14 @@ class Discussion1(Scene):
         # You can see how these options get increasingly abstract and as they are getting more abstract, they are also getting easier to work with. In one extreme, analyzing an algorithm empirically is pretty hard and even impossible to do for nontrivial values of n, because there are too many inputs to check. On the other hand, understanding whether an algorithm runs in polynomial time is often really easy.
 
         arrow1 = Arrow(
-            start=empirical_img.get_top(),
+            start=empirical_tex.get_top(),
             end=poly_tex.get_bottom(),
             buff=0,
         ).next_to(table, LEFT, buff=1)
         arrow1.set_color(color=[GREEN, GREEN, YELLOW, RED])
         arrow1.tip.set_color(GREEN)
         label1 = Tex(r"easy \\to use").next_to(arrow1, LEFT)
-        self.play(Create(arrow1), Write(label1))
+        self.play(Create(arrow1), Write(label1), run_time = 3)
         self.wait()
 
         highlight_rec = SurroundingRectangle(
@@ -105,7 +106,7 @@ class Discussion1(Scene):
         )
 
         arrow2 = Arrow(
-            end=empirical_img.get_top(),
+            end=empirical_tex.get_top(),
             start=poly_tex.get_bottom(),
             buff=0,
         ).next_to(table, RIGHT, buff=1)
@@ -113,7 +114,7 @@ class Discussion1(Scene):
         arrow2.tip.set_color(GREEN)
 
         label2 = Tex(r"informative").next_to(arrow2, RIGHT)
-        self.play(Create(arrow2), Write(label2))
+        self.play(Create(arrow2), Write(label2), run_time = 3)
         self.wait()
 
         self.play(
