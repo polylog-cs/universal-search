@@ -2,6 +2,7 @@ from manim import *
 import manim as m  # hack for type hinting
 from utils import *
 from utils.utilcliparts import *
+
 # ^ also imports manim and changes some of its defaults
 
 
@@ -261,11 +262,12 @@ class Intro(Scene):
             else:
                 return 0.1
 
+        anims = []
         fst = True
         for i in range(len(pairs)):
             if fst == True:
                 fst = False
-                self.play(
+                anims.append(
                     FadeIn(Group(*pairs[i])),
                 )
             else:
@@ -273,13 +275,17 @@ class Intro(Scene):
                 for j in [0, 1]:
                     pairs[i][j].save_state()
                 g.shift(1 * DOWN).set_color(BACKGROUND_COLOR)
-                self.play(
-                    Group(*pairs[i - 1])
-                    .animate.shift(1 * UP)
-                    .set_color(BACKGROUND_COLOR),
-                    *[pairs[i][j].animate.restore() for j in [0, 1]],
-                    run_time=f(i),
+                anims.append(
+                    AnimationGroup(
+                        Group(*pairs[i - 1])
+                        .animate.shift(1 * UP)
+                        .set_color(BACKGROUND_COLOR),
+                        *[pairs[i][j].animate.restore() for j in [0, 1]],
+                        run_time=f(i),
+                    )
                 )
+
+        self.play(Succession(*anims))
 
         self.wait(2)
 
@@ -481,17 +487,29 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         )
 
         sc = 0.4
+        corner = Point(axes.coords_to_point(0, 0, 0))
+        cornerer = make_updater(corner)
+        our_algo.generate_target()
+        your_algo.generate_target()
+        our_algo.target.scale(sc)
+        your_algo.target.scale(sc)
+        cornerer(our_algo.target)
+        cornerer(your_algo.target)
         self.play(
-            our_algo.animate.scale(sc).align_to(axes, DL),
-            your_algo.animate.scale(sc).align_to(axes, DL),
+            MoveToTarget(our_algo),
+            MoveToTarget(your_algo),
         )
         self.wait()
 
         your_algo.add_updater(make_updater(plot_yours))
         our_algo.add_updater(make_updater(plot_ours))
 
-        self.play(Write(plot_ours), Write(plot_yours), run_time=3)
-        self.wait()
+        rate_func = rate_functions.double_smooth
+        self.play(
+            Write(plot_ours, rate_func=rate_func),
+            Write(plot_yours, rate_func=rate_func),
+            run_time=3,
+        )
 
         zero = axes.coords_to_point(0, 0)
         arrow = Arrow(zero + DOWN, zero)
@@ -546,8 +564,10 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         self.play(
             plot_ours.animate.become(plot_bad),
             FadeIn(
-                clipart_yes_no_maybe("no", 2).scale_to_fit_height(2).move_to(2*UP + 1*LEFT)
-            )
+                clipart_yes_no_maybe("no", 2)
+                .scale_to_fit_height(2)
+                .move_to(2 * UP + 1 * LEFT)
+            ),
         )
         self.wait()
 
@@ -562,10 +582,14 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
 class FinalScene(Scene):
     def construct(self):
         default()
-        code_img = ImageMobject("img/program_placeholder.png").scale_to_fit_width(14.2).align_to(Dot().to_edge(DOWN), UP)
+        code_img = (
+            ImageMobject("img/program_placeholder.png")
+            .scale_to_fit_width(14.2)
+            .align_to(Dot().to_edge(DOWN), UP)
+        )
         self.play(
             code_img.animate.to_edge(DOWN),
-            run_time = 20,
-            rate_func = linear,
+            run_time=20,
+            rate_func=linear,
         )
         self.wait()
