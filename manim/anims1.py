@@ -347,14 +347,14 @@ class Factoring(Scene):
         self.wait(5)
 
 
-class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
+class Asymptotics(Scene):
     def construct(self):
         default()
 
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
         # TODO nezapomenout vyprintscreenovat final verzi v solarized barvach
         our_algo_img = m.ImageMobject(
-            "img/program3x_placeholder.png"
+            "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
         ).scale_to_fit_width(14.2)
         # our_algo.width = 16 * 0.75
         self.play(
@@ -362,7 +362,9 @@ class Asymptotics(Scene):  # TODO zmenit placeholdery na obrazky
         )
         self.wait()
 
-        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
+        badge_img = ImageMobject(
+            "img/badge_text_small.png" if DRAFT else "img/badge_text.png"
+        ).scale_to_fit_width(6)
         # badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
         badge_group = Group(badge_img)
 
@@ -583,7 +585,7 @@ class FinalScene(Scene):
     def construct(self):
         default()
         code_img = (
-            ImageMobject("img/program_placeholder.png")
+            ImageMobject("img/program_placeholder.png" if DRAFT else "img/program.png")
             .scale_to_fit_width(14.2)
             .align_to(Dot().to_edge(DOWN), UP)
         )
