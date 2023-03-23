@@ -584,12 +584,12 @@ class ProgramsWithStepping(MovingCameraScene):
         prog.group[-1].save_state().fade(1)
         checker = (
             make_checking_code()
-            .align_to(self.camera.frame, RIGHT + DOWN)
-            .shift(SMALL_BUFF * (LEFT + UP))
+            .move_to(self.camera.frame)
+            .shift(1.5 * RIGHT + 0.5 * DOWN)
         )
         self.play(arrow, stdout)
         self.play(FadeIn(checker))
-        self.wait(3)
+        self.wait(2)
         self.play(FadeOut(checker))
         prog.group[-1].restore()
         self.play(tick)
@@ -604,7 +604,7 @@ class ProgramsWithStepping(MovingCameraScene):
         prog.group[-1].save_state().fade(1)
         self.play(arrow, stdout)
         self.play(FadeIn(checker))
-        self.wait(3)
+        self.wait(2)
         self.play(FadeOut(checker))
         prog.group[-1].restore()
         self.play(tick)
@@ -797,7 +797,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             Group(Point(first_wheel.get_bottom()), Point(last_wheel.get_bottom())),
             "f(n)",
             DOWN,
-            buff=0.02 * ZOOM,
+            buff=0,
             z_index=100,
             color=color_fn,
         )
@@ -844,6 +844,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             stroke_width=4 * ZOOM,
         )
         self.play(FadeIn(triangle))
+        self.wait(3)
         jag = p.return_for_jagging(L - 1)
         self.play(*map(FadeOut, jag))
         self.wait(2)
@@ -888,6 +889,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         fn_rehor = mkbrace(
             Group(Line(triangle_hmid, triangle_right)), "f(n)", UP, color=color_fn
         )
+        self.wait(2)
         self.play(
             fn_label.copy().animate.become(fn_rehor),
             l_label.copy().animate.become(l_rehor),

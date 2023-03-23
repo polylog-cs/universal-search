@@ -20,7 +20,13 @@ class Discussion1(Scene):
         # First of all, what I don’t want you to take away, is that asymptotic complexity is a broken concept. Let’s say we want to analyze some algorithm like selectsort. There are a bunch of approaches you could take. First, you could code the algorithm and empirically measure its complexity.
 
         sl = 2
-        op = 0.1
+
+        def surrounding_rectangle(obj):
+            return SurroundingRectangle(
+                obj, fill_opacity=0.1, fill_color=ORANGE, color=ORANGE, z_index=-1
+            )
+
+        rainbow = [GREEN, GREEN, YELLOW, RED]
 
         # def make_range(max):
         #     return [0, max, max]
@@ -75,32 +81,20 @@ class Discussion1(Scene):
             end=poly_tex.get_bottom(),
             buff=0,
         ).next_to(table, LEFT, buff=1)
-        arrow1.set_color(color=[GREEN, GREEN, YELLOW, RED])
-        arrow1.tip.set_color(GREEN)
+        arrow1.set_color(color=rainbow)
+        arrow1.tip.set_color(rainbow[0])
         label1 = Tex(r"easy \\to use").next_to(arrow1, LEFT)
-        self.play(Create(arrow1), Write(label1), run_time = 3)
+        self.play(Create(arrow1, run_time=3), Write(label1, run_time=1.5))
         self.wait()
 
-        highlight_rec = SurroundingRectangle(
-            empirical_group, fill_opacity=op, fill_color=RED, color=RED
-        )
+        highlight_rec = surrounding_rectangle(empirical_group)
         self.play(
             Succession(
                 FadeIn(highlight_rec),
                 Wait(),
-                Transform(
-                    highlight_rec,
-                    SurroundingRectangle(
-                        asymptotic_group, fill_opacity=op, fill_color=RED, color=RED
-                    ),
-                ),
+                Transform(highlight_rec, surrounding_rectangle(asymptotic_group)),
                 Wait(),
-                Transform(
-                    highlight_rec,
-                    SurroundingRectangle(
-                        poly_group, fill_opacity=op, fill_color=RED, color=RED
-                    ),
-                ),
+                Transform(highlight_rec, surrounding_rectangle(poly_group)),
                 Wait(),
             )
         )
@@ -110,28 +104,18 @@ class Discussion1(Scene):
             start=poly_tex.get_bottom(),
             buff=0,
         ).next_to(table, RIGHT, buff=1)
-        arrow2.set_color(color=[RED, YELLOW, GREEN, GREEN])
-        arrow2.tip.set_color(GREEN)
+        arrow2.set_color(color=list(reversed(rainbow)))
+        arrow2.tip.set_color(rainbow[0])
 
         label2 = Tex(r"informative").next_to(arrow2, RIGHT)
-        self.play(Create(arrow2), Write(label2), run_time = 3)
+        self.play(Create(arrow2, run_time=3), Write(label2, run_time=1.5))
         self.wait()
 
         self.play(
             Succession(
-                Transform(
-                    highlight_rec,
-                    SurroundingRectangle(
-                        asymptotic_group, fill_opacity=op, fill_color=RED, color=RED
-                    ),
-                ),
+                Transform(highlight_rec, surrounding_rectangle(asymptotic_group)),
                 Wait(),
-                Transform(
-                    highlight_rec,
-                    SurroundingRectangle(
-                        empirical_group, fill_opacity=op, fill_color=RED, color=RED
-                    ),
-                ),
+                Transform(highlight_rec, surrounding_rectangle(empirical_group)),
                 Wait(),
             )
         )
@@ -139,31 +123,16 @@ class Discussion1(Scene):
         sl = 3.0
         self.play(
             Succession(
+                Transform(highlight_rec, surrounding_rectangle(asymptotic_group)),
+                Wait(),
                 Transform(
                     highlight_rec,
-                    SurroundingRectangle(
-                        asymptotic_group, fill_opacity=op, fill_color=RED, color=RED
-                    ),
+                    surrounding_rectangle(Group(asymptotic_group, label1)),
                 ),
                 Wait(),
                 Transform(
                     highlight_rec,
-                    SurroundingRectangle(
-                        Group(asymptotic_group, label1),
-                        fill_opacity=op,
-                        fill_color=RED,
-                        color=RED,
-                    ),
-                ),
-                Wait(),
-                Transform(
-                    highlight_rec,
-                    SurroundingRectangle(
-                        Group(asymptotic_group, label1, label2),
-                        fill_opacity=op,
-                        fill_color=RED,
-                        color=RED,
-                    ),
+                    surrounding_rectangle(Group(asymptotic_group, label1, label2)),
                 ),
                 Wait(),
             )
