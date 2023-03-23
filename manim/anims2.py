@@ -16,9 +16,8 @@ class Intro(Scene):
 
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
 
-        our_algo_img = ImageMobject("img/program3x_placeholder.png").scale_to_fit_width(
-            14.2
-        )
+        img_path = "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
+        our_algo_img = ImageMobject(img_path).scale_to_fit_width(14.2)
         self.play(
             FadeIn(our_algo_img),
         )
@@ -426,7 +425,7 @@ def factor(n):
                 z_index=0,
                 font="monospace",
                 line_spacing=1.2,
-                font_size=0.7 * DEFAULT_FONT_SIZE
+                font_size=0.7 * DEFAULT_FONT_SIZE,
             ).scale(0.5)
             texts_group.add(text_group)
 
@@ -474,7 +473,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.play(
             AnimationGroup(
                 *p.add_programs_around("a", "SyntaxError", 0, 10, show_stdin=False)[0],
-                lag_ratio=0.1
+                lag_ratio=0.1,
             )
         )
         for q in p:
@@ -735,10 +734,14 @@ class TimeComplexityAnalysis(MovingCameraScene):
         L = 5
         time = 10
         ZOOM = 4
+        run_time1 = 1
+        run_time2 = 1
         if not DRAFT:
             L = 20
             time = 40
             ZOOM = 8
+            run_time1 = 10
+            run_time2 = 10
         total = L + time - 1
         steps_till_appearance = (L + 1) * L // 2
         steps_till_finished = (total + 1) * (total) // 2 + total - L
@@ -752,14 +755,14 @@ class TimeComplexityAnalysis(MovingCameraScene):
                 *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
             ),
             self.camera.frame.animate.become(zoomed_out),
-            run_time=1,
+            run_time=run_time1,
         )
         our_prog = p[L - 1]
 
         def mkbrace(*args, **kwargs):
             kwargs["stroke_width"] = kwargs.get("stroke_width", 2 * ZOOM)
             kwargs["font_size"] = kwargs.get("font_size", 48 * ZOOM)
-            kwargs["buff"] = kwargs.get("buff", 0.2 * ZOOM)
+            kwargs["buff"] = kwargs.get("buff", 0.15 * ZOOM)
             return BraceLabel(*args, **kwargs).set_color(kwargs["color"])
 
         color_l = RED
@@ -781,7 +784,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             Group(Point(first_wheel.get_bottom()), Point(last_wheel.get_bottom())),
             "f(n)",
             DOWN,
-            buff=0.05 * ZOOM,
+            buff=0.02 * ZOOM,
             z_index=100,
             color=color_fn,
         )
@@ -796,7 +799,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             AnimationGroup(
                 *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
             ),
-            run_time=1,
+            run_time=run_time2,
         )
         self.play(*anim_last)
         p.ptr += 1
@@ -916,7 +919,7 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
         ).move_to(
             1*DOWN
         )
-        new_tex.shift(0.3*DOWN)
+        new_tex.shift(0.3 * DOWN)
 
         self.add(p, og_tex)
         self.wait()
@@ -927,7 +930,7 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
         self.wait()
         self.play(
             FadeIn(new_tex[0:2]),
-                  )
+        )
         self.wait()
         bigo_tex = Tex(r"$\mathcal{O}$").scale(10).next_to(new_tex, DOWN, buff = 0.7)
         self.play(
