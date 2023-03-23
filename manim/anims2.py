@@ -908,13 +908,13 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
             cog.fade(1)
 
         
-        og_tex = Tex(r"{{Original complexity: }}{{$(L + f(n))^2 $}}{{$=$}}{{$O(f(n)^2). $}}")
-        new_tex = Tex(r"{{New complexity: }}{{$2^L \cdot f(n) $}}{{$=$}}{{$O(f(n)). $}}")
+        og_tex = Tex(r"{{Original complexity: }}{{$(L + f(n))^2 $}}{{$=$}}{{$\mathcal{O}(f(n)^2). $}}")
+        new_tex = Tex(r"{{New complexity: }}{{$2^L \cdot f(n) $}}{{$=$}}{{$\mathcal{O}(f(n)). $}}")
         Group(*og_tex, *new_tex).scale(sc).arrange_in_grid(
             rows = 2,
             buff = MED_SMALL_BUFF * 2
         ).move_to(
-            3*DOWN
+            1*DOWN
         )
         new_tex.shift(0.3*DOWN)
 
@@ -929,9 +929,16 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
             FadeIn(new_tex[0:2]),
                   )
         self.wait()
+        bigo_tex = Tex(r"$\mathcal{O}$").scale(10).next_to(new_tex, DOWN, buff = 0.7)
         self.play(
-            FadeIn(new_tex[2:]),
-                  )
+            FadeIn(bigo_tex)
+        )
+        self.wait()
+        self.play(
+            FadeIn(new_tex[2]),
+            FadeIn(new_tex[3][1:]),
+            Transform(bigo_tex, new_tex[3][0]),
+        )
         
         
         #self.play(*(FadeOut(cog) for cog in to_hide))

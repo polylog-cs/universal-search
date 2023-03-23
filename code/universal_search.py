@@ -165,6 +165,9 @@ class UniversalFactorization(UniversalSearch):
 
 
 class UniversalSort(UniversalSearch):
+    
+    # Checks that the output contains the same numbers as the input
+    # but in the sorted order
     def check(self, output: str) -> bool:
         def split_to_ints(string):
             return [int(x) for x in string.split(",")]
