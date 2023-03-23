@@ -257,37 +257,20 @@ class Intro(Scene):
         # 2) The algorithm is extremely slow]
 
 
-class Polylog(Scene):
+class Polylogo(BasePolylogo):
     def construct(self):
         default()
-        authors = Tex(
-            r"\textbf{Richard Hladík, Filip Hlásek, Václav Rozhoň, Václav Volhejn}",
-            color=text_color,
-            font_size=40,
-        ).shift(3 * DOWN + 0 * LEFT)
+        self.construct_logo()
+        Group(self.channel_name, self.logo_solarized).shift(2 * LEFT + 0.5 * UP)
+        self.authors.scale(0.5).next_to(self.channel_name, DOWN)
 
-        channel_name = Tex(r"polylog", color=text_color)
-        channel_name.scale(4).shift(1 * UP)
-
-        logo_solarized = (
-            ImageMobject("img/logo-solarized.png")
-            .scale(0.032)
-            .move_to(2 * LEFT + 1 * UP + 0.5 * RIGHT)
-        )
-        Group(channel_name, logo_solarized).shift(2 * LEFT + 0.5 * UP)
-        authors.scale(0.5).next_to(channel_name, DOWN)
-
-        self.play(
-            Write(authors),
-            Write(channel_name),
-            FadeIn(logo_solarized),
-        )
+        self.write_logo()
         self.wait()
 
         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3).to_corner(DR)
         quote_txt = (
             Group(
-                Tex(r"\textit{``Only math nerds would call $2^{500}$ finite. ''}"),
+                Tex(r"\textit{``Only math nerds would call $2^{500}$ finite.''}"),
                 Tex("Attributed to Leonid Levin").scale(0.7),
             )
             .arrange_in_grid(cols=1, cell_alignment=RIGHT)
@@ -298,8 +281,7 @@ class Polylog(Scene):
         self.play(FadeIn(levin_img), FadeIn(quote_txt))
 
         self.wait()
-        self.play(*[FadeOut(o) for o in self.mobjects])
-        self.wait()
+        self.destroy_logo()
 
 
 class MonkeyTyping(Scene):

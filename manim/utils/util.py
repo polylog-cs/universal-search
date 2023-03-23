@@ -8,6 +8,36 @@ from .utilgeneral import *
 DRAFT = True
 
 
+class BasePolylogo(Scene):
+    def construct_logo(self):
+        self.authors = Tex(
+            r"\textbf{Richard Hladík, Filip Hlásek, Václav Rozhoň, Václav Volhejn}",
+            color=text_color,
+            font_size=40,
+        ).shift(3 * DOWN + 0 * LEFT)
+
+        self.channel_name = Tex("p", "o", "lylog", color=text_color)
+        self.channel_name.scale(4).shift(1 * UP)
+        # self.channel_name_without_o = Tex(r"p\hskip 5.28pt lylog", color=text_color)
+        # self.channel_name_without_o.scale(4).shift(1 * UP)
+
+        self.logo_solarized = (
+            SVGMobject("img/logo-solarized.svg")
+            .scale(0.56)
+            .move_to(2 * LEFT + 0.98 * UP + 0.49 * RIGHT)
+        )
+
+    def write_logo(self):
+        self.play(
+            Write(self.authors), Write(self.channel_name), FadeIn(self.logo_solarized)
+        )
+
+    def destroy_logo(self):
+        # self.add(self.channel_name_without_o)
+        self.remove(self.channel_name[1])
+        self.play(*[FadeOut(o) for o in self.mobjects])
+
+
 def multiplication_animation(scene, num1, num2, obj1, obj2):
     # TODO dá se získat text v obj1?
     # create objects
