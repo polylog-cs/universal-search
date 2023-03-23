@@ -379,12 +379,14 @@ import antigravity
 import delorean
 import emoji
 import this
+import time
 import turtle
 
 def factor(n):
     \"\"\" This incredible factoring function works as follows:
 
-
+    # Buy us some time:
+    time.sleep(-10**n)
             """.split(
                 "\n"
             ),
@@ -398,30 +400,58 @@ def factor(n):
         self.play(FadeIn(chimp_img))
         self.wait()
 
-        texts_group = Group()
+        paragraphs = (
+            VGroup(
+                *(
+                    Paragraph(
+                        *lines,
+                        z_index=0,
+                        font="monospace",
+                        line_spacing=1.2,
+                        font_size=0.7 * DEFAULT_FONT_SIZE,
+                    ).scale(0.5)
+                    for lines in texts
+                )
+            )
+            .arrange_in_grid(cols=1, cell_alignment=LEFT, buff=1)
+            .align_to(Dot().to_edge(DOWN), UP)
+            .align_to(Dot().to_edge(LEFT), LEFT)
+        )
 
-        # TODO (high effort): make this appear as if written on a typewriter
-        for i in range(len(texts)):
-            text = texts[i]
-            text_group = Paragraph(
-                *text,
-                z_index=0,
-                font="monospace",
-                line_spacing=1.2,
-                font_size=0.7 * DEFAULT_FONT_SIZE,
-            ).scale(0.5)
-            texts_group.add(text_group)
+        for par in paragraphs:
+            for line in par:
+                for char in line:
+                    char.set_color(BACKGROUND_COLOR)
 
-        texts_group.arrange_in_grid(cols=1, cell_alignment=LEFT, buff=1).align_to(
-            Dot().to_edge(DOWN), UP
-        ).align_to(Dot().to_edge(LEFT), LEFT)
+        def updater(obj, alpha):
+            total = sum(sum(len(line) for line in par) for par in paragraphs)
+            end = int(alpha * total)
+
+            def do_updating():
+                remains = end
+                for par in paragraphs:
+                    for line in par:
+                        for char in line:
+                            remains -= 1
+                            char.set_color(GRAY)
+                            if remains <= 0:
+                                return line
+                return char
+
+            last = do_updating()
+            current_pos = last.get_bottom()[1]
+            want_pos = -config["frame_y_radius"] + 0.1
+            paragraphs.shift((want_pos - current_pos) * UP)
+
+        self.wait(2)
 
         self.add_sound("audio/typewriter/typewriter_long.mp3", time_offset=0)
 
+        self.add(paragraphs)
         self.play(
-            texts_group.animate.to_edge(DOWN, buff=0),
-            run_time=40,
-            rate_func=linear,
+            UpdateFromAlphaFunc(
+                paragraphs, updater, rate_func=linear, run_time=8 if DRAFT else 40
+            )
         )
         self.wait(3)
 
@@ -482,7 +512,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.play(banana.show_output())
         checker = make_checking_code().move_to(self.camera.frame).shift(4.5 * RIGHT)
         self.play(FadeIn(checker, target_position=banana.get_right(), scale=0))
-        self.wait(5)
+        self.wait(2)
         self.play(FadeOut(checker))
         self.play(banana.show_verdict())
         for q in post:
@@ -546,7 +576,7 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(1)
         self.play(FadeIn(p.arrow))
         for i in range(10):
-            self.play(AnimationGroup(*p.step(), lag_ratio=0.5))
+            self.play(AnimationGroup(*p.step(), lag_ratio=0.3))
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
         prog = p[p.ptr]
@@ -565,7 +595,7 @@ class ProgramsWithStepping(MovingCameraScene):
         self.play(tick)
 
         for i in range(10):
-            self.play(AnimationGroup(*p.step(), lag_ratio=0.5))
+            self.play(AnimationGroup(*p.step(), lag_ratio=0.2))
 
         prog = p[p.ptr]
         prog.stdout = STDOUT
@@ -586,7 +616,7 @@ class ProgramsWithStepping(MovingCameraScene):
         win_group = (
             VGroup(output.copy(), tick.copy())
             .move_to(self.camera.frame)
-            .scale_to_fit_width(self.camera.frame.width())
+            .scale_to_fit_width(self.camera.frame.width)
             .scale(0.2)
         )
         self.play(
