@@ -540,17 +540,20 @@ class Asymptotics(Scene):
 
         # In other words, up to constant factors, our algorithm completely nails it.
 
+        forbidden = (
+            Text("×", color=RED, font_size=80)
+            .scale_to_fit_height(2)
+            .move_to(2 * UP + 1 * LEFT)
+        )
         self.play(
             plot_ours.animate.become(plot_bad),
-            FadeIn(
-                clipart_yes_no_maybe("no", 2)
-                .scale_to_fit_height(2)
-                .move_to(2 * UP + 1 * LEFT)
-            ),
         )
         self.wait()
 
-        self.play(arrow.animate.shift(4 * RIGHT), run_time=4)
+        self.play(
+            FadeIn(forbidden, scale=2, run_time=1),
+            arrow.animate(run_time=4).shift(4 * RIGHT),
+        )
 
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing!
         # Or just run the algorithm on some real data! In that case be careful, our implementation is in Python, so it’s a bit slow. Good luck and see you in a few days with the follow-up video!
