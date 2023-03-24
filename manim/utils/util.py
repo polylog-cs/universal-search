@@ -378,8 +378,8 @@ def programs_around(code, before=0, after=0):
 
 
 def rotating_wheel():
-    waiting_big = Circle(color=YELLOW, stroke_width=8, radius=0.2)
-    waiting_small = Arc(color=ORANGE, stroke_width=8, radius=0.2).shift(
+    waiting_big = Circle(color=BASE0, stroke_width=8, radius=0.2)
+    waiting_small = Arc(color=BASE02, stroke_width=8, radius=0.2).shift(
         waiting_big.get_center()
     )
     waiting = VGroup(waiting_big, waiting_small)
