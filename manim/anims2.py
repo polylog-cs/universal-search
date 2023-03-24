@@ -667,14 +667,8 @@ class ExplanationBeginning(Scene):
         shft = 1 * DOWN
         your_algo_img = you_image().scale_to_fit_height(3.5)
         fn = Tex(r"$f(n)$")
-        your_algo = (
-            Group(your_algo_img, fn)
-            .arrange(DOWN)
-            .align_to(Dot().to_edge(LEFT), RIGHT)
-            .shift(LEFT)
-            .shift(shft)
-        )
-        self.play(your_algo.animate.move_to(3 * LEFT).shift(shft))
+        your_algo = Group(your_algo_img, fn).arrange(DOWN).move_to(3 * LEFT).shift(shft)
+        self.play(arrive_from(your_algo, LEFT))
         self.wait()
 
         our_algo_img = our_code_with_badge().scale_to_fit_height(3)
@@ -683,11 +677,10 @@ class ExplanationBeginning(Scene):
         our_algo = (
             Group(our_algo_img, fn2)
             .arrange(DOWN)
-            .align_to(Dot().to_edge(RIGHT), LEFT)
-            .shift(RIGHT)
+            .move_to(3 * RIGHT)
             .align_to(your_algo, DOWN)
         )
-        self.play(our_algo.animate.move_to(3 * RIGHT).align_to(your_algo, DOWN))
+        self.play(arrive_from(our_algo, RIGHT))
 
         fn2_new = Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
             fn2.get_center()
@@ -747,8 +740,8 @@ class TimeComplexityAnalysis(MovingCameraScene):
         L = 5
         time = 10
         ZOOM = 4
-        run_time1 = 1
-        run_time2 = 1
+        run_time1 = 2
+        run_time2 = 2
         if not DRAFT:
             L = 20
             time = 40
@@ -772,11 +765,23 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
         our_prog = p[L - 1]
 
-        def mkbrace(*args, **kwargs):
-            kwargs["stroke_width"] = kwargs.get("stroke_width", 2 * ZOOM)
-            kwargs["font_size"] = kwargs.get("font_size", 48 * ZOOM)
-            kwargs["buff"] = kwargs.get("buff", 0.15 * ZOOM)
-            return BraceLabel(*args, **kwargs).set_color(kwargs["color"])
+        def mkbrace(
+            obj,
+            text,
+            dir,
+            buff=0.15 * ZOOM,
+            label_buff=0.15 * ZOOM,
+            font_size=48 * ZOOM,
+            stroke_width=2 * ZOOM,
+            sharpness=4 / ZOOM,
+            **kwargs
+        ):
+            brace = Brace(
+                obj, dir, buff, stroke_width=stroke_width, sharpness=sharpness, **kwargs
+            )
+            text = MathTex(text, font_size=font_size)
+            brace.put_at_tip(text, buff=label_buff)
+            return VGroup(brace, text).set_color(kwargs["color"])
 
         color_l = RED
         color_fn = BLUE

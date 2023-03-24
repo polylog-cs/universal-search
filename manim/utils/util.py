@@ -570,3 +570,9 @@ def make_our_algo():
     return ImageMobject(
         "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
     ).scale_to_fit_width(14.2)
+
+
+def arrive_from(obj, dir, buff=0.5):
+    pos = obj.get_center()
+    obj.align_to(Point().to_edge(dir, buff=0), -dir).shift(buff * dir)
+    return obj.animate.move_to(pos)
