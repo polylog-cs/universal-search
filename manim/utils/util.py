@@ -218,7 +218,17 @@ class ProgramInvocation(VMobject):
             margin=0.15,
         )
 
-    def __init__(self, code, stdin, stdout, ok, show_stdin=True, *args, **kwargs):
+    def __init__(
+        self,
+        code,
+        stdin,
+        stdout,
+        ok,
+        show_stdin=True,
+        auto_arrange=True,
+        *args,
+        **kwargs
+    ):
         super().__init__(*args, **kwargs)
         self.wheels = 0
         self.text = code
@@ -246,7 +256,8 @@ class ProgramInvocation(VMobject):
             .set_sheen_factor(0)
         )
         self.add(self.group)
-        self.add_updater(ProgramInvocation.arrange)
+        if auto_arrange:
+            self.add_updater(ProgramInvocation.arrange)
         self.finished = False
 
     def arrange(self):
@@ -397,7 +408,9 @@ class ProgramInvocationList(VGroup):
         self.arrange()
         self.add_updater(ProgramInvocationList.arrange)
         self.dots = ProgramInvocation("...", self.stdin, "", False)
-        self.dummy = ProgramInvocation("[code]", self.stdin, "foo", False)
+        self.dummy = ProgramInvocation(
+            "[code]", self.stdin, "foo", False, auto_arrange=False
+        )
         self.ptr = 0
         self.arrow = (
             Arrow(start=RIGHT, end=LEFT)
