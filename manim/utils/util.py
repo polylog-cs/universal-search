@@ -295,34 +295,36 @@ class ProgramInvocation(VMobject):
             return anims
         return AnimationGroup(*anims, lag_ratio=lag_ratio)
 
-    def step(self, finish=False, fade=True):
-        if finish:
-            return self.finish(lag_ratio=None)
-        self.wheels += 1
-        target_angle = -math.radians(90)
-        cur = self.wheel.copy().next_to(self.group)
-        self.group.add(cur)
-        cur = self.group[-1]
-        cur.save_state()
-        cur.rotate(target_angle)
-        if fade:
-            cur.fade(1)
-
-        old_obj = self.wheel.copy().next_to(cur, LEFT)
-        old_pos = old_obj.get_center()
-        target_pos = cur.get_center()
-        last = self.group[-1]
-
-        def update(self, alpha):
-            obj = last
+    def make_rotating_updater(obj, target_pos, old_pos, target_angle=-90 * DEGREES):
+        def updater(_, alpha):
             obj.restore()
             obj.move_to(alpha * target_pos + (1 - alpha) * old_pos).set_fill(
                 opacity=alpha
             ).rotate(alpha * target_angle)
 
+        return updater
+
+    def step(self, finish=False, fade=True):
+        if finish:
+            return self.finish(lag_ratio=None)
+        self.wheels += 1
+        cur = self.wheel.copy().next_to(self.group)
+        self.group.add(cur)
+        cur.save_state()
+        if fade:
+            cur.fade(1)
+
+        if self.wheels > 1:
+            old_pos = self.group[-2].get_center()
+        else:
+            old_pos = self.wheel.copy().next_to(cur, LEFT).get_center()
+        target_pos = cur.get_center()
+        last = self.group[-1]
+        updater = ProgramInvocation.make_rotating_updater(last, target_pos, old_pos)
+
         return UpdateFromAlphaFunc(
             self,
-            update,
+            updater,
             rate_func=rate_functions.ease_in_out_quad,
             suspend_mobject_updating=True,
         )

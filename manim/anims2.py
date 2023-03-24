@@ -1033,8 +1033,10 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
             num_hide = (1 << i) - (i + 1)
             if num_hide <= 0:
                 continue
-            to_hide += list(p[-1].group[-num_hide:])
-        for cog in to_hide:
+            for j, cog in enumerate(p[-1].group[-num_hide:]):
+                dist = j + 1
+                to_hide.append((cog, p[-1].group[-num_hide - 1], dist))
+        for cog, *_ in to_hide:
             cog.save_state()
             cog.fade(1)
 
@@ -1045,7 +1047,7 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
             r"{{New complexity: }}{{$2^L \cdot f(n) $}}{{$=$}}{{$\mathcal{O}(f(n)). $}}"
         )
         Group(*og_tex, *new_tex).scale(sc).arrange_in_grid(
-            rows=2, buff=MED_SMALL_BUFF * 2
+            rows=2, buff=MED_SMALL_BUFF * 2, cell_alignment=RIGHT
         ).move_to(1 * DOWN)
         new_tex.shift(0.3 * DOWN)
 
@@ -1053,8 +1055,19 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
         self.wait()
 
         self.play(
-            *(cog.animate.restore() for cog in to_hide),
+            *(
+                UpdateFromAlphaFunc(
+                    cog,
+                    ProgramInvocation.make_rotating_updater(
+                        cog, cog.get_center(), last.get_center(), -90 * dist * DEGREES
+                    ),
+                    rate_func=rate_functions.smooth,
+                    suspend_mobject_updating=True,
+                )
+                for cog, last, dist in to_hide
+            )
         )
+
         self.wait()
         self.play(
             FadeIn(new_tex[0:2]),
