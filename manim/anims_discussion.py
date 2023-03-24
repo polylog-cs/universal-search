@@ -237,8 +237,9 @@ class Discussion2(Scene):
         explanation_scale = 0.5
 
         weier_img = (
-            ImageMobject("img/weierstrass.png").scale_to_fit_width(width).shift(shft)
+            SVGMobject("img/weierstrass.svg").scale_to_fit_width(width).shift(shft)
         )
+
         weiertitle_tex = Tex("Weierstrass function").next_to(weier_img, DOWN)
         weierexplanation_tex = (
             Tex("Continuous everywhere, yet differentiable nowhere. ")
@@ -247,7 +248,7 @@ class Discussion2(Scene):
         )
 
         cantor_img = (
-            ImageMobject("img/cantor.png").scale_to_fit_width(width * 0.8).shift(shft)
+            SVGMobject("img/cantor.svg").scale_to_fit_width(width * 0.8).shift(shft)
         )
         cantortitle_tex = Tex("Cantor function").next_to(cantor_img, DOWN)
         cantorexplanation_tex = (
@@ -279,6 +280,7 @@ class Discussion2(Scene):
             anims[1][0],
         )
         self.wait()
+        return
 
         self.next_section(skip_animations=False)
         from hilbertcurve.hilbertcurve import HilbertCurve
@@ -297,7 +299,6 @@ class Discussion2(Scene):
             distances = list(range(4**iter))
             points = HilbertCurve(iter, 2).points_from_distances(distances)
             points = [[p[0], p[1], 0] for p in points]
-            print(points)
 
             curve = VMobject(z_index=0)
             curve.set_points_as_corners(points)
