@@ -360,7 +360,10 @@ class Asymptotics(Scene):
         self.play(our_group.animate.scale_to_fit_height(3).move_to(3 * RIGHT))
         self.wait()
         your_algo = (
-            you_image().scale_to_fit_height(3).align_to(Dot().to_edge(LEFT), RIGHT)
+            you_image()
+            .scale_to_fit_height(3)
+            .align_to(Point().to_edge(LEFT, buff=0), RIGHT)
+            .shift(LEFT)
         )
         self.play(your_algo.animate.move_to(3 * LEFT))
         self.wait()
