@@ -544,3 +544,16 @@ def our_code_with_badge():
 
 def you_image():
     return SVGMobject("img/you.svg").set_stroke(BLACK, 3)
+
+
+def make_badge_img():
+    return ImageMobject(
+        "img/badge_text_small.png" if DRAFT else "img/badge_text.png"
+    ).scale_to_fit_width(6)
+
+
+def make_our_algo():
+    # TODO nezapomenout vyprintscreenovat final verzi v solarized barvach
+    return ImageMobject(
+        "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
+    ).scale_to_fit_width(14.2)

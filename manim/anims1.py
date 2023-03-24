@@ -332,37 +332,31 @@ class Asymptotics(Scene):
         default()
 
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
-        # TODO nezapomenout vyprintscreenovat final verzi v solarized barvach
-        our_algo_img = m.ImageMobject(
-            "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
-        ).scale_to_fit_width(14.2)
-        # our_algo.width = 16 * 0.75
+        our_algo_img = make_our_algo()
         self.play(
             FadeIn(our_algo_img),
         )
         self.wait()
 
-        badge_img = ImageMobject(
-            "img/badge_text_small.png" if DRAFT else "img/badge_text.png"
-        ).scale_to_fit_width(6)
+        badge_img = make_badge_img()
         # badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
-        badge_group = Group(badge_img)
+        badge_img = Group(badge_img)
 
-        badge_group.generate_target()
-        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
+        badge_img.generate_target()
+        badge_img.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
 
-        our_algo = Group(our_algo_img, badge_group)
+        our_algo = Group(our_algo_img, badge_img)
 
         # TODO double check it is ok to use this image: https://gallery.yopriceville.com/Free-Clipart-Pictures/Badges-and-Labels-PNG/Green_Classic_Seal_Badge_PNG_Clipart#.ZAaV6dLMJkg
 
         self.add_sound("audio/tada_success.mp3")
-        self.play(FadeIn(badge_group))
+        self.play(FadeIn(badge_img))
         self.wait()
 
-        self.play(MoveToTarget(badge_group))
+        self.play(MoveToTarget(badge_img))
         self.wait()
 
-        our_group = Group(our_algo_img, badge_group)
+        our_group = Group(our_algo_img, badge_img)
         self.play(our_group.animate.scale_to_fit_height(3).move_to(3 * RIGHT))
         self.wait()
         your_algo = (

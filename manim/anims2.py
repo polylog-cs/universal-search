@@ -15,28 +15,26 @@ class Intro(Scene):
 
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
 
-        img_path = "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
-        our_algo_img = ImageMobject(img_path).scale_to_fit_width(14.2)
+        our_algo_img = make_our_algo()
         self.play(
             FadeIn(our_algo_img),
         )
         self.wait()
 
-        badge_img = ImageMobject("img/badge_text_small.png").scale_to_fit_width(6)
-        badge_group = Group(badge_img)
+        badge_img = make_badge_img()
 
-        badge_group.generate_target()
-        badge_group.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
+        badge_img.generate_target()
+        badge_img.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
 
-        our_algo = Group(our_algo_img, badge_group)
+        our_algo = Group(our_algo_img, badge_img)
 
-        self.play(FadeIn(badge_group))
+        self.play(FadeIn(badge_img))
         self.wait()
 
-        self.play(MoveToTarget(badge_group))
+        self.play(MoveToTarget(badge_img))
         self.wait()
 
-        our_group = Group(our_algo_img, badge_group)
+        our_group = Group(our_algo_img, badge_img)
         self.play(our_group.animate.scale_to_fit_height(3).move_to(2 * UP))
 
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
