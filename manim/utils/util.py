@@ -167,17 +167,18 @@ def horrible_multiplication():
 
 
 class CollapsibleAsymptotics(VMobject):
-    def __init__(self, tex, *args, **kwargs):
+    def __init__(self, tex, font_size=DEFAULT_FONT_SIZE, *args, **kwargs):
         super().__init__(*args, **kwargs)
-        self.tex = MathTex(*[t if t else "{}" for t in tex])
+        self.tex = MathTex(*[t if t else "{}" for t in tex], font_size=font_size)
+        self.font_size = font_size
         self.immovable = self.tex[1]
         self.add(self.tex)
 
     def collapse(self, target=None):
         fake_tex = Group(
-            MathTex("\mathcal{O}("),
-            MathTex(self.immovable.get_tex_string()),
-            MathTex(")"),
+            MathTex("\mathcal{O}(", font_size=self.font_size),
+            MathTex(self.immovable.get_tex_string(), font_size=self.font_size),
+            MathTex(")", font_size=self.font_size),
         )
         if target is None:
             target = self.immovable.get_center()
@@ -185,7 +186,12 @@ class CollapsibleAsymptotics(VMobject):
         fake_tex[1].shift(target - fake_tex[1].get_center())
         fake_tex[2].next_to(self.tex, RIGHT, buff=SMALL_BUFF)
 
-        self.new_tex = MathTex("\mathcal{O}(", self.immovable.get_tex_string(), ")")
+        self.new_tex = MathTex(
+            "\mathcal{O}(",
+            self.immovable.get_tex_string(),
+            ")",
+            font_size=self.font_size,
+        )
         self.new_tex.shift(target - self.new_tex[1].get_center())
         self.new_tex[1].save_state()
         self.new_tex[1].move_to(self.tex[1])
@@ -541,6 +547,18 @@ else:
     for i, col in (2, GREEN), (-1, RED):
         code.code[i].set_color(col).scale(2.5).shift(0.9 * RIGHT + 0.15 * UP)
     return code
+
+
+FACTORING_EXAMPLE_PROGRAM = """
+for a in range(2, n):
+    b = n // a
+    if a * b == n:
+        return a, b
+""".strip()
+
+
+def make_factoring_example_program():
+    return ProgramInvocation.make_code(FACTORING_EXAMPLE_PROGRAM.strip())
 
 
 def our_code_with_badge():

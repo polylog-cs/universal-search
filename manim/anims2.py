@@ -467,13 +467,6 @@ while True:
     print("Are we there yet?")
 """.strip()
 
-FACTORING_EXAMPLE_PROGRAM = """
-for a in range(2, n):
-    b = n // a
-    if a * b == n:
-        return a, b
-""".strip()
-
 
 class ProgramsWithoutStepping(MovingCameraScene):
     def construct(self):
@@ -735,6 +728,15 @@ class BazillionScroll(MovingCameraScene):
 class TimeComplexityAnalysis(MovingCameraScene):
     def construct(self):
         default()
+
+        self.next_section(skip_animations=False)
+        your_algo = you_image().scale_to_fit_height(2.5).shift(2 * LEFT)
+        self.play(arrive_from(your_algo, LEFT))
+        code = make_factoring_example_program()
+        code.next_to(your_algo)
+        self.play(FadeIn(code, target_position=your_algo, scale=0))
+        self.wait(2)
+        self.play(FadeOut(code, your_algo))
         p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3.7 * UP)
         p.arrow.fade(1)
         L = 5
@@ -764,6 +766,21 @@ class TimeComplexityAnalysis(MovingCameraScene):
             run_time=run_time1,
         )
         our_prog = p[L - 1]
+        your_algo.scale_to_fit_height(2.5 * ZOOM).move_to(self.camera.frame).shift(
+            2 * ZOOM * RIGHT
+        ).set_stroke(BLACK, 3 * ZOOM)
+        self.play(FadeIn(your_algo))
+        your_algo_arrow = Arrow(
+            our_prog.get_left() + 0.8 * ZOOM * LEFT,
+            our_prog.get_left() + 0.2 * ZOOM * LEFT,
+        )
+        your_algo_small = (
+            your_algo.copy()
+            .set_stroke(BLACK, 1 * ZOOM)
+            .scale(0.2)
+            .next_to(your_algo_arrow, LEFT)
+        )
+        self.play(FadeIn(your_algo_arrow), your_algo.animate.become(your_algo_small))
 
         def mkbrace(
             obj,
@@ -788,6 +805,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
 
         l_label = mkbrace(p, "L", LEFT, color=color_l)
         self.play(FadeIn(l_label))
+
         anims = [
             anim
             for _ in range(steps_till_appearance, steps_till_finished)
@@ -882,25 +900,115 @@ class TimeComplexityAnalysis(MovingCameraScene):
             FadeOut(p),
             FadeOut(fn_label_horiz),
             FadeOut(behind),
+            FadeOut(your_algo),
+            FadeOut(your_algo_arrow),
             triangle.animate.set_fill(GREEN, 1),
         )
+
+        self.remove(p)
 
         triangle_left = triangle.get_corner(UP + LEFT)
         triangle_right = triangle.get_corner(UP + RIGHT)
         triangle_hmid = (1 - alpha) * triangle_left + alpha * triangle_right
-        l_rehor = mkbrace(
+        l_rehor = l_label.copy()
+        l_rehor.target = mkbrace(
             Group(Line(triangle_left, triangle_hmid)), "L", UP, color=color_l
         )
-        fn_rehor = mkbrace(
+        fn_rehor = fn_label.copy()
+        fn_rehor.target = mkbrace(
             Group(Line(triangle_hmid, triangle_right)), "f(n)", UP, color=color_fn
         )
         self.wait(2)
         self.play(
-            fn_label.copy().animate.become(fn_rehor),
-            l_label.copy().animate.become(l_rehor),
+            MoveToTarget(fn_rehor),
+            MoveToTarget(l_rehor),
         )
 
-        self.wait(5)
+        self.next_section(skip_animations=False)
+        area = (
+            MathTex(r"{{\text{area} \approx}} \frac12 \cdot ({{L}} + {{f(n)}})^2")
+            .scale(ZOOM)
+            .move_to(self.camera.frame)
+            .shift(ZOOM * (2 * RIGHT + 2 * UP))
+        )
+        pos2 = area[2].get_center()
+        pos4 = area[4].get_center()
+        area[2].set_color(color_l).move_to(l_label[1])
+        area[4].set_color(color_fn).move_to(fn_label[1])
+        self.play(
+            *(FadeIn(area[i]) for i in (0, 1, 3, 5)),
+            area[2].animate.move_to(pos2),
+            area[4].animate.move_to(pos4),
+        )
+
+        area2 = area[1:].copy()
+        self.play(area2.animate.shift(ZOOM * 1.5 * DOWN))
+        shift = -area2.get_center()
+        for obj in [area, area2, triangle, fn_label, l_label, fn_rehor, l_rehor]:
+            obj.shift(shift)
+        self.camera.frame.shift(shift)
+
+        a = MathTex(
+            r"{{\mathcal{O}\left(}}\frac12 \cdot {{(L + f(n))^2}}{{\right)}}"
+        ).scale(ZOOM)
+        a.shift(area2[0][0].get_center() - a[1][0].get_center())
+        a[2][1].set_color(color_l)
+        a[2][3:7].set_color(color_fn)
+        self.play(FadeIn(a))
+        self.remove(area2)
+        b = MathTex(r"{{\mathcal{O}\left(}}{{(L + f(n))^2}}{{\right)}}").scale(ZOOM)
+        b[1][1].set_color(color_l)
+        b[1][3:7].set_color(color_fn)
+        b.shift(a[2][3].get_center() - b[1][3].get_center())
+        b_two = MathTex(r"{{\mathcal{O}\left(}}(L + {{f(n)}}){{^2}}{{\right)}}").scale(
+            ZOOM
+        )
+        b_two[1][1].set_color(color_l)
+        b_two[2].set_color(color_fn)
+        b_two.shift(a[2][3].get_center() - b_two[2][0].get_center())
+        c = MathTex(r"{{\mathcal{O}\left(}}{{f(n)}}{{^2}}{{\right)}}").scale(ZOOM)
+        c[1].set_color(color_fn)
+        c.shift(a[2][3].get_center() - c[1][0].get_center())
+        self.wait()
+        self.play(TransformMatchingTex(a, b))
+        self.wait()
+        self.remove(b)
+        self.add(b_two)
+        self.wait()
+        self.play(TransformMatchingTex(b_two, c))
+        self.play(
+            *(
+                map(
+                    FadeOut,
+                    (triangle, area, fn_label, l_label, fn_rehor, l_rehor),
+                )
+            ),
+            c.animate.scale(1.5).move_to(self.camera.frame),
+        )
+
+        shft = DOWN
+        self.camera.frame.center().scale(1 / ZOOM)
+        c.center().scale(1 / ZOOM)
+        self.camera.frame.shift(-shft)
+        c.shift(-shft)
+
+        with_multiplication = MathTex(
+            r"{{\mathcal{O}\left(}}{{f(n)}}{{^2}}+{{T_\textit{mul}(n)}}{{\right)}}"
+        ).scale(2)
+
+        with_multiplication[1].set_color(color_fn)
+        with_multiplication[4].set_color(ORANGE2)
+        without_multiplication = c.copy().shift(shft)
+        self.wait(2)
+        checker = make_checking_code().scale(1.5).shift(-shft + 2 * UP)
+        self.play(FadeIn(checker), c.animate.shift(shft))
+        self.wait()
+        self.play(TransformMatchingTex(c, with_multiplication))
+        self.wait(2)
+        self.play(TransformMatchingTex(with_multiplication, without_multiplication))
+        self.wait(2)
+        self.play(FadeOut(checker), FadeOut(without_multiplication))
+        self.wait()
 
         # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
 
