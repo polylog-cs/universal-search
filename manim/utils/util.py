@@ -563,20 +563,23 @@ def make_factoring_example_program():
     return ProgramInvocation.make_code(FACTORING_EXAMPLE_PROGRAM.strip())
 
 
-def our_code_with_badge():
-    code_img = ImageMobject("img/program3x.png").scale_to_fit_width(2)
-    badge_img = (
-        ImageMobject("img/badge_text_small.png")
-        .scale_to_fit_width(0.8)
-        .align_to(code_img, RIGHT)
-        .shift(0.3 * DOWN)
-    )
+# def our_code_with_badge():
+#     code_img = ImageMobject("img/program3x.png").scale_to_fit_width(2)
+#     badge_img = (
+#         ImageMobject("img/badge_text_small.png")
+#         .scale_to_fit_width(0.8)
+#         .align_to(code_img, RIGHT)
+#         .shift(0.3 * DOWN)
+#     )
 
-    return Group(code_img, badge_img)
+#     return Group(code_img, badge_img)
 
 
 def you_image():
     return SVGMobject("img/you.svg").set_stroke(BLACK, 3)
+
+def badge_image():
+    return SVGMobject("img/badge_drawing.svg").scale_to_fit_height(5).set_stroke(BLACK, 3)
 
 
 def make_badge_img():
@@ -596,3 +599,6 @@ def arrive_from(obj, dir, buff=0.5):
     pos = obj.get_center()
     obj.align_to(Point().to_edge(dir, buff=0), -dir).shift(buff * dir)
     return obj.animate.move_to(pos)
+
+def step_sound():
+    return random_pop_file()

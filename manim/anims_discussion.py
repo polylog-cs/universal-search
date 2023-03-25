@@ -573,7 +573,7 @@ class Discussion3(Scene):
 
         question_tex = Tex("Why don't we have algorithms with complexities")
         faster_tex = Tex(
-            r"{{$\mathcal{O}\left(2^n \right)$, }}{{$\mathcal{O}\left(2^{0.1n} \right)$, }}{{$\mathcal{O}\left(2^{0.01n} \right)$, }}{{$\dots$}}"
+            r"{{$\mathcal{O}\left(2^n \right)$, }}{{$\mathcal{O}\left(2^{n/2} \right)$, }}{{$\mathcal{O}\left(2^{n/3} \right)$, }}{{$\dots$}}"
         )
         question2_tex = Tex("but no asymptotically fastest algorithm? ")
         quest_group = (

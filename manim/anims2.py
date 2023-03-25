@@ -15,27 +15,34 @@ class Intro(Scene):
 
         # But you know what? Apart from the video being heavily misleading, what we said there was actually true. Remember, we said that we have a concrete asymptotically optimal algorithm for factoring composite numbers.
 
-        our_algo_img = make_our_algo()
+        # our_algo_img = make_our_algo()
+        # self.play(
+        #     FadeIn(our_algo_img),
+        # )
+        # self.wait()
+
+        # badge_img = make_badge_img()
+
+        # badge_img.generate_target()
+        # badge_img.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
+
+        # our_algo = Group(our_algo_img, badge_img)
+
+        # self.play(FadeIn(badge_img))
+        # self.wait()
+
+        # self.play(MoveToTarget(badge_img))
+        # self.wait()
+
+        # our_group = Group(our_algo_img, badge_img)
+        # self.play(our_group.animate.scale_to_fit_height(3).move_to(2 * UP))
+
+        our_group = badge_image().scale(1.3)
+        self.play(FadeIn(our_group))
+        self.wait()
         self.play(
-            FadeIn(our_algo_img),
+            our_group.animate.scale(0.7).scale_to_fit_height(3).move_to(2 * UP)
         )
-        self.wait()
-
-        badge_img = make_badge_img()
-
-        badge_img.generate_target()
-        badge_img.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
-
-        our_algo = Group(our_algo_img, badge_img)
-
-        self.play(FadeIn(badge_img))
-        self.wait()
-
-        self.play(MoveToTarget(badge_img))
-        self.wait()
-
-        our_group = Group(our_algo_img, badge_img)
-        self.play(our_group.animate.scale_to_fit_height(3).move_to(2 * UP))
 
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
@@ -62,9 +69,9 @@ class Intro(Scene):
         # Before showing you our algorithm, let’s see how it can even be possible that we know such an algorithm and yet do not have Turing awards for finding out what the complexity of factoring is.
         # Well, the only possibility is that although we know the asymptotically optimal algorithm, we unfortunately don’t know what its time complexity is!
         our_group.generate_target()
-        our_group.target.scale(0.8).to_edge(LEFT)
+        our_group.target.to_edge(LEFT)
         statement2_tex = (
-            Tex(prop1_str).next_to(our_group.target, RIGHT, buff=0.5).shift(1 * UP)
+            Tex(prop1_str).next_to(our_group.target, RIGHT, buff=0.5).shift(0.5 * UP)
         )
 
         self.play(
@@ -111,7 +118,7 @@ class Intro(Scene):
             CollapsibleAsymptotics(["", "n^2", "/2 + n/2"]),
             CollapsibleAsymptotics(["3", "n^2", " + 3n + 10"]),
             CollapsibleAsymptotics(["10", "n^2", "{} + 42"]),
-            CollapsibleAsymptotics(["100000000000", "n^2", ""]),
+            CollapsibleAsymptotics([r"1\,000\,000\,", "n^2", ""]),
         )
         eq_texs = []
         for i in range(len(complexities)):
@@ -122,7 +129,7 @@ class Intro(Scene):
                 *[o for l in zip(complexities, eq_texs, complexities.copy()) for o in l]
             )
             .arrange_in_grid(cols=3)
-            .move_to(2 * DOWN)
+            .move_to(1.7 * DOWN)
         )
 
         for i in range(len(complexities)):
@@ -375,17 +382,19 @@ for i in range(42):
 
 import antigravity
 import delorean
-import emoji
 import this
 import time
-import turtle
 
 def factor(n):
-    \"\"\" This incredible factoring function works as follows:
 
     # Buy us some time:
     time.sleep(-10**n)
-            """.split(
+
+    
+
+
+    
+-                """.split(
                 "\n"
             ),
         ]
@@ -461,7 +470,7 @@ if not DRAFT:
     NUM_DOTS = 30
     NUM_AROUND = 15
 STDIN = "4"
-STDOUT = "2,2"
+STDOUT = r"2,2"
 INFINITE_PROGRAM = """
 while True:
     print("Are we there yet?")
@@ -539,7 +548,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         nebo tak neco
         """
 
-        self.wait(3, frozen_frame=False)
+        self.wait(5, frozen_frame=False)
         self.play(
             FadeOut(p[:-1]),
             infinite.animate.align_to(self.camera.frame.get_top() + 0.1 * DOWN, UP),
@@ -555,6 +564,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.wait(2)
 
 
+# kdyz se generuje kod tak bud zadny zvuk nebo jiny zvuk (da se udelat v postprocessingu)
 class ProgramsWithStepping(MovingCameraScene):
     def construct(self):
         default()
@@ -566,8 +576,12 @@ class ProgramsWithStepping(MovingCameraScene):
         self.camera.frame.align_to(p[0].stdin.get_top() + 0.5 * UP, UP)
         self.wait(1)
         self.play(FadeIn(p.arrow))
-        for i in range(10):
+        for i in range(15):
+            self.add_sound(
+                step_sound()
+            )
             self.play(AnimationGroup(*p.step(), lag_ratio=0.3))
+        #self.wait(5)
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
         prog = p[p.ptr]
@@ -576,16 +590,23 @@ class ProgramsWithStepping(MovingCameraScene):
         checker = (
             make_checking_code()
             .move_to(self.camera.frame)
-            .shift(1.5 * RIGHT + 0.5 * DOWN)
+            .shift(1.5 * RIGHT + 1.5 * UP)
         )
         self.play(arrow, stdout)
         self.play(FadeIn(checker))
         self.wait(2)
         self.play(FadeOut(checker))
         prog.group[-1].restore()
+        self.add_sound(
+            "audio/polylog_failure.wav"
+        )
         self.play(tick)
-
-        for i in range(10):
+        self.wait(2)
+    
+        for i in range(11):
+            self.add_sound(
+                step_sound()
+            )
             self.play(AnimationGroup(*p.step(), lag_ratio=0.2))
 
         prog = p[p.ptr]
@@ -594,21 +615,31 @@ class ProgramsWithStepping(MovingCameraScene):
         arrow, stdout, tick = p.step(True)
         prog.group[-1].save_state().fade(1)
         self.play(arrow, stdout)
+        checker.shift(2*DOWN + 1*RIGHT)
         self.play(FadeIn(checker))
         self.wait(2)
-        self.play(FadeOut(checker))
+        #self.play(FadeOut(checker))
         prog.group[-1].restore()
+        self.add_sound(
+            "audio/polylog_success.wav"
+        )        
         self.play(tick)
+        self.wait(2)
 
         output = prog.stdout_obj[1]
         tick = prog.group[-1]
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
         win_group = (
-            VGroup(output.copy(), tick.copy())
+            VGroup(
+                Text(r"4 = 2 * 2").move_to(output.get_center()), 
+                tick.copy()
+            )
+            .arrange(RIGHT)
             .move_to(self.camera.frame)
             .scale_to_fit_width(self.camera.frame.width)
             .scale(0.2)
+            .shift(2*LEFT)
         )
         self.play(
             FadeOut(p),
@@ -616,6 +647,13 @@ class ProgramsWithStepping(MovingCameraScene):
             output.animate.become(win_group[0]),
             tick.animate.become(win_group[1]),
         )
+        self.wait()
+
+        self.play(
+            Circumscribe(checker, color = RED),
+            run_time = 2,
+        )
+        #TODO nitpick: zelená fajfka vypadá jinak než v checkovači
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
         # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
@@ -633,7 +671,7 @@ class ExplanationBeginning(Scene):
         self.wait()
 
         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
-        name_txt = Tex("Leonid Levin").scale(0.7).next_to(levin_img, DOWN)
+        name_txt = Tex("Leonid Levin").scale(1).next_to(levin_img, DOWN)
         levin_group = (
             Group(levin_img, name_txt).arrange(DOWN).to_edge(RIGHT).shift(0.3 * DOWN)
         )
@@ -664,7 +702,7 @@ class ExplanationBeginning(Scene):
         self.play(arrive_from(your_algo, LEFT))
         self.wait()
 
-        our_algo_img = our_code_with_badge().scale_to_fit_height(3)
+        our_algo_img = badge_image().scale_to_fit_height(3.5)
         # TODO fix tečku
         fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}")
         our_algo = (
