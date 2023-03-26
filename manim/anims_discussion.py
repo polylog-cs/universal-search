@@ -280,7 +280,6 @@ class Discussion2(Scene):
             anims[1][0],
         )
         self.wait()
-        return
 
         self.next_section(skip_animations=False)
         from hilbertcurve.hilbertcurve import HilbertCurve

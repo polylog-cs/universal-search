@@ -538,7 +538,7 @@ class ProgramInvocationList(VGroup):
 def make_checking_code():
     code = ProgramInvocation.make_code(
         """
-if a * b == n:
+if a * b == num:
 
 ✓
 else:
@@ -552,9 +552,9 @@ else:
 
 
 FACTORING_EXAMPLE_PROGRAM = """
-for a in range(2, n):
-    b = n // a
-    if a * b == n:
+for a in range(2, num):
+    b = num // a
+    if a * b == num:
         return a, b
 """.strip()
 

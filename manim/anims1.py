@@ -131,6 +131,9 @@ class Intro(Scene):
         rec2 = nums_intermediate_rec[0]
 
         for i in range(len(str(num2))):
+            self.add_sound(
+                random_pop_file()
+            )
             if i == 0:
                 self.play(
                     # FadeIn(rec),
@@ -149,14 +152,21 @@ class Intro(Scene):
         self.wait()
 
         self.play(Create(line2))
-        self.play(
-            Succession(
-                *[
-                    AnimationGroup(FadeIn(let), run_time=0.2)
-                    for let in reversed(num_tex[0])
-                ]
+        for i in reversed(range(len(num_tex[0]))):
+            self.add_sound(random_click_file())
+            self.play(
+                FadeIn(num_tex[0][i]),
+                run_time = 0.2
             )
-        )
+        # self.add
+        # self.play(
+        #     Succession(
+        #         *[
+        #             AnimationGroup(FadeIn(let), run_time=0.2)
+        #             for let in reversed(num_tex[0])
+        #         ]
+        #     )
+        # )
         self.wait()
 
         # it takes only roughly n^2 steps to compute the result.
@@ -200,6 +210,7 @@ class Intro(Scene):
         self.play(
             MoveToTarget(num_tex),
         )
+        self.wait()
         self.play(
             FadeIn(Group(div_sign, eq_sign)),
         )
@@ -359,7 +370,6 @@ class Asymptotics(Scene):
 
         # our_algo = Group(our_algo_img, badge_img)
 
-        # TODO double check it is ok to use this image: https://gallery.yopriceville.com/Free-Clipart-Pictures/Badges-and-Labels-PNG/Green_Classic_Seal_Badge_PNG_Clipart#.ZAaV6dLMJkg
 
         # self.play(FadeIn(badge_img))
         # self.wait()
@@ -440,7 +450,6 @@ class Asymptotics(Scene):
 
         # Asymptotic optimality means that whenever you come up with some amazing factoring algorithm, I can prove that my algorithm is either faster than yours, or if my algorithm is slower, it is slower only by a constant factor.
         # For example, perhaps my algorithm is twice as slow as yours, but it is at most twice as slow for all inputs, even very large ones.
-        # TODO obrazek pro your algo
         # your_algo = (
         #     Triangle(color=COLOR_YOURS, fill_opacity=1)
         #     .scale(0.5 * target_size)
@@ -464,12 +473,12 @@ class Asymptotics(Scene):
         def make_updater(plot):
             def updater(obj):
                 obj.next_to(plot, RIGHT + UP)
-                obj.shift(0.7 * DOWN)
+                obj.shift(1 * DOWN)
 
             return updater
 
         ptr_group = Group(
-            our_group.copy().scale(0.3), MathTex(), your_algo.copy().scale(0.3)
+            our_group.copy().scale(0.2), MathTex(), your_algo.copy().scale(0.2)
         )
 
         sc = 0.4
@@ -559,7 +568,7 @@ class Asymptotics(Scene):
         self.wait()
 
         self.play(
-            arrow.animate(run_time=4).shift(4.2 * RIGHT),
+            arrow.animate(run_time=4).shift(4.0 * RIGHT),
         )
 
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing!
@@ -583,9 +592,9 @@ class FinalScene(Scene):
         )
         self.wait()
 
-# TODO proc se nezobrazuje jmeno?
-# proc ta animace nema rate_func = linear?
-# proc surrounding rec za badgem je za kodem?
+# TODO proc se nezobrazuje Levinovo jmeno?
+# TODO proc ta animace nema rate_func = linear?
+# TODO proc surrounding rec za badgem je za kodem?
 class LadiesandGentlemen(Scene):
     def construct(self):
         default()
