@@ -582,9 +582,6 @@ class FinalScene(Scene):
         self.wait()
 
 
-# TODO proc se nezobrazuje Levinovo jmeno?
-# TODO proc ta animace nema rate_func = linear?
-# TODO proc surrounding rec za badgem je za kodem?
 class LadiesandGentlemen(Scene):
     def construct(self):
         default()

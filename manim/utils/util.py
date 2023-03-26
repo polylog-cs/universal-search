@@ -269,28 +269,33 @@ class ProgramInvocation(VMobject):
     def arrange(self):
         self.group.arrange(center=False)
 
-    def show_output(self):
+    def show_output(self, scale_result=1):
         color = RED if "Error" in self.stdout else TEXT_COLOR
-        self.stdout_obj = VGroup(
-            self.arrow.copy(),
-            Text(self.stdout, font="monospace", font_size=24, color=color),
-        ).arrange()
+        self.stdout_obj = (
+            VGroup(
+                self.arrow.copy(),
+                Text(self.stdout, font="monospace", font_size=24, color=color),
+            )
+            .arrange()
+            .scale(scale_result)
+        )
         self.stdout_obj.next_to(self.group)
         self.group.add(self.stdout_obj)
         return FadeIn(self.stdout_obj)
 
-    def show_verdict(self):
+    def show_verdict(self, scale_result=1):
         if self.ok:
             verdict = Text("✓", color=GREEN, font_size=80)
         else:
             verdict = Text("×", color=RED, font_size=80)
-        verdict.next_to(self.group)
+        verdict.scale(scale_result).next_to(self.group)
         self.group.add(verdict)
         return FadeIn(self.group[-1], scale=3)
 
-    def finish(self, lag_ratio=0.5):
+    def finish(self, lag_ratio=0.5, scale_result=None):
         self.finished = True
-        anims = [self.show_output(), self.show_verdict()]
+        scale_result = scale_result or 1
+        anims = [self.show_output(scale_result), self.show_verdict(scale_result)]
         if lag_ratio is None:
             return anims
         return AnimationGroup(*anims, lag_ratio=lag_ratio)
@@ -304,9 +309,9 @@ class ProgramInvocation(VMobject):
 
         return updater
 
-    def step(self, finish=False, fade=True):
+    def step(self, finish=False, fade=True, scale_result=None):
         if finish:
-            return self.finish(lag_ratio=None)
+            return self.finish(lag_ratio=None, scale_result=scale_result)
         self.wheels += 1
         cur = self.wheel.copy().next_to(self.group)
         self.group.add(cur)
@@ -494,7 +499,7 @@ class ProgramInvocationList(VGroup):
         target = self.arrow.copy().next_to(self[i], RIGHT).set_x(6)
         return self.arrow.animate.move_to(target)
 
-    def step(self, finish=False):
+    def step(self, finish=False, scale_result=None):
         anims = []
         oldlen = len(self)
         if oldlen == 0:
@@ -506,7 +511,7 @@ class ProgramInvocationList(VGroup):
             oldlen += 1
             self.now_adding = False
         else:
-            step = self[self.ptr].step(finish)
+            step = self[self.ptr].step(finish, scale_result=scale_result)
             anims.append(self.point_arrow_at(self.ptr))
             if type(step) != list:
                 step = [step]
@@ -560,7 +565,7 @@ for a in range(2, num):
 
 
 def make_factoring_example_program():
-    return ProgramInvocation.make_code(FACTORING_EXAMPLE_PROGRAM.strip())
+    return ProgramInvocation.make_code(FACTORING_EXAMPLE_PROGRAM)
 
 
 # def our_code_with_badge():
@@ -578,8 +583,11 @@ def make_factoring_example_program():
 def you_image():
     return SVGMobject("img/you.svg").set_stroke(BLACK, 3)
 
+
 def badge_image():
-    return SVGMobject("img/badge_drawing.svg").scale_to_fit_height(5).set_stroke(BLACK, 3)
+    return (
+        SVGMobject("img/badge_drawing.svg").scale_to_fit_height(5).set_stroke(BLACK, 3)
+    )
 
 
 def make_badge_img():
@@ -599,6 +607,7 @@ def arrive_from(obj, dir, buff=0.5):
     pos = obj.get_center()
     obj.align_to(Point().to_edge(dir, buff=0), -dir).shift(buff * dir)
     return obj.animate.move_to(pos)
+
 
 def step_sound():
     return random_pop_file()

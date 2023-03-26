@@ -754,9 +754,23 @@ class TimeComplexityAnalysis(MovingCameraScene):
         self.play(FadeIn(code, target_position=your_algo, scale=0))
         self.wait(2)
         pos = 3 * RIGHT + 2.5 * DOWN
-        self.play(Group(code, your_algo).animate.shift(pos + 0.5 * LEFT))
+        self.play(Group(code, your_algo).animate.move_to(self.camera.frame).shift(pos))
         self.wait()
-        self.remove(code, your_algo)
+        orig_width = self.camera.frame.width
+
+        def your_updater(grp):
+            zoom = self.camera.frame.width / orig_width
+            code.restore()
+            your_algo.restore()
+            grp.scale(zoom).move_to(self.camera.frame).shift(zoom * pos)
+            your_algo.set_stroke(BLACK, 3 * zoom)
+
+        your_grp = Group(code, your_algo)
+        code.save_state()
+        your_algo.save_state()
+        your_grp.add_updater(your_updater)
+        self.add(your_grp)
+        # self.remove(code, your_algo)
 
         # self.play(FadeOut(code, your_algo))
         p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3.7 * UP)
@@ -789,8 +803,8 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
         our_prog = p[L - 1]
 
-        Group(code, your_algo).scale(ZOOM).move_to(self.camera.frame).shift(ZOOM * pos)
-        your_algo.set_stroke(BLACK, 3 * ZOOM)
+        # Group(code, your_algo).scale(ZOOM).move_to(self.camera.frame).shift(ZOOM * pos)
+        # your_algo.set_stroke(BLACK, 3 * ZOOM)
 
         self.add(
             code, your_algo
@@ -811,6 +825,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             FadeIn(your_algo_arrow),
             ReplacementTransform(your_algo.copy(), your_algo_small),
         )
+        your_grp.remove_updater(your_updater)
 
         def mkbrace(
             obj,
@@ -835,23 +850,31 @@ class TimeComplexityAnalysis(MovingCameraScene):
 
         l_label = mkbrace(p, "L", LEFT, color=color_l)
 
-        # TODO put actual number here
+        num = program_to_number(FACTORING_EXAMPLE_PROGRAM) + 1
         iter_number = (
-            Tex(r"{{$L$}}{{$\,=\,$}}{{$9999999999999$}}")
+            Tex(
+                "$L$",
+                r"$\,=\,$",
+            )
             .scale(ZOOM)
             .next_to(code, UP)
-            .shift(ZOOM * (1 * UP + 1 * LEFT))
+            .shift(ZOOM * (1.5 * UP + 2 * LEFT))
+        )
+        number = (
+            Tex("\\hsize=7cm{}\\rightskip=0pt plus 1fill{}" + allow_breaks(str(num)))
+            .scale(0.4 * ZOOM)
+            .next_to(iter_number, buff=0.1 * ZOOM)
         )
         iter_number[0][0].set_color(RED)
 
-        self.play(FadeIn(iter_number[2]))
+        self.play(FadeIn(number))
         self.wait()
 
-        self.play(FadeIn(iter_number[0:2]))
+        self.play(FadeIn(iter_number))
         self.wait()
 
         self.play(
-            FadeOut(iter_number[1:]),
+            FadeOut(iter_number[1], number),
             FadeOut(code),
             FadeOut(your_algo),
             FadeIn(l_label[0]),
@@ -895,7 +918,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         our_prog.stdout = STDOUT
         our_prog.ok = True
         self.add_sound("audio/polylog_success.wav")
-        self.play(*p.step(finish=True))
+        self.play(*p.step(finish=True, scale_result=2))
         # TODO nitpick: asi bych trochu zvetsil 2,2+zeleny tick, aby to bylo trochu videt i pred tim nez se to zvetsi
 
         output = our_prog.stdout_obj[1]
