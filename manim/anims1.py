@@ -131,9 +131,7 @@ class Intro(Scene):
         rec2 = nums_intermediate_rec[0]
 
         for i in range(len(str(num2))):
-            self.add_sound(
-                random_pop_file()
-            )
+            self.add_sound(random_pop_file())
             if i == 0:
                 self.play(
                     # FadeIn(rec),
@@ -154,10 +152,7 @@ class Intro(Scene):
         self.play(Create(line2))
         for i in reversed(range(len(num_tex[0]))):
             self.add_sound(random_click_file())
-            self.play(
-                FadeIn(num_tex[0][i]),
-                run_time = 0.2
-            )
+            self.play(FadeIn(num_tex[0][i]), run_time=0.2)
         # self.add
         # self.play(
         #     Succession(
@@ -255,9 +250,7 @@ class Intro(Scene):
         fst = True
         for i in range(len(pairs)):
             # if i < len(pairs) - 1:
-            self.add_sound(
-                random_click_file()
-            )
+            self.add_sound(random_click_file())
             # elif i == len(pairs) - 1:
             #     self.add_sound(
             #         "audio/polylog_success.wav",
@@ -280,10 +273,7 @@ class Intro(Scene):
                     *[pairs[i][j].animate.restore() for j in [0, 1]],
                     run_time=f(i),
                 )
-        self.add_sound(
-            "audio/polylog_success.wav",
-            time_offset = 0.3
-        )
+        self.add_sound("audio/polylog_success.wav", time_offset=0.3)
 
         for pair in pairs[:-1]:
             for one in pair:
@@ -351,7 +341,7 @@ class Asymptotics(Scene):
     def construct(self):
         default()
 
-        our_group = badge_image().shift(3*RIGHT)
+        our_group = badge_image().shift(3 * RIGHT)
         self.add(our_group)
 
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
@@ -369,7 +359,6 @@ class Asymptotics(Scene):
         # badge_img.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
 
         # our_algo = Group(our_algo_img, badge_img)
-
 
         # self.play(FadeIn(badge_img))
         # self.wait()
@@ -592,6 +581,7 @@ class FinalScene(Scene):
         )
         self.wait()
 
+
 # TODO proc se nezobrazuje Levinovo jmeno?
 # TODO proc ta animace nema rate_func = linear?
 # TODO proc surrounding rec za badgem je za kodem?
@@ -599,48 +589,48 @@ class LadiesandGentlemen(Scene):
     def construct(self):
         default()
         code_img = (
-            ImageMobject("img/program_placeholder.png" if DRAFT else "img/program.png", z_index = 10)
+            ImageMobject(
+                "img/program_placeholder.png" if DRAFT else "img/program.png",
+                z_index=-2,
+            )
             .scale_to_fit_width(14.2)
             .align_to(Dot().to_edge(DOWN), UP)
         )
 
-        levin_img = ImageMobject("img/levin.jpg", z_index = 100).scale_to_fit_width(3)
-        name_txt = Tex("Leonid Levin", z_index = 1000).scale(0.7).next_to(levin_img, DOWN)
-        levin_back = SurroundingRectangle(Group(levin_img, name_txt), fill_color = BACKGROUND_COLOR, fill_opacity = 1, z_index = 1, color = BACKGROUND_COLOR)
-        levin_group = (
-            Group(levin_back, levin_img, name_txt).shift(3*LEFT)
+        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
+        name_txt = Tex("Leonid Levin").scale(0.7).next_to(levin_img, DOWN)
+        levin_back = SurroundingRectangle(
+            Group(levin_img, name_txt),
+            fill_color=BACKGROUND_COLOR,
+            fill_opacity=1,
+            z_index=-1,
+            color=BACKGROUND_COLOR,
         )
+        levin_group = Group(levin_back, levin_img, name_txt).shift(3 * LEFT)
 
-        badge_img = badge_image().set_z_index(100).shift(3*RIGHT)
-        badge_back = SurroundingRectangle(badge_img, fill_color = BACKGROUND_COLOR, fill_opacity = 1, z_index = 1, color = BACKGROUND_COLOR)
+        badge_img = badge_image().shift(3 * RIGHT)
+        badge_back = SurroundingRectangle(
+            badge_img,
+            fill_color=BACKGROUND_COLOR,
+            fill_opacity=1,
+            z_index=-1,
+            color=BACKGROUND_COLOR,
+        )
         badge = Group(badge_img, badge_back)
 
         time_badge = 15
-        self.add_sound("audio/tada_success.mp3", time_offset = time_badge)
+        self.add_sound("audio/tada_success.mp3", time_offset=time_badge)
 
         self.play(
-            AnimationGroup(
-                AnimationGroup(
-                    code_img.animate.to_edge(DOWN),
-                    run_time=20,
-                    rate_func=linear,            
-                ),
-                Succession(
-                    Wait(8),
-                    FadeIn(levin_group),
-                ),
-                Succession(
-                    Wait(time_badge),
-                    FadeIn(badge),
-                ),
-                rate_func=linear,            
-            ), 
-            rate_func=linear,
-            run_time = 20
+            code_img.animate(rate_func=linear, run_time=20).to_edge(DOWN),
+            Succession(
+                Wait(8),
+                FadeIn(levin_group),
+            ),
+            Succession(
+                Wait(time_badge),
+                FadeIn(badge),
+            ),
         )
-        self.play(
-            FadeOut(code_img),
-            FadeOut(levin_img),
-            FadeOut(name_txt)
-        )
+        self.play(FadeOut(code_img), FadeOut(levin_img), FadeOut(name_txt))
         self.wait(5)
