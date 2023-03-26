@@ -40,9 +40,7 @@ class Intro(Scene):
         our_group = badge_image().scale(1.3)
         self.play(FadeIn(our_group))
         self.wait()
-        self.play(
-            our_group.animate.scale(0.7).scale_to_fit_height(3).move_to(2 * UP)
-        )
+        self.play(our_group.animate.scale(0.7).scale_to_fit_height(3).move_to(2 * UP))
 
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
@@ -540,7 +538,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
 
         infinite.add(waiting)
         self.play(FadeIn(waiting))
-        
+
         self.wait(5, frozen_frame=False)
         self.play(
             FadeOut(p[:-1]),
@@ -570,11 +568,9 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(1)
         self.play(FadeIn(p.arrow))
         for i in range(15):
-            self.add_sound(
-                step_sound()
-            )
+            self.add_sound(step_sound())
             self.play(AnimationGroup(*p.step(), lag_ratio=0.3))
-        #self.wait(5)
+        # self.wait(5)
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
         prog = p[p.ptr]
@@ -590,16 +586,12 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(2)
         self.play(FadeOut(checker))
         prog.group[-1].restore()
-        self.add_sound(
-            "audio/polylog_failure.wav"
-        )
+        self.add_sound("audio/polylog_failure.wav")
         self.play(tick)
         self.wait(2)
-    
+
         for i in range(11):
-            self.add_sound(
-                step_sound()
-            )
+            self.add_sound(step_sound())
             self.play(AnimationGroup(*p.step(), lag_ratio=0.2))
 
         prog = p[p.ptr]
@@ -608,14 +600,12 @@ class ProgramsWithStepping(MovingCameraScene):
         arrow, stdout, tick = p.step(True)
         prog.group[-1].save_state().fade(1)
         self.play(arrow, stdout)
-        checker.shift(2*DOWN + 1*RIGHT)
+        checker.shift(2 * DOWN + 1 * RIGHT)
         self.play(FadeIn(checker))
         self.wait(2)
-        #self.play(FadeOut(checker))
+        # self.play(FadeOut(checker))
         prog.group[-1].restore()
-        self.add_sound(
-            "audio/polylog_success.wav"
-        )        
+        self.add_sound("audio/polylog_success.wav")
         self.play(tick)
         self.wait(2)
 
@@ -624,15 +614,12 @@ class ProgramsWithStepping(MovingCameraScene):
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
         win_group = (
-            VGroup(
-                Text(r"4 = 2 * 2").move_to(output.get_center()), 
-                tick.copy()
-            )
+            VGroup(Text(r"4 = 2 * 2").move_to(output.get_center()), tick.copy())
             .arrange(RIGHT)
             .move_to(self.camera.frame)
             .scale_to_fit_width(self.camera.frame.width)
             .scale(0.2)
-            .shift(2*LEFT)
+            .shift(2 * LEFT)
         )
         self.play(
             FadeOut(p),
@@ -643,10 +630,10 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait()
 
         self.play(
-            Circumscribe(checker, color = RED),
-            run_time = 2,
+            Circumscribe(checker, color=RED),
+            run_time=2,
         )
-        #TODO nitpick: zelená fajfka vypadá jinak než v checkovači
+        # TODO nitpick: zelená fajfka vypadá jinak než v checkovači
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
         # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
@@ -707,7 +694,7 @@ class ExplanationBeginning(Scene):
 
         fn2_new = Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
             fn2.get_center()
-        )  
+        )
         fn2.save_state()
         self.play(Transform(fn2, fn2_new))
         self.wait()
@@ -766,12 +753,12 @@ class TimeComplexityAnalysis(MovingCameraScene):
         code.next_to(your_algo)
         self.play(FadeIn(code, target_position=your_algo, scale=0))
         self.wait(2)
-        pos = 3*RIGHT + 2.5*DOWN
-        self.play(Group(code, your_algo).animate.shift(pos + 0.5*LEFT))
+        pos = 3 * RIGHT + 2.5 * DOWN
+        self.play(Group(code, your_algo).animate.shift(pos + 0.5 * LEFT))
         self.wait()
         self.remove(code, your_algo)
 
-        #self.play(FadeOut(code, your_algo))
+        # self.play(FadeOut(code, your_algo))
         p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3.7 * UP)
         p.arrow.fade(1)
         L = 5
@@ -801,15 +788,15 @@ class TimeComplexityAnalysis(MovingCameraScene):
             run_time=run_time1,
         )
         our_prog = p[L - 1]
-        
-        Group(code, your_algo).scale(ZOOM).move_to(self.camera.frame).shift(
-            ZOOM * pos
-        )
+
+        Group(code, your_algo).scale(ZOOM).move_to(self.camera.frame).shift(ZOOM * pos)
         your_algo.set_stroke(BLACK, 3 * ZOOM)
 
-        self.add(code, your_algo) # I hope the fact it is not there for a while can be solved in postprocessing
-        #self.play(FadeIn(your_algo))
-        
+        self.add(
+            code, your_algo
+        )  # I hope the fact it is not there for a while can be solved in postprocessing
+        # self.play(FadeIn(your_algo))
+
         your_algo_arrow = Arrow(
             our_prog.get_left() + 0.8 * ZOOM * LEFT,
             our_prog.get_left() + 0.2 * ZOOM * LEFT,
@@ -820,10 +807,11 @@ class TimeComplexityAnalysis(MovingCameraScene):
             .scale(0.2)
             .next_to(your_algo_arrow, LEFT)
         )
-        self.play(FadeIn(your_algo_arrow), 
-                  ReplacementTransform(your_algo.copy(), your_algo_small)
+        self.play(
+            FadeIn(your_algo_arrow),
+            ReplacementTransform(your_algo.copy(), your_algo_small),
         )
-    
+
         def mkbrace(
             obj,
             text,
@@ -847,18 +835,19 @@ class TimeComplexityAnalysis(MovingCameraScene):
 
         l_label = mkbrace(p, "L", LEFT, color=color_l)
 
-        #TODO put actual number here
-        iter_number = Tex(r"{{$L$}}{{$\,=\,$}}{{$9999999999999$}}").scale(ZOOM).next_to(code, UP).shift(ZOOM * (1*UP + 1 *LEFT))
+        # TODO put actual number here
+        iter_number = (
+            Tex(r"{{$L$}}{{$\,=\,$}}{{$9999999999999$}}")
+            .scale(ZOOM)
+            .next_to(code, UP)
+            .shift(ZOOM * (1 * UP + 1 * LEFT))
+        )
         iter_number[0][0].set_color(RED)
 
-        self.play(
-            FadeIn(iter_number[2])
-        )
+        self.play(FadeIn(iter_number[2]))
         self.wait()
 
-        self.play(
-            FadeIn(iter_number[0:2])
-        )
+        self.play(FadeIn(iter_number[0:2]))
         self.wait()
 
         self.play(
@@ -905,13 +894,9 @@ class TimeComplexityAnalysis(MovingCameraScene):
         p.ptr += 1
         our_prog.stdout = STDOUT
         our_prog.ok = True
-        self.add_sound(
-            "audio/polylog_success.wav"
-        )
+        self.add_sound("audio/polylog_success.wav")
         self.play(*p.step(finish=True))
-        #TODO nitpick: asi bych trochu zvetsil 2,2+zeleny tick, aby to bylo trochu videt i pred tim nez se to zvetsi
-
-
+        # TODO nitpick: asi bych trochu zvetsil 2,2+zeleny tick, aby to bylo trochu videt i pred tim nez se to zvetsi
 
         output = our_prog.stdout_obj[1]
         tick = our_prog.group[-1]
@@ -978,7 +963,6 @@ class TimeComplexityAnalysis(MovingCameraScene):
         self.wait()
 
         self.remove(p)
-    
 
         triangle_left = triangle.get_corner(UP + LEFT)
         triangle_right = triangle.get_corner(UP + RIGHT)
@@ -1031,7 +1015,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         a[2][1].set_color(color_l)
         a[2][3:7].set_color(color_fn)
         self.play(FadeIn(a))
-        self.wait()        
+        self.wait()
         self.remove(area2)
         b = MathTex(r"{{\mathcal{O}\left(}}{{(L + f(n))^2}}{{\right)}}").scale(ZOOM)
         b[1][1].set_color(color_l)
@@ -1080,15 +1064,13 @@ class TimeComplexityAnalysis(MovingCameraScene):
         checker = make_checking_code().scale(1.5).shift(-shft + 2 * UP)
         self.play(FadeIn(checker), c.animate.shift(shft))
         self.wait()
-        self.play(
-            Circumscribe(checker, color = RED)
-        )
+        self.play(Circumscribe(checker, color=RED))
         self.wait()
         self.play(TransformMatchingTex(c, with_multiplication))
         self.wait(2)
         self.play(TransformMatchingTex(with_multiplication, without_multiplication))
         self.wait()
-        self.play(Circumscribe(without_multiplication[2], color = RED))
+        self.play(Circumscribe(without_multiplication[2], color=RED))
         self.wait()
         self.play(FadeOut(checker), FadeOut(without_multiplication))
         self.wait()
@@ -1171,81 +1153,3 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
 
         # self.play(*(FadeOut(cog) for cog in to_hide))
         self.wait(5)
-
-
-# class Part1Rest(Scene):
-#     def construct(self):
-#         default()
-#         # And that’s basically the whole algorithm. In the actual code we shared with you, we simulated Brainfuck programs instead of Python programs because it was suggested to us by a higher authority [konverzace s ChatGPT], but in this explanation, let’s stick with Python.
-
-#         gpt_img = ImageMobject("img/chatgpt.png").scale_to_fit_height(8)
-#         self.play(FadeIn(gpt_img))
-#         self.wait()
-#         self.play(FadeOut(gpt_img))
-#         self.wait()
-
-#         return
-
-#         # This algorithm was discovered by Leonid Levin in the early 1970’s and now it is known as the universal search, so I will use this name from now on.  [Levin s thug life glasses?] I hope that now you can intuitively see how it can happen that we have no idea what the time complexity of the universal search is and also why it is so slow that it struggles to factor the number 4. [Zopakovat ty dva body]
-
-#         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
-#         levin_tex = Tex("Leonid Levin")
-#         levin_group = Group(levin_img, levin_tex).to_corner(DR)
-
-#         # But the only thing I promised was that universal search is asymptotically optimal. In other words, I promised that whenever there is some factoring algorithm with time complexity f(n), then the universal search has time complexity O(f(n)), in other words, it is slower at most by a constant factor.
-
-#         # For simplicity, I explained a version of the universal search that has a weaker property: whenever there is a factoring algorithm with time complexity f(n), our universal search has time complexity O(f(n)^2 + f(n)*n^2). I will now explain this complexity and then I will tell you how to improve the algorithm to achieve the promised O(f(n)).
-
-#         # So, let us fix some valid factoring algorithm that needs f(n) time to factor numbers of size n. To have a concrete example in mind, you can think of the naive algorithm that simply tries to divide the input number by 2,3,4 and so on, until it succeeds.
-
-#         # The most important observation is that our universal search will at some point start simulating this algorithm. For example, this code has roughly 1000 letters, so if we are using the ASCII encoding with 128 different letters, it will take only roughly 128^1000 iterations of universal search until we start simulating this algorithm. This number, that I will call L from now on, is ridiculously huge, but what’s absolutely essential is that it is constant and clearly does not depend on the length of the input number we want to factor. [možná input číslo a nad tím svorka n]
-
-#         # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. [Možná točící se gears, píše checking, tři tečky pak řekne correct!] Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
-
-#         # So what is the total number of steps we need to make? Well, look at this triangle diagram that shows how many steps were simulated. In the worst case, the number of steps of the universal search is proportional to the number of dots in this picture. Since it took f(n) steps before we finished simulating our algorithm, we started the simulation of another f(n) algorithms in the meantime. So, the area of this triangle is roughly ½ * (L+f(n))^2. Remember, L is just a constant, so this is simply O(f(n)^2) steps.
-
-#         # But we also need to account for the time we spent by checking whether the outputs of the finished algorithms are correct. Remember, to make this check, we need to multiply two long numbers and that takes up to n^2 steps if we do it with the basic multiplication algorithm, so we also need to add the term f(n) * n^2 to the final asymptotic complexity.
-
-#         # So this is the analysis of the version of universal search I explained. But how do we improve this complexity to O(f(n)) as I promised? Well, we can do that by tweaking the algorithm a bit: instead of simulating exactly one step of every algorithm in each iteration, we allocate different numbers of steps for different algorithms that will grow as an exponential series. So we run one step in the newest algorithm, then 2 steps in the one before that, then 4 steps and so on. The complexity of such improved universal search becomes O(f(n) + n^2). We still need this additional quadratic term because we simply have to check whether the output is correct by multiplying two long numbers.
-
-#         # However, we can get rid of the quadratic term by using a faster algorithm for multiplication. Multiplication algorithms is a complex and fascinating topic, but long story short, in the classical models of computing, there is a way to multiply two long numbers in linear time. If we use that linear time algorithm, n^2 is replaced by n, which is at most f(n), so we finally get the complexity O(f(n)). Nice!
-#         # [<3000BC unknown  Standard n^2
-#         # 1962 Karatsuba divide&conquer n^1.58
-#         # 1963 Toom divide&conquer n^1+o(1)
-#         # 1966 Schönhage&Strassen FFT n polylog(n)
-#         # 1979 Schönhage FFT + tricks n (word RAM)
-#         # 2019 Harvey&van Der Hoeven dark magic nlog(n) (bit operations)
-#         # ]
-
-#         mult_algs_texts = [
-#             ["When", "Who", "Technique", "Complexity"],
-#             ["$<$3000BC", "unknown", "straightforward", r"$O(n^2)$"],
-#             ["1962", "Karatsuba", "divide \& conquer", r"$O(n^{1.58})$"],
-#             ["1963", "Toom", "divide \& conquer", r"$O(n^{1.01})$"],
-#             ["1966", "Schönhage \& Strassen", "FFT", r"$n \cdot \text{polylog}(n)$"],
-#             ["1979", "Schönhage", "FFT + tricks", r"$O(n)$ {\tiny (word RAM)}"],
-#             [
-#                 "2019",
-#                 "Harvey \& van Der Hoeven",
-#                 "dark magic",
-#                 r"$O(n\text{log}(n))$ {\tiny (bit operations)}",
-#             ],
-#         ]
-
-#         mult_algs_group = (
-#             Group(*[Tex(str).scale(0.5) for line in mult_algs_texts for str in line])
-#             .arrange_in_grid(cols=4)
-#             .to_corner(DR)
-#         )
-
-#         self.play(FadeIn(mult_algs_group))
-#         self.wait()
-
-#         self.play(
-#             Circumscribe(mult_algs_group[4 * 5 : 4 * 6], color=RED),
-#         )
-#         self.wait()
-
-#         # I hope you can see that the universal search is a pretty general algorithm. For example, let’s say we want to solve another classical problem: sorting. Then we can simply change a few lines of code in the universal search: we now check whether the output of a simulated algorithm is the same set of numbers as those we received on input, but in the sorted order. [assume uniqueness]  And now we have an asymptotically optimal algorithm for sorting! Of course, as in the case of factoring, though asymptotically optimal, this sorting algorithm is entirely useless.
-
-
