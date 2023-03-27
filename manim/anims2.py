@@ -376,8 +376,8 @@ for i in range(42):
             ),
             perl_program(False),
             #random_text(10, 50),
-            random_text(5),
-            random_text(4),
+            #random_text(5),
+            #random_text(4),
             """
 # Absolutely amazing factoring algorithm
 
