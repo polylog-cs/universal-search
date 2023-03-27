@@ -285,7 +285,7 @@ class ProgramInvocation(VMobject):
 
     def show_verdict(self, scale_result=1):
         if self.ok:
-            verdict = Text("✓", color=GREEN, font_size=80)
+            verdict = Text("✓", color=GREEN, font_size=80, font="monospace")
         else:
             verdict = Text("×", color=RED, font_size=80)
         verdict.scale(scale_result).next_to(self.group)
@@ -332,6 +332,7 @@ class ProgramInvocation(VMobject):
             updater,
             rate_func=rate_functions.ease_in_out_quad,
             suspend_mobject_updating=True,
+            run_time=0.5,
         )
 
     def dumb_down(self, animate=True):
@@ -499,32 +500,43 @@ class ProgramInvocationList(VGroup):
         target = self.arrow.copy().next_to(self[i], RIGHT).set_x(6)
         return self.arrow.animate.move_to(target)
 
-    def step(self, finish=False, scale_result=None):
+    def step(self, finish=False, scale_result=None, say_sound=False, move_arrow=True):
         anims = []
         oldlen = len(self)
+
+        def mkret(anims):
+            if say_sound:
+                return anims, sound
+            else:
+                return anims
+
+        sound = False
         if oldlen == 0:
-            return self.add_dummy()
+            return mkret(self.add_dummy())
         if self.now_adding:
             anims_dummy = self.add_dummy()
-            anims.append(self.point_arrow_at(oldlen))
+            if move_arrow:
+                anims.append(self.point_arrow_at(oldlen))
             anims.append(*anims_dummy)
             oldlen += 1
             self.now_adding = False
         else:
+            sound = True
             step = self[self.ptr].step(finish, scale_result=scale_result)
-            anims.append(self.point_arrow_at(self.ptr))
+            if move_arrow:
+                anims.append(self.point_arrow_at(self.ptr))
             if type(step) != list:
                 step = [step]
             anims += step
             if self.ptr == 0:
                 self.now_adding = True
-                return anims
+                return mkret(anims)
 
         while True:
             self.ptr = (self.ptr - 1 + oldlen) % oldlen
             if not self[self.ptr].finished:
                 break
-        return anims
+        return mkret(anims)
 
     def return_for_jagging(self, ignore=None):
         cogs = []
@@ -610,4 +622,5 @@ def arrive_from(obj, dir, buff=0.5):
 
 
 def step_sound():
+    return "audio/pop/pop_0.wav"
     return random_pop_file()

@@ -579,8 +579,10 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(1)
         self.play(FadeIn(p.arrow))
         for i in range(15):
-            self.add_sound(step_sound())
-            self.play(AnimationGroup(*p.step(), lag_ratio=0.3))
+            anims, sound = p.step(say_sound=True)
+            self.play(AnimationGroup(*anims, lag_ratio=0.3))
+            if sound:
+                self.add_sound(step_sound(), time_offset=-0.25)
         # self.wait(5)
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
@@ -597,13 +599,15 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(2)
         self.play(FadeOut(checker))
         prog.group[-1].restore()
-        self.add_sound("audio/polylog_failure.wav")
+        self.add_sound("audio/polylog_failure.wav", time_offset=0.5)
         self.play(tick)
         self.wait(2)
 
         for i in range(11):
-            self.add_sound(step_sound())
-            self.play(AnimationGroup(*p.step(), lag_ratio=0.2))
+            anims, sound = p.step(say_sound=True)
+            self.play(AnimationGroup(*anims, lag_ratio=0.2))
+            if sound:
+                self.add_sound(step_sound(), time_offset=-0.25)
 
         prog = p[p.ptr]
         prog.stdout = STDOUT
@@ -616,7 +620,7 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(2)
         # self.play(FadeOut(checker))
         prog.group[-1].restore()
-        self.add_sound("audio/polylog_success.wav")
+        self.add_sound("audio/polylog_success.wav", time_offset=0.5)
         self.play(tick)
         self.wait(2)
 
@@ -625,7 +629,7 @@ class ProgramsWithStepping(MovingCameraScene):
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
         win_group = (
-            VGroup(Text(r"4 = 2 * 2").move_to(output.get_center()), tick.copy())
+            VGroup(Text(r"4 = 2 × 2").move_to(output.get_center()), tick.copy())
             .arrange(RIGHT)
             .move_to(self.camera.frame)
             .scale_to_fit_width(self.camera.frame.width)
@@ -641,10 +645,9 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait()
 
         self.play(
-            Circumscribe(checker, color=RED),
+            Circumscribe(checker, color=CYAN2),
             run_time=2,
         )
-        # TODO nitpick: zelená fajfka vypadá jinak než v checkovači
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
         # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
@@ -800,15 +803,26 @@ class TimeComplexityAnalysis(MovingCameraScene):
         total = L + time - 1
         steps_till_appearance = (L + 1) * L // 2
         steps_till_finished = (total + 1) * (total) // 2 + total - L
-        anims = [anim for _ in range(steps_till_appearance) for anim in p.step()]
+        anims = [
+            anim
+            for _ in range(steps_till_appearance)
+            for anim in p.step(move_arrow=False)
+        ]
         zoomed_out = self.camera.frame.copy().scale(
             ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT)
         )
         zoomed_out.shift(LEFT * zoomed_out.width * 0.1 + UP * zoomed_out.height * 0.1)
+        anim_group = AnimationGroup(
+            *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
+        )
+        run_scale = run_time1 / anim_group.max_end_time
+        for anim, start, end in anim_group.anims_with_timings:
+            start *= run_scale
+            end *= run_scale
+            if isinstance(anim, UpdateFromAlphaFunc):
+                self.add_sound(step_sound(), time_offset=0.2 * start + 0.8 * end)
         self.play(
-            AnimationGroup(
-                *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
-            ),
+            anim_group,
             self.camera.frame.animate.become(zoomed_out),
             run_time=run_time1,
         )
@@ -896,7 +910,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         anims = [
             anim
             for _ in range(steps_till_appearance, steps_till_finished)
-            for anim in p.step()
+            for anim in p.step(move_arrow=False)
         ]
         anim_last = p.step()
         dist = our_prog.group[3].get_center() - our_prog.group[2].get_center()
