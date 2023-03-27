@@ -131,7 +131,7 @@ class Intro(Scene):
         rec2 = nums_intermediate_rec[0]
 
         for i in range(len(str(num2))):
-            self.add_sound(random_pop_file())
+            self.add_sound(random_pop_file(), time_offset=0.1)
             if i == 0:
                 self.play(
                     # FadeIn(rec),
@@ -151,7 +151,7 @@ class Intro(Scene):
 
         self.play(Create(line2))
         for i in reversed(range(len(num_tex[0]))):
-            self.add_sound(random_click_file())
+            self.add_sound(random_click_file(), time_offset=0.1)
             self.play(FadeIn(num_tex[0][i]), run_time=0.2)
         # self.add
         # self.play(
@@ -250,7 +250,7 @@ class Intro(Scene):
         fst = True
         for i in range(len(pairs)):
             # if i < len(pairs) - 1:
-            self.add_sound(random_click_file())
+            self.add_sound(random_click_file(), time_offset=f(i) / 2)
             # elif i == len(pairs) - 1:
             #     self.add_sound(
             #         "audio/polylog_success.wav",
@@ -280,6 +280,7 @@ class Intro(Scene):
             for one in pair:
                 self.remove(one)
 
+        self.wait()
         self.next_section(skip_animations=False)
 
         brace = Brace(num_tex, DOWN).shift(0.3 * DOWN)
@@ -511,7 +512,7 @@ class Asymptotics(Scene):
             ratio = y_ours / y_yours
             our, tex, your = obj
             tex.become(MathTex(r" = {:.2f}\times".format(ratio)))
-            obj.arrange()
+            obj.arrange(buff=SMALL_BUFF)
             obj.next_to(arrow, RIGHT).shift(0.3 * DOWN)
 
         def lines_updater(obj):
@@ -560,7 +561,7 @@ class Asymptotics(Scene):
         self.wait()
 
         self.play(
-            arrow.animate(run_time=4).shift(4.0 * RIGHT),
+            arrow.animate(run_time=4).shift(4.5 * RIGHT),
         )
 
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing!
