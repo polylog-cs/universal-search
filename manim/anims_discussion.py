@@ -290,11 +290,6 @@ class Discussion2(Scene):
         )
 
         def create_curve(iter):
-            if iter >= 10:
-                return Square(
-                    color=RED, fill_opacity=1, fill_color=RED
-                ).scale_to_fit_width(side_length)
-                # TODO pak dropnout, aby se i plný čtverec nakreslil Hilbertovsky
             distances = list(range(4**iter))
             points = HilbertCurve(iter, 2).points_from_distances(distances)
             points = [[p[0], p[1], 0] for p in points]
@@ -305,8 +300,9 @@ class Discussion2(Scene):
                 side_length * (1 - 2 ** (-iter))
             ).move_to(bounding_square.get_center())
 
-            if iter >= 8:
-                curve.stroke_width = curve.stroke_width * 2
+            curve.stroke_width = min(
+                curve.stroke_width, max(0.1, curve.stroke_width * 2 ** (6 - iter))
+            )
             # curve = []
             # for i in range(len(points) - 1):
             #     curve.append(Line(
