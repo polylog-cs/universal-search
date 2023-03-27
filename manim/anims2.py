@@ -369,9 +369,8 @@ for i in range(42):
             """.strip().split(
                 "\n"
             ),
-            random_text(10, 50),
             perl_program(False),
-            random_text(10, 50),
+            #random_text(10, 50),
             random_text(5),
             random_text(4),
             """
