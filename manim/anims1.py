@@ -274,6 +274,7 @@ class Intro(Scene):
                     run_time=f(i),
                 )
         self.add_sound("audio/polylog_success.wav", time_offset=0.3)
+        self.wait(2)
 
         for pair in pairs[:-1]:
             for one in pair:
@@ -615,13 +616,13 @@ class LadiesandGentlemen(Scene):
         )
         badge = Group(badge_img, badge_back)
 
-        time_badge = 15
+        time_badge = 19
         self.add_sound("audio/tada_success.mp3", time_offset=time_badge)
 
         self.play(
             code_img.animate(rate_func=linear, run_time=20).to_edge(DOWN),
             Succession(
-                Wait(8),
+                Wait(15),
                 FadeIn(levin_group),
             ),
             Succession(

@@ -5,7 +5,7 @@ from manim import *
 
 from .utilgeneral import *
 
-DRAFT = True
+DRAFT = False
 
 
 class BasePolylogo(Scene):

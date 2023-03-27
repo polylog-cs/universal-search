@@ -1,0 +1,7 @@
+Important
+video1
+- svg obrazek pandulaka je divny
+
+
+Nitpicks
+- změnil jsem jedno slovo v universal_search.py

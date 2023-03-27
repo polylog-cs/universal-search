@@ -87,7 +87,7 @@ class BrainfuckExecution:
 class UniversalSearch:
     """
     This class represents a universal search algorithm that is used to find a program
-    that takes the input and computes the output. We generate all programs in an
+    that takes the input and computes the correct output. We generate all programs in an
     exhaustive manner, and execute them in parallel. When we start
     executing the n-th program, we simulate 1 step of the n-th program, 2 steps
     of the (n - 1)-th program, 4 steps of the (n - 2)-th program, 8 steps
