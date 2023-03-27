@@ -342,7 +342,7 @@ class Asymptotics(Scene):
     def construct(self):
         default()
 
-        our_group = badge_image().shift(3 * RIGHT)
+        our_group = badge_image().shift(3 * RIGHT).set_z_index(10)
         self.add(our_group)
 
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
@@ -371,7 +371,7 @@ class Asymptotics(Scene):
         # self.play(our_group.animate.scale_to_fit_height(3).move_to(3 * RIGHT))
         # self.wait()
 
-        your_algo = you_image().scale_to_fit_height(5).move_to(3 * LEFT)
+        your_algo = you_image().scale_to_fit_height(5).move_to(3 * LEFT).set_z_index(10)
         self.play(arrive_from(your_algo, LEFT))
         self.wait()
         self.play(our_group.animate.scale(1.3), run_time=0.5)
@@ -468,7 +468,9 @@ class Asymptotics(Scene):
             return updater
 
         ptr_group = Group(
-            our_group.copy().scale(0.2), MathTex(), your_algo.copy().scale(0.2)
+            our_group.copy().scale(0.2).set_stroke(BLACK, 0.8),
+            MathTex(),
+            your_algo.copy().scale(0.2).set_stroke(BLACK, 0.8),
         )
 
         sc = 0.4
@@ -476,8 +478,8 @@ class Asymptotics(Scene):
         cornerer = make_updater(corner)
         our_group.generate_target()
         your_algo.generate_target()
-        our_group.target.scale(sc)
-        your_algo.target.scale(sc)
+        our_group.target.scale(sc).set_stroke(BLACK, 1.5)
+        your_algo.target.scale(sc).set_stroke(BLACK, 1.5)
         cornerer(our_group.target)
         cornerer(your_algo.target)
         self.play(
