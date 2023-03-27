@@ -683,9 +683,11 @@ class ExplanationBeginning(Scene):
             .to_edge(LEFT)
         )
 
-        self.play(FadeIn(props))
-        self.wait()
-        self.play(FadeOut(props), FadeOut(levin_group))
+        self.play(FadeIn(props[0]), run_time = 0.5)
+        self.wait(0.5)
+        self.play(FadeIn(props[1]), run_time = 0.5)
+        self.wait(0.5)
+        self.play(FadeOut(props), FadeOut(levin_group), FadeOut(title_tex))
         self.wait()
 
         shft = 1 * DOWN
@@ -694,6 +696,8 @@ class ExplanationBeginning(Scene):
         your_algo = Group(your_algo_img, fn).arrange(DOWN).move_to(3 * LEFT).shift(shft)
         self.play(arrive_from(your_algo, LEFT))
         self.wait()
+
+
 
         our_algo_img = badge_image().scale_to_fit_height(3.5)
         fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}")
@@ -704,17 +708,41 @@ class ExplanationBeginning(Scene):
             .align_to(your_algo, DOWN)
         )
         self.play(arrive_from(our_algo, RIGHT))
-
-        fn2_new = Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
-            fn2.get_center()
-        )
-        fn2.save_state()
-        self.play(Transform(fn2, fn2_new))
         self.wait()
+
+        self.play(FadeOut(fn), FadeOut(fn2))
+        self.wait()
+
+        self.play(
+            Succession(
+                AnimationGroup(your_algo_img.animate.scale(1.2), run_time = 0.5),
+                AnimationGroup(your_algo_img.animate.scale(1/1.2), run_time = 0.5),
+            )
+        )
+        self.play(
+            FadeIn(fn)
+        )
+        self.wait()
+
+        self.play(
+            Succession(
+                AnimationGroup(our_algo_img.animate.scale(1.2), run_time = 0.5),
+                AnimationGroup(our_algo_img.animate.scale(1/1.2), run_time = 0.5),
+            )
+        )
+
+        fn2.save_state()    
+        fn2.become(Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
+            fn2.get_center()
+        ))
+        self.play(
+            FadeIn(fn2)
+        )
+        self.wait()
+
         self.play(fn2.animate.restore())
         self.wait()
 
-        self.wait(3)
 
 
 class BazillionScroll(MovingCameraScene):
