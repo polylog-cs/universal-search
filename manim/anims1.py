@@ -617,9 +617,10 @@ class LadiesandGentlemen(Scene):
             z_index=-1,
             color=BACKGROUND_COLOR,
         )
-        badge = Group(badge_img, badge_back)
+        badge = Group(badge_img)
 
         time_badge = 19
+        badge_runtime = 0.8
         self.add_sound("audio/tada_success.mp3", time_offset=time_badge)
 
         self.play(
@@ -630,7 +631,7 @@ class LadiesandGentlemen(Scene):
             ),
             Succession(
                 Wait(time_badge),
-                FadeIn(badge),
+                FadeIn(badge, scale=2, run_time=badge_runtime),
             ),
         )
         self.play(FadeOut(code_img), FadeOut(levin_img), FadeOut(name_txt))

@@ -40,7 +40,12 @@ class Intro(Scene):
         our_group = badge_image().scale(1.3)
         self.play(FadeIn(our_group))
         self.wait()
-        self.play(our_group.animate.scale(0.7).scale_to_fit_height(3).move_to(2 * UP))
+        self.play(
+            our_group.animate.scale(0.7)
+            .scale_to_fit_height(3)
+            .set_stroke(BLACK, 1.5)
+            .move_to(2 * UP)
+        )
 
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
@@ -387,11 +392,17 @@ def factor(n):
     # Buy us some time:
     time.sleep(-10**n)
 
-    
+    arp = "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
 
+    # TODO: refactor
+    def is_true(var):
+        if var == True:
+            return True
+        else:
+            return False
 
-    
--                """.split(
+    for self in this.s:
+""".split(
                 "\n"
             ),
         ]
