@@ -39,7 +39,7 @@ class BasePolylogo(Scene):
 
 
 def multiplication_animation(scene, num1, num2, obj1, obj2):
-    # TODO dá se získat text v obj1?
+    # TODO dá se získat text v obj1?    
     # create objects
 
     nums_intermediate = []
