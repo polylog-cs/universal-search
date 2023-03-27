@@ -7,7 +7,7 @@
    viewBox="0 0 192.70502 274.896"
    version="1.1"
    id="svg5"
-   inkscape:version="1.2.2 (b0a8486541, 2022-12-01)"
+   inkscape:version="1.1.2 (0a00cf5339, 2022-02-04)"
    sodipodi:docname="badge_drawing.svg"
    inkscape:export-filename="/home/vasek/bitmap.png"
    inkscape:export-xdpi="200"
@@ -29,12 +29,12 @@
      objecttolerance="1"
      guidetolerance="1"
      inkscape:zoom="0.54750932"
-     inkscape:cx="47.487776"
+     inkscape:cx="46.57455"
      inkscape:cy="532.41103"
-     inkscape:window-width="1920"
-     inkscape:window-height="1200"
-     inkscape:window-x="0"
-     inkscape:window-y="0"
+     inkscape:window-width="1846"
+     inkscape:window-height="1016"
+     inkscape:window-x="74"
+     inkscape:window-y="27"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
      fit-margin-top="0"
@@ -51,16 +51,16 @@
      id="layer1"
      transform="translate(-8.0835698,-9.6125321)">
     <path
-       style="fill:#ffff00;stroke:#000000;stroke-width:1.065;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#008080;stroke:#000000;stroke-width:1.065;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 51.841452,167.76395 c -2.887163,4.41927 -4.007419,10.39701 -5.803815,15.23336 -6.569916,17.68787 -11.359158,36.3843 -16.739798,54.44751 -0.609844,2.04729 -12.358933,28.76292 -8.357171,29.09645 12.405946,1.03399 26.668295,-17.69305 38.524496,-19.66939 2.103819,-0.35069 17.567632,38.89161 19.644429,37.04572 4.263078,-3.78913 25.965117,-85.18909 27.441037,-96.9966 8.19328,24.95352 16.2438,50.8665 21.81018,76.84311 0.48461,2.26155 0.001,20.37956 4.02569,20.128 5.19817,-0.32495 18.14581,-37.96263 22.95673,-35.61892 6.77157,3.29888 12.72579,9.33438 20.53619,11.28698 7.32563,1.83141 13.3684,7.4028 13.47847,7.00656 0.82745,-2.97877 -30.01589,-81.29252 -29.17363,-98.47432"
        id="path2067"
        sodipodi:nodetypes="cssssscsssssc" />
     <path
-       style="fill:#0000ff;stroke:#000000;stroke-width:1.065;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#d4aa00;stroke:#000000;stroke-width:1.065;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="m 102.8052,16.036817 c 14.83576,0.888716 31.08214,-13.8828205 43.31456,0.280266 2.54123,2.942319 1.37607,12.347663 5.01941,14.013162 11.05839,5.055177 24.96266,7.438594 32.58784,17.503725 4.36834,5.766146 0.0581,18.557626 1.40134,25.656823 1.9179,10.136769 15.70239,15.50865 15.10916,26.777887 -0.39555,7.51395 -11.797,14.22962 -14.75244,21.68219 -4.57203,11.52902 2.27096,25.80743 -3.71996,35.54247 -5.22493,8.49033 -20.03859,8.24565 -28.46021,13.32526 -8.52862,5.14415 -9.69576,18.98413 -19.56801,23.26184 -10.17014,4.4068 -21.71736,-7.64665 -31.72154,-8.79005 -13.715254,-1.56755 -19.822229,8.85522 -33.938229,1.50322 -5.614947,-2.92442 -4.978693,-11.81696 -10.319075,-15.82213 -8.811305,-6.60829 -25.963747,-6.37617 -30.192797,-18.21713 -2.916427,-8.16574 1.102291,-22.00226 -3.108451,-29.01998 C 20.114317,116.49708 6.9803229,107.29672 8.7871074,97.720831 10.65441,87.824198 23.362367,82.961638 26.316768,73.465321 27.946212,68.227807 21.116174,52.056159 23.845299,48.547366 32.626554,37.25745 45.071786,38.610534 56.280261,31.833478 85.217253,14.33711 59.263478,4.4493886 102.8052,16.036817 Z"
        id="path2032" />
     <path
-       style="fill:#ff0000;stroke:#000000;stroke-width:1.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
+       style="fill:#ffcc00;stroke:#000000;stroke-width:1.165;stroke-linecap:butt;stroke-linejoin:miter;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"
        d="M 89.30125,35.833597 C 71.33732,39.102167 60.610596,53.24399 50.521965,66.560644 41.810508,78.059475 44.813632,85.545648 41.22207,97.51701 c -12.270166,40.8988 39.723583,71.12449 74.65394,67.8492 5.18157,-0.48586 14.52098,-6.68441 19.28773,-9.19773 C 205.38329,119.14449 159.19031,21.589145 85.301015,36.648905"
        id="path1995" />
     <path
