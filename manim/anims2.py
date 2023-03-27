@@ -913,14 +913,17 @@ class TimeComplexityAnalysis(MovingCameraScene):
             )
             .scale(ZOOM)
             .next_to(code, UP)
-            .shift(ZOOM * (1.5 * UP + 2 * LEFT))
+            .shift(ZOOM * (2.0 * UP + 7 * LEFT))
         )
         number = (
             Tex("\\hsize=7cm{}\\rightskip=0pt plus 1fill{}" + allow_breaks(str(num)))
-            .scale(0.4 * ZOOM)
+            .scale(0.7 * ZOOM)
             .next_to(iter_number, buff=0.1 * ZOOM)
         )
-        iter_number[0][0].set_color(RED)
+        iter_number[0][0].set_color(RED).scale(1.3)
+
+        self.play(Circumscribe(code, color = HIGHLIGHT))
+        self.wait()
 
         self.play(FadeIn(number))
         self.wait()
@@ -936,7 +939,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             ReplacementTransform(iter_number[0], l_label[1]),
         )
         self.wait()
-
+        
         anims = [
             anim
             for _ in range(steps_till_appearance, steps_till_finished)
@@ -1021,10 +1024,19 @@ class TimeComplexityAnalysis(MovingCameraScene):
         # arrow_down.target.rotate(
         #    -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
         # self.play(MoveToTarget(arrow_down))
+        self.play(
+            Succession(
+                AnimationGroup(fn_label_horiz.animate.scale(1.2), run_time = 0.5),
+                AnimationGroup(fn_label_horiz.animate.scale(1/1.2), run_time = 0.5),
+            )
+        )
+        self.wait()
+
         fn_label_horiz_copy = fn_label_horiz.copy()
 
         vg = VGroup(p[L:])
         fn_label = mkbrace(vg, "f(n)", LEFT, color=color_fn)
+
         self.play(fn_label_horiz_copy.animate.become(fn_label))
         self.wait()
         fn_label = fn_label_horiz_copy
