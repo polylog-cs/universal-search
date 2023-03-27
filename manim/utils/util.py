@@ -222,6 +222,7 @@ class ProgramInvocation(VMobject):
             insert_line_no=False,
             font_size=24,
             margin=0.15,
+            line_spacing=0.4,
         )
 
     def __init__(
@@ -622,5 +623,20 @@ def arrive_from(obj, dir, buff=0.5):
 
 
 def step_sound():
-    return "audio/pop/pop_0.wav"
     return random_pop_file()
+
+
+def add_sounds_for_anims(scene, anim_group, run_time, sound_fn):
+    for anim, start, end in anim_group.anims_with_timings:
+        time = (start + end) / 2
+        alpha = time / anim_group.max_end_time
+        l, r = 0, 1
+        for _ in range(20):
+            inv = (l + r) / 2
+            if anim_group.rate_func(inv) > alpha:
+                r = inv
+            else:
+                l = inv
+        sound = sound_fn(anim)
+        if sound is not None:
+            scene.add_sound(sound, time_offset=inv * run_time)

@@ -645,7 +645,7 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait()
 
         self.play(
-            Circumscribe(checker, color=CYAN2),
+            Circumscribe(checker, color=HIGHLIGHT),
             run_time=2,
         )
 
@@ -815,12 +815,15 @@ class TimeComplexityAnalysis(MovingCameraScene):
         anim_group = AnimationGroup(
             *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
         )
-        run_scale = run_time1 / anim_group.max_end_time
-        for anim, start, end in anim_group.anims_with_timings:
-            start *= run_scale
-            end *= run_scale
-            if isinstance(anim, UpdateFromAlphaFunc):
-                self.add_sound(step_sound(), time_offset=0.2 * start + 0.8 * end)
+
+        add_sounds_for_anims(
+            self,
+            anim_group,
+            run_time1,
+            lambda anim: "audio/pop/pop_0.wav"
+            if isinstance(anim, UpdateFromAlphaFunc)
+            else None,
+        )
         self.play(
             anim_group,
             self.camera.frame.animate.become(zoomed_out),
@@ -932,19 +935,28 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
 
         self.play(FadeIn(fn_label_horiz), FadeIn(behind))
+        anim_group = AnimationGroup(
+            *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
+        )
+        add_sounds_for_anims(
+            self,
+            anim_group,
+            run_time2,
+            lambda anim: "audio/pop/pop_0.wav"
+            if isinstance(anim, UpdateFromAlphaFunc)
+            else None,
+        )
         self.play(
-            AnimationGroup(
-                *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
-            ),
+            anim_group,
             run_time=run_time2,
         )
         self.play(*anim_last)
+        self.add_sound(step_sound(), time_offset=-0.5)
         p.ptr += 1
         our_prog.stdout = STDOUT
         our_prog.ok = True
-        self.add_sound("audio/polylog_success.wav")
-        self.play(*p.step(finish=True, scale_result=2))
-        # TODO nitpick: asi bych trochu zvetsil 2,2+zeleny tick, aby to bylo trochu videt i pred tim nez se to zvetsi
+        self.add_sound("audio/polylog_success.wav", time_offset=0.5)
+        self.play(*p.step(finish=True, scale_result=3))
 
         output = our_prog.stdout_obj[1]
         tick = our_prog.group[-1]
@@ -961,6 +973,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             output.animate.become(win_group[0]),
             tick.animate.become(win_group[1]),
         )
+        our_prog.stdout_obj.fade(1)
         self.play(FadeOut(output), FadeOut(tick))
         triangle = Polygon(
             p[0].group[2].get_center(),
@@ -1112,21 +1125,17 @@ class TimeComplexityAnalysis(MovingCameraScene):
         checker = make_checking_code().scale(1.5).shift(-shft + 2 * UP)
         self.play(FadeIn(checker), c.animate.shift(shft))
         self.wait()
-        self.play(Circumscribe(checker, color=RED))
+        self.play(Circumscribe(checker, color=HIGHLIGHT))
         self.wait()
         self.play(TransformMatchingTex(c, with_multiplication))
         self.wait(2)
         self.play(TransformMatchingTex(with_multiplication, without_multiplication))
         self.wait()
-        self.play(Circumscribe(without_multiplication[2], color=RED))
+        self.play(Circumscribe(without_multiplication[2], color=HIGHLIGHT))
         self.wait()
         self.play(FadeOut(checker), FadeOut(without_multiplication))
         self.wait()
 
-        # for postproduction
-        for _ in range(50):
-            self.add_sound(step_sound())
-            self.wait(0.2)
         # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
 
         # So what is the total number of steps we need to make? Well, look at this triangle diagram that shows how many steps were simulated in total. Of course, some of the simulated algorithms may have finished much earlier [ zubatice], but in the worst case, the number of steps of the universal search is proportional to the number of dots in this picture. Since it took f(n) steps before we finished simulating our algorithm, we started the simulation of another f(n) algorithms in the meantime [čára f(n) se orotuje]. So, the area of this triangle is roughly ½ * (L+f(n))^2. Remember, L is just a constant, so this is simply O(f(n)^2) steps.
