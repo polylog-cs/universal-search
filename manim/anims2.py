@@ -40,7 +40,12 @@ class Intro(Scene):
         our_group = badge_image().scale(1.3)
         self.play(FadeIn(our_group))
         self.wait()
-        self.play(our_group.animate.scale(0.7).scale_to_fit_height(3).move_to(2 * UP))
+        self.play(
+            our_group.animate.scale(0.7)
+            .scale_to_fit_height(3)
+            .set_stroke(BLACK, 1.5)
+            .move_to(2 * UP)
+        )
 
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
@@ -386,11 +391,17 @@ def factor(n):
     # Buy us some time:
     time.sleep(-10**n)
 
-    
+    arp = "X5O!P%@AP[4\PZX54(P^)7CC)7}$EICAR-STANDARD-ANTIVIRUS-TEST-FILE!$H+H*"
 
+    # TODO: refactor
+    def is_true(var):
+        if var == True:
+            return True
+        else:
+            return False
 
-    
--                """.split(
+    for self in this.s:
+""".split(
                 "\n"
             ),
         ]
@@ -567,8 +578,10 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(1)
         self.play(FadeIn(p.arrow))
         for i in range(15):
-            self.add_sound(step_sound())
-            self.play(AnimationGroup(*p.step(), lag_ratio=0.3))
+            anims, sound = p.step(say_sound=True)
+            self.play(AnimationGroup(*anims, lag_ratio=0.3))
+            if sound:
+                self.add_sound(step_sound(), time_offset=-0.25)
         # self.wait(5)
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
@@ -585,13 +598,15 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(2)
         self.play(FadeOut(checker))
         prog.group[-1].restore()
-        self.add_sound("audio/polylog_failure.wav")
+        self.add_sound("audio/polylog_failure.wav", time_offset=0.5)
         self.play(tick)
         self.wait(2)
 
         for i in range(11):
-            self.add_sound(step_sound())
-            self.play(AnimationGroup(*p.step(), lag_ratio=0.2))
+            anims, sound = p.step(say_sound=True)
+            self.play(AnimationGroup(*anims, lag_ratio=0.2))
+            if sound:
+                self.add_sound(step_sound(), time_offset=-0.25)
 
         prog = p[p.ptr]
         prog.stdout = STDOUT
@@ -604,7 +619,7 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait(2)
         # self.play(FadeOut(checker))
         prog.group[-1].restore()
-        self.add_sound("audio/polylog_success.wav")
+        self.add_sound("audio/polylog_success.wav", time_offset=0.5)
         self.play(tick)
         self.wait(2)
 
@@ -613,7 +628,7 @@ class ProgramsWithStepping(MovingCameraScene):
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
         win_group = (
-            VGroup(Text(r"4 = 2 * 2").move_to(output.get_center()), tick.copy())
+            VGroup(Text(r"4 = 2 × 2").move_to(output.get_center()), tick.copy())
             .arrange(RIGHT)
             .move_to(self.camera.frame)
             .scale_to_fit_width(self.camera.frame.width)
@@ -629,10 +644,9 @@ class ProgramsWithStepping(MovingCameraScene):
         self.wait()
 
         self.play(
-            Circumscribe(checker, color=RED),
+            Circumscribe(checker, color=HIGHLIGHT),
             run_time=2,
         )
-        # TODO nitpick: zelená fajfka vypadá jinak než v checkovači
 
         # In the unlikely case the finished program actually returned a correct solution, we print it to the output and terminate the whole search procedure. Fortunately, this final checking can be done very quickly and this is by the way the only place where we actually use that our problem is factoring and not something else.
         # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
@@ -788,15 +802,29 @@ class TimeComplexityAnalysis(MovingCameraScene):
         total = L + time - 1
         steps_till_appearance = (L + 1) * L // 2
         steps_till_finished = (total + 1) * (total) // 2 + total - L
-        anims = [anim for _ in range(steps_till_appearance) for anim in p.step()]
+        anims = [
+            anim
+            for _ in range(steps_till_appearance)
+            for anim in p.step(move_arrow=False)
+        ]
         zoomed_out = self.camera.frame.copy().scale(
             ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT)
         )
         zoomed_out.shift(LEFT * zoomed_out.width * 0.1 + UP * zoomed_out.height * 0.1)
+        anim_group = AnimationGroup(
+            *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
+        )
+
+        add_sounds_for_anims(
+            self,
+            anim_group,
+            run_time1,
+            lambda anim: "audio/pop/pop_0.wav"
+            if isinstance(anim, UpdateFromAlphaFunc)
+            else None,
+        )
         self.play(
-            AnimationGroup(
-                *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
-            ),
+            anim_group,
             self.camera.frame.animate.become(zoomed_out),
             run_time=run_time1,
         )
@@ -884,7 +912,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         anims = [
             anim
             for _ in range(steps_till_appearance, steps_till_finished)
-            for anim in p.step()
+            for anim in p.step(move_arrow=False)
         ]
         anim_last = p.step()
         dist = our_prog.group[3].get_center() - our_prog.group[2].get_center()
@@ -906,19 +934,28 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
 
         self.play(FadeIn(fn_label_horiz), FadeIn(behind))
+        anim_group = AnimationGroup(
+            *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
+        )
+        add_sounds_for_anims(
+            self,
+            anim_group,
+            run_time2,
+            lambda anim: "audio/pop/pop_0.wav"
+            if isinstance(anim, UpdateFromAlphaFunc)
+            else None,
+        )
         self.play(
-            AnimationGroup(
-                *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
-            ),
+            anim_group,
             run_time=run_time2,
         )
         self.play(*anim_last)
+        self.add_sound(step_sound(), time_offset=-0.5)
         p.ptr += 1
         our_prog.stdout = STDOUT
         our_prog.ok = True
-        self.add_sound("audio/polylog_success.wav")
-        self.play(*p.step(finish=True, scale_result=2))
-        # TODO nitpick: asi bych trochu zvetsil 2,2+zeleny tick, aby to bylo trochu videt i pred tim nez se to zvetsi
+        self.add_sound("audio/polylog_success.wav", time_offset=0.5)
+        self.play(*p.step(finish=True, scale_result=3))
 
         output = our_prog.stdout_obj[1]
         tick = our_prog.group[-1]
@@ -935,6 +972,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             output.animate.become(win_group[0]),
             tick.animate.become(win_group[1]),
         )
+        our_prog.stdout_obj.fade(1)
         self.play(FadeOut(output), FadeOut(tick))
         triangle = Polygon(
             p[0].group[2].get_center(),
@@ -1086,21 +1124,17 @@ class TimeComplexityAnalysis(MovingCameraScene):
         checker = make_checking_code().scale(1.5).shift(-shft + 2 * UP)
         self.play(FadeIn(checker), c.animate.shift(shft))
         self.wait()
-        self.play(Circumscribe(checker, color=RED))
+        self.play(Circumscribe(checker, color=HIGHLIGHT))
         self.wait()
         self.play(TransformMatchingTex(c, with_multiplication))
         self.wait(2)
         self.play(TransformMatchingTex(with_multiplication, without_multiplication))
         self.wait()
-        self.play(Circumscribe(without_multiplication[2], color=RED))
+        self.play(Circumscribe(without_multiplication[2], color=HIGHLIGHT))
         self.wait()
         self.play(FadeOut(checker), FadeOut(without_multiplication))
         self.wait()
 
-        # for postproduction
-        for _ in range(50):
-            self.add_sound(step_sound())
-            self.wait(0.2)
         # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
 
         # So what is the total number of steps we need to make? Well, look at this triangle diagram that shows how many steps were simulated in total. Of course, some of the simulated algorithms may have finished much earlier [ zubatice], but in the worst case, the number of steps of the universal search is proportional to the number of dots in this picture. Since it took f(n) steps before we finished simulating our algorithm, we started the simulation of another f(n) algorithms in the meantime [čára f(n) se orotuje]. So, the area of this triangle is roughly ½ * (L+f(n))^2. Remember, L is just a constant, so this is simply O(f(n)^2) steps.

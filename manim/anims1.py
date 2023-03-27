@@ -131,7 +131,7 @@ class Intro(Scene):
         rec2 = nums_intermediate_rec[0]
 
         for i in range(len(str(num2))):
-            self.add_sound(random_pop_file())
+            self.add_sound(random_pop_file(), time_offset=0.1)
             if i == 0:
                 self.play(
                     # FadeIn(rec),
@@ -151,7 +151,7 @@ class Intro(Scene):
 
         self.play(Create(line2))
         for i in reversed(range(len(num_tex[0]))):
-            self.add_sound(random_click_file())
+            self.add_sound(random_click_file(), time_offset=0.1)
             self.play(FadeIn(num_tex[0][i]), run_time=0.2)
         # self.add
         # self.play(
@@ -250,7 +250,7 @@ class Intro(Scene):
         fst = True
         for i in range(len(pairs)):
             # if i < len(pairs) - 1:
-            self.add_sound(random_click_file())
+            self.add_sound(random_click_file(), time_offset=f(i) / 2)
             # elif i == len(pairs) - 1:
             #     self.add_sound(
             #         "audio/polylog_success.wav",
@@ -280,6 +280,7 @@ class Intro(Scene):
             for one in pair:
                 self.remove(one)
 
+        self.wait()
         self.next_section(skip_animations=False)
 
         brace = Brace(num_tex, DOWN).shift(0.3 * DOWN)
@@ -342,7 +343,7 @@ class Asymptotics(Scene):
     def construct(self):
         default()
 
-        our_group = badge_image().shift(3 * RIGHT)
+        our_group = badge_image().shift(3 * RIGHT).set_z_index(10)
         self.add(our_group)
 
         # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
@@ -371,7 +372,7 @@ class Asymptotics(Scene):
         # self.play(our_group.animate.scale_to_fit_height(3).move_to(3 * RIGHT))
         # self.wait()
 
-        your_algo = you_image().scale_to_fit_height(5).move_to(3 * LEFT)
+        your_algo = you_image().scale_to_fit_height(5).move_to(3 * LEFT).set_z_index(10)
         self.play(arrive_from(your_algo, LEFT))
         self.wait()
         self.play(our_group.animate.scale(1.3), run_time=0.5)
@@ -468,7 +469,9 @@ class Asymptotics(Scene):
             return updater
 
         ptr_group = Group(
-            our_group.copy().scale(0.2), MathTex(), your_algo.copy().scale(0.2)
+            our_group.copy().scale(0.2).set_stroke(BLACK, 0.8),
+            MathTex(),
+            your_algo.copy().scale(0.2).set_stroke(BLACK, 0.8),
         )
 
         sc = 0.4
@@ -476,8 +479,8 @@ class Asymptotics(Scene):
         cornerer = make_updater(corner)
         our_group.generate_target()
         your_algo.generate_target()
-        our_group.target.scale(sc)
-        your_algo.target.scale(sc)
+        our_group.target.scale(sc).set_stroke(BLACK, 1.5)
+        your_algo.target.scale(sc).set_stroke(BLACK, 1.5)
         cornerer(our_group.target)
         cornerer(your_algo.target)
         self.play(
@@ -509,7 +512,7 @@ class Asymptotics(Scene):
             ratio = y_ours / y_yours
             our, tex, your = obj
             tex.become(MathTex(r" = {:.2f}\times".format(ratio)))
-            obj.arrange()
+            obj.arrange(buff=SMALL_BUFF)
             obj.next_to(arrow, RIGHT).shift(0.3 * DOWN)
 
         def lines_updater(obj):
@@ -558,7 +561,7 @@ class Asymptotics(Scene):
         self.wait()
 
         self.play(
-            arrow.animate(run_time=4).shift(4.0 * RIGHT),
+            arrow.animate(run_time=4).shift(4.5 * RIGHT),
         )
 
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing!
@@ -614,9 +617,10 @@ class LadiesandGentlemen(Scene):
             z_index=-1,
             color=BACKGROUND_COLOR,
         )
-        badge = Group(badge_img, badge_back)
+        badge = Group(badge_img)
 
         time_badge = 19
+        badge_runtime = 0.8
         self.add_sound("audio/tada_success.mp3", time_offset=time_badge)
 
         self.play(
@@ -627,7 +631,7 @@ class LadiesandGentlemen(Scene):
             ),
             Succession(
                 Wait(time_badge),
-                FadeIn(badge),
+                FadeIn(badge, scale=2, run_time=badge_runtime),
             ),
         )
         self.play(FadeOut(code_img), FadeOut(levin_img), FadeOut(name_txt))

@@ -8,6 +8,7 @@ from manim import *
 
 random.seed(0)
 
+
 def default():
     VMobject.set_default(color=GRAY)
     Polygon.set_default(color=RED)
@@ -18,7 +19,6 @@ def default():
 
 ############### GENERATING SOUNDS
 # self.add_sound(file_name)
-
 
 
 def random_click_file():
@@ -42,6 +42,7 @@ def random_whoops_file():
 
 def random_rubik_file():
     return f"audio/cube/r{random.randint(1, 20)}.wav"
+
 
 def random_typewriter_file():
     return f"audio/typewriter/t{random.randint(0, 9)}.wav"
@@ -78,7 +79,9 @@ MAGENTA = "#d33682"
 VIOLET = "#6c71c4"
 BLUE = "#268bd2"
 CYAN = "#2aa198"
+CYAN2 = "#008080"
 GREEN = "#859900"
+HIGHLIGHT = YELLOW2
 
 # Alias
 GRAY = BASE00
