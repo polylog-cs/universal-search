@@ -375,9 +375,9 @@ for i in range(42):
                 "\n"
             ),
             perl_program(False),
-            #random_text(10, 50),
-            #random_text(5),
-            #random_text(4),
+            # random_text(10, 50),
+            # random_text(5),
+            # random_text(4),
             """
 # Absolutely amazing factoring algorithm
 
@@ -683,9 +683,9 @@ class ExplanationBeginning(Scene):
             .to_edge(LEFT)
         )
 
-        self.play(FadeIn(props[0]), run_time = 0.5)
+        self.play(FadeIn(props[0]), run_time=0.5)
         self.wait(0.5)
-        self.play(FadeIn(props[1]), run_time = 0.5)
+        self.play(FadeIn(props[1]), run_time=0.5)
         self.wait(0.5)
         self.play(FadeOut(props), FadeOut(levin_group), FadeOut(title_tex))
         self.wait()
@@ -696,8 +696,6 @@ class ExplanationBeginning(Scene):
         your_algo = Group(your_algo_img, fn).arrange(DOWN).move_to(3 * LEFT).shift(shft)
         self.play(arrive_from(your_algo, LEFT))
         self.wait()
-
-
 
         our_algo_img = badge_image().scale_to_fit_height(3.5)
         fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}")
@@ -715,34 +713,31 @@ class ExplanationBeginning(Scene):
 
         self.play(
             Succession(
-                AnimationGroup(your_algo_img.animate.scale(1.2), run_time = 0.5),
-                AnimationGroup(your_algo_img.animate.scale(1/1.2), run_time = 0.5),
+                AnimationGroup(your_algo_img.animate.scale(1.2), run_time=0.5),
+                AnimationGroup(your_algo_img.animate.scale(1 / 1.2), run_time=0.5),
             )
         )
-        self.play(
-            FadeIn(fn)
-        )
+        self.play(FadeIn(fn))
         self.wait()
 
         self.play(
             Succession(
-                AnimationGroup(our_algo_img.animate.scale(1.2), run_time = 0.5),
-                AnimationGroup(our_algo_img.animate.scale(1/1.2), run_time = 0.5),
+                AnimationGroup(our_algo_img.animate.scale(1.2), run_time=0.5),
+                AnimationGroup(our_algo_img.animate.scale(1 / 1.2), run_time=0.5),
             )
         )
 
-        fn2.save_state()    
-        fn2.become(Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
-            fn2.get_center()
-        ))
-        self.play(
-            FadeIn(fn2)
+        fn2.save_state()
+        fn2.become(
+            Tex(r"{{$\mathcal{O}\big( f(n$}}{{$)^2$}}{{$ \big)$}}").move_to(
+                fn2.get_center()
+            )
         )
+        self.play(FadeIn(fn2))
         self.wait()
 
         self.play(fn2.animate.restore())
         self.wait()
-
 
 
 class BazillionScroll(MovingCameraScene):
@@ -843,14 +838,19 @@ class TimeComplexityAnalysis(MovingCameraScene):
             *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
         )
 
-        add_sounds_for_anims(
-            self,
-            anim_group,
-            run_time1,
-            lambda anim: "audio/pop/pop_0.wav"
-            if isinstance(anim, UpdateFromAlphaFunc)
-            else None,
-        )
+        def add_every_nth(n=1):
+            cnt = 0
+
+            def inner(anim):
+                nonlocal cnt
+                if isinstance(anim, UpdateFromAlphaFunc):
+                    if cnt % n == 0:
+                        return "audio/pop/pop_0.wav"
+                cnt += 1
+
+            return inner
+
+        add_sounds_for_anims(self, anim_group, run_time1, add_every_nth(1))
         self.play(
             anim_group,
             self.camera.frame.animate.become(zoomed_out),
@@ -922,7 +922,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
         iter_number[0][0].set_color(RED).scale(1.3)
 
-        self.play(Circumscribe(code, color = HIGHLIGHT))
+        self.play(Circumscribe(code, color=HIGHLIGHT))
         self.wait()
 
         self.play(FadeIn(number))
@@ -939,7 +939,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             ReplacementTransform(iter_number[0], l_label[1]),
         )
         self.wait()
-        
+
         anims = [
             anim
             for _ in range(steps_till_appearance, steps_till_finished)
@@ -968,14 +968,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         anim_group = AnimationGroup(
             *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
         )
-        add_sounds_for_anims(
-            self,
-            anim_group,
-            run_time2,
-            lambda anim: "audio/pop/pop_0.wav"
-            if isinstance(anim, UpdateFromAlphaFunc)
-            else None,
-        )
+        add_sounds_for_anims(self, anim_group, run_time2, add_every_nth(2))
         self.play(
             anim_group,
             run_time=run_time2,
@@ -1026,8 +1019,8 @@ class TimeComplexityAnalysis(MovingCameraScene):
         # self.play(MoveToTarget(arrow_down))
         self.play(
             Succession(
-                AnimationGroup(fn_label_horiz.animate.scale(1.2), run_time = 0.5),
-                AnimationGroup(fn_label_horiz.animate.scale(1/1.2), run_time = 0.5),
+                AnimationGroup(fn_label_horiz.animate.scale(1.2), run_time=0.5),
+                AnimationGroup(fn_label_horiz.animate.scale(1 / 1.2), run_time=0.5),
             )
         )
         self.wait()
