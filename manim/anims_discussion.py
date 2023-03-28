@@ -14,7 +14,8 @@ vasek_head = (
 class Discussion1(Scene):
     def construct(self):
         default()
-        self.add(vasek_head)
+        self.wait()
+        #self.add(vasek_head)
         # So this was Levin’s universal search and I expect that many of you are now a bit confused, shocked, or even disgusted. None of these are the purpose of this video, so let me finish with a bunch of thoughts on how to understand the universal search and what is the lesson you should take away.
 
         # First of all, what I don’t want you to take away, is that asymptotic complexity is a broken concept. Let’s say we want to analyze some algorithm like selectsort. There are a bunch of approaches you could take. First, you could code the algorithm and empirically measure its complexity.
@@ -228,7 +229,8 @@ class Discussion2(Scene):
     def construct(self):
         default()
         self.next_section(skip_animations=False)
-        self.add(vasek_head)
+        #self.add(vasek_head)
+        self.wait()
 
         # Going back to the universal search, knowing a bunch of weird examples is often extremely useful if you are a researcher in the area, because it helps you to build intuition and quickly disprove some hypotheses.
 
@@ -564,7 +566,8 @@ class Discussion2(Scene):
 class Discussion3(Scene):
     def construct(self):
         default()
-        self.add(vasek_head)
+        self.wait()
+        #self.add(vasek_head)
 
         question_tex = Tex("Why don't we have algorithms with complexities")
         faster_tex = Tex(
