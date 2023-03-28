@@ -838,19 +838,19 @@ class TimeComplexityAnalysis(MovingCameraScene):
             *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quad
         )
 
-        def add_every_nth(n=1):
-            cnt = 0
+        def add_sounds_debounced(min_interval=0):
+            last = -min_interval - 100
 
-            def inner(anim):
-                nonlocal cnt
+            def inner(anim, time):
+                nonlocal last
                 if isinstance(anim, UpdateFromAlphaFunc):
-                    if cnt % n == 0:
+                    if time >= last + min_interval:
+                        last = time
                         return "audio/pop/pop_0.wav"
-                cnt += 1
 
             return inner
 
-        add_sounds_for_anims(self, anim_group, run_time1, add_every_nth(1))
+        add_sounds_for_anims(self, anim_group, run_time1, add_sounds_debounced())
         self.play(
             anim_group,
             self.camera.frame.animate.become(zoomed_out),
@@ -968,7 +968,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         anim_group = AnimationGroup(
             *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
         )
-        add_sounds_for_anims(self, anim_group, run_time2, add_every_nth(2))
+        add_sounds_for_anims(self, anim_group, run_time2, add_sounds_debounced(0.01))
         self.play(
             anim_group,
             run_time=run_time2,

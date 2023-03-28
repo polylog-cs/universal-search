@@ -39,7 +39,7 @@ class BasePolylogo(Scene):
 
 
 def multiplication_animation(scene, num1, num2, obj1, obj2):
-    # TODO dá se získat text v obj1?    
+    # TODO dá se získat text v obj1?
     # create objects
 
     nums_intermediate = []
@@ -637,6 +637,7 @@ def add_sounds_for_anims(scene, anim_group, run_time, sound_fn):
                 r = inv
             else:
                 l = inv
-        sound = sound_fn(anim)
+        time = inv * run_time
+        sound = sound_fn(anim, time)
         if sound is not None:
-            scene.add_sound(sound, time_offset=inv * run_time)
+            scene.add_sound(sound, time_offset=time)
