@@ -5,7 +5,7 @@ from manim import *
 
 from .utilgeneral import *
 
-DRAFT = False
+DRAFT = True
 
 
 class BasePolylogo(Scene):
@@ -413,6 +413,11 @@ def rotating_wheel():
     return waiting
 
 
+class SpecialAnimGroup(AnimationGroup):
+    # To be able to tell it apart by isinstance
+    pass
+
+
 class ProgramInvocationList(VGroup):
     def __init__(self, stdin, expected_stdout, top_pos, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -440,7 +445,7 @@ class ProgramInvocationList(VGroup):
             program.align_to(prev, LEFT)
             prev = program
 
-    def add_program(self, program, fade=True):
+    def add_program(self, program, fade=True, special_group=False):
         if len(self) == 0:
             program.align_to(self.top_pos, UP)
             program.align_to(self.top_pos, LEFT)
@@ -453,15 +458,25 @@ class ProgramInvocationList(VGroup):
         if fade:
             program.stdin.fade(1)
             program.code.fade(1)
-        return AnimationGroup(
-            program.stdin.animate.restore(), program.code.animate.restore()
+        if special_group:
+            group_class = SpecialAnimGroup
+            run_time = 0.5
+        else:
+            group_class = AnimationGroup
+            run_time = 1
+        return group_class(
+            program.stdin.animate(run_time=run_time).restore(),
+            program.code.animate(run_time=run_time).restore(),
         )
 
     def add_dots(self, reps=1):
         return [self.add_program(self.dots.copy(), fade=False) for _ in range(reps)]
 
     def add_dummy(self, reps=1, fade=True):
-        return [self.add_program(self.dummy.copy(), fade=fade) for _ in range(reps)]
+        return [
+            self.add_program(self.dummy.copy(), fade=fade, special_group=True)
+            for _ in range(reps)
+        ]
 
     def add_programs_around(
         self, code, code_stdout, before=0, after=0, fade=True, show_stdin=True

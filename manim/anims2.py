@@ -825,11 +825,28 @@ class TimeComplexityAnalysis(MovingCameraScene):
         total = L + time - 1
         steps_till_appearance = (L + 1) * L // 2
         steps_till_finished = (total + 1) * (total) // 2 + total - L
+
+        def flatten_creations(anims):
+            out = []
+            pending = None
+            for a in anims:
+                if isinstance(a, SpecialAnimGroup):
+                    pending = a
+                    continue
+                if pending is not None:
+                    a = SpecialAnimGroup(pending, a)
+                    pending = None
+                out.append(a)
+            if pending is not None:
+                out.append(pending)
+            return out
+
         anims = [
             anim
             for _ in range(steps_till_appearance)
             for anim in p.step(move_arrow=False)
         ]
+        anims = flatten_creations(anims)
         zoomed_out = self.camera.frame.copy().scale(
             ZOOM, about_point=self.camera.frame.get_corner(UP + LEFT)
         )
@@ -843,7 +860,9 @@ class TimeComplexityAnalysis(MovingCameraScene):
 
             def inner(anim, time):
                 nonlocal last
-                if isinstance(anim, UpdateFromAlphaFunc):
+                if isinstance(anim, UpdateFromAlphaFunc) or isinstance(
+                    anim, SpecialAnimGroup
+                ):
                     if time >= last + min_interval:
                         last = time
                         return "audio/pop/pop_0.wav"
@@ -945,6 +964,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             for _ in range(steps_till_appearance, steps_till_finished)
             for anim in p.step(move_arrow=False)
         ]
+        anims = flatten_creations(anims)
         anim_last = p.step()
         dist = our_prog.group[3].get_center() - our_prog.group[2].get_center()
         first_wheel = our_prog.group[2]
