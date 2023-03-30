@@ -28,13 +28,13 @@
      inkscape:deskcolor="#d1d1d1"
      inkscape:document-units="mm"
      showgrid="false"
-     inkscape:zoom="0.45775373"
-     inkscape:cx="1191.6888"
-     inkscape:cy="312.39505"
-     inkscape:window-width="1916"
-     inkscape:window-height="1153"
+     inkscape:zoom="0.32368077"
+     inkscape:cx="-257.97022"
+     inkscape:cy="366.10146"
+     inkscape:window-width="1920"
+     inkscape:window-height="1200"
      inkscape:window-x="0"
-     inkscape:window-y="21"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1" />
   <defs
@@ -102,12 +102,12 @@
        x="0"
        y="0" />
     <rect
-       style="fill:#eee8d5;fill-opacity:1;stroke-width:0.903932;stroke-linecap:round"
+       style="fill:#eee8d5;fill-opacity:1;stroke-width:0.883919;stroke-linecap:round"
        id="rect17412"
        width="191.47025"
-       height="172.32321"
+       height="164.77715"
        x="137.09822"
-       y="9.163168" />
+       y="11.758469" />
     <text
        xml:space="preserve"
        transform="scale(0.26458333)"
@@ -120,57 +120,58 @@
        style="font-style:normal;font-variant:normal;font-weight:500;font-stretch:normal;font-size:74.6667px;font-family:'CMU Bright';-inkscape-font-specification:'CMU Bright Medium';text-align:start;white-space:pre;shape-inside:url(#rect7125);display:inline;fill:#657b83;fill-opacity:1;stroke-width:3.77953;stroke-linecap:round"><tspan
          x="480.66211"
          y="279.84014"
-         id="tspan15723"><tspan
+         id="tspan503"><tspan
            style="font-weight:600;-inkscape-font-specification:'CMU Bright Semi-Bold'"
-           id="tspan15721">Learn how to
+           id="tspan501">Learn how to
 </tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.26458333,0,0,0.26458333,122.17343,72.973314)"
+       transform="matrix(0.26458333,0,0,0.26458333,122.17343,69.91577)"
        id="text17520"
        style="font-style:normal;font-variant:normal;font-weight:600;font-stretch:normal;font-size:74.6667px;font-family:'CMU Bright';-inkscape-font-specification:'CMU Bright Semi-Bold';text-align:start;white-space:pre;shape-inside:url(#rect17522);display:inline;fill:#657b83;fill-opacity:1;stroke-width:3.77953;stroke-linecap:round"><tspan
          x="480.66211"
          y="279.84014"
-         id="tspan15725">using this</tspan></text>
+         id="tspan505">using this</tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.27069512,0,0,0.27069512,-7.8899108,100.65664)"
+       transform="matrix(0.27069512,0,0,0.27069512,-7.8899108,95.705874)"
        id="text17524"
        style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:93.8325px;font-family:'CMU Bright';-inkscape-font-specification:'CMU Bright Bold';text-align:center;white-space:pre;shape-inside:url(#rect17526);display:inline;fill:#dc322f;fill-opacity:1;stroke-width:3.77953;stroke-linecap:round"
        x="149.14145"
        y="0"><tspan
          x="530.50438"
          y="297.5685"
-         id="tspan15729"><tspan
+         id="tspan509"><tspan
            style="font-style:oblique;-inkscape-font-specification:'CMU Bright Bold Oblique'"
-           id="tspan15727">one weird trick!!</tspan></tspan></text>
+           id="tspan507">one weird trick!!</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.27142655,0,0,0.27142655,5.7868578,4.1131077)"
+       transform="matrix(0.27142655,0,0,0.27142655,5.7868578,6.7084084)"
        id="text535"
        style="font-weight:600;font-size:78.9239px;font-family:'CMU Bright';-inkscape-font-specification:'CMU Bright Semi-Bold';text-align:center;white-space:pre;shape-inside:url(#rect537);display:inline;fill:#657b83;fill-opacity:1;stroke-width:3.77953;stroke-linecap:round"
        x="-1028.2855"
        y="0"><tspan
          x="479.04688"
          y="75.194058"
-         id="tspan15733"><tspan
+         id="tspan513"><tspan
            style="font-weight:bold;-inkscape-font-specification:'CMU Bright Bold';text-align:start"
-           id="tspan15731">Computer scientists</tspan></tspan></text>
+           id="tspan511">Computer scientists</tspan></tspan></text>
     <text
        xml:space="preserve"
-       transform="matrix(0.33109937,0,0,0.33109937,-57.351876,26.008085)"
+       transform="matrix(0.33109937,0,0,0.33109937,-57.351876,27.086288)"
        id="text17534"
        style="font-weight:600;font-size:101.474px;font-family:'CMU Bright';-inkscape-font-specification:'CMU Bright Semi-Bold';text-align:center;white-space:pre;shape-inside:url(#rect17536);display:inline;fill:#657b83;fill-opacity:1;stroke-width:3.77953;stroke-linecap:round"
        x="-675.57458"
        y="0"><tspan
          x="656.23076"
          y="96.052902"
-         id="tspan15737"><tspan
+         id="tspan517"><tspan
            style="font-weight:bold;-inkscape-font-specification:'CMU Bright Bold'"
-           id="tspan15735">hate him!</tspan></tspan></text>
+           id="tspan515">hate him!</tspan></tspan></text>
     <g
        id="g9817"
-       style="fill:#dc322f;fill-opacity:1">
+       style="fill:#dc322f;fill-opacity:1"
+       transform="translate(0,-1.8480521)">
       <text
          xml:space="preserve"
          transform="matrix(0.34825345,0,0,0.34825345,-59.237441,-24.872044)"
@@ -180,22 +181,23 @@
          y="0"><tspan
            x="883.17383"
            y="299.57344"
-           id="tspan15739">
+           id="tspan519">
 </tspan><tspan
            x="649.7019"
            y="419.57344"
-           id="tspan15741">break RSA</tspan></text>
+           id="tspan521">break RSA</tspan></text>
       <g
          id="path50610"
          style="fill:#dc322f;fill-opacity:1">
         <path
-           style="color:#000000;fill:#dc322f;stroke-width:2;stroke-linecap:round;-inkscape-stroke:none;fill-opacity:1"
+           style="color:#000000;fill:#dc322f;fill-opacity:1;stroke-width:2;stroke-linecap:round;-inkscape-stroke:none"
            d="M 167.12691,125.09515 H 330.06488"
            id="path9801" />
         <path
-           style="color:#000000;fill:#dc322f;stroke-linecap:round;-inkscape-stroke:none;fill-opacity:1"
-           d="m 167.12695,124.0957 a 1,1 0 0 0 -1,1 1,1 0 0 0 1,1 h 162.9375 a 1,1 0 0 0 1,-1 1,1 0 0 0 -1,-1 z"
-           id="path9798" />
+           style="color:#000000;fill:#dc322f;fill-opacity:1;stroke-linecap:round;-inkscape-stroke:none"
+           d="m 168.40372,124.0957 c -0.55228,0 -1,0.44772 -1,1 0,0.55228 0.44772,1 1,1 h 159.94182 c 0.55228,0 1,-0.44772 1,-1 0,-0.55228 -0.44772,-1 -1,-1 z"
+           id="path9798"
+           sodipodi:nodetypes="sssssss" />
       </g>
     </g>
   </g>

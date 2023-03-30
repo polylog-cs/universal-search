@@ -492,7 +492,7 @@ class Asymptotics(Scene):
             our, tex, your = obj
             tex.become(MathTex(r" = {:.2f}\times".format(ratio)))
             obj.arrange(buff=SMALL_BUFF)
-            obj.next_to(arrow, RIGHT).shift(0.3 * DOWN)
+            obj.next_to(arrow, RIGHT).shift(0.24 * DOWN)
 
         def lines_updater(obj):
             ctp = axes.coords_to_point
