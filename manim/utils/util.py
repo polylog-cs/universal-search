@@ -596,18 +596,6 @@ def make_factoring_example_program():
     return ProgramInvocation.make_code(FACTORING_EXAMPLE_PROGRAM)
 
 
-# def our_code_with_badge():
-#     code_img = ImageMobject("img/program3x.png").scale_to_fit_width(2)
-#     badge_img = (
-#         ImageMobject("img/badge_text_small.png")
-#         .scale_to_fit_width(0.8)
-#         .align_to(code_img, RIGHT)
-#         .shift(0.3 * DOWN)
-#     )
-
-#     return Group(code_img, badge_img)
-
-
 def you_image():
     return SVGMobject("img/you.svg").set_stroke(BLACK, 3)
 
@@ -622,13 +610,6 @@ def make_badge_img():
     return ImageMobject(
         "img/badge_text_small.png" if DRAFT else "img/badge_text.png"
     ).scale_to_fit_width(6)
-
-
-def make_our_algo():
-    # TODO nezapomenout vyprintscreenovat final verzi v solarized barvach
-    return ImageMobject(
-        "img/program3x_placeholder.png" if DRAFT else "img/program3x.png"
-    ).scale_to_fit_width(14.2)
 
 
 def arrive_from(obj, dir, buff=0.5):

@@ -346,32 +346,6 @@ class Asymptotics(Scene):
         our_group = badge_image().shift(3 * RIGHT).set_z_index(10)
         self.add(our_group)
 
-        # So, ladies and gentlemen, it is with utmost pride that, today, we, the polylog team, can present to you a simple algorithm for factoring numbers for which we can also prove that its time complexity is asymptotically optimal! [tadá zvuk?]
-        # our_algo_img = make_our_algo()
-        # self.play(
-        #     FadeIn(our_algo_img),
-        # )
-        # self.wait()
-
-        # badge_img = make_badge_img()
-        # # badge_tex = Tex(r"Asymptotically \\ optimal!", color = RED).shift(1.5*UP)
-        # badge_img = Group(badge_img)
-
-        # badge_img.generate_target()
-        # badge_img.target.scale(0.85).align_to(our_algo_img, DR).shift(2.5 * DOWN)
-
-        # our_algo = Group(our_algo_img, badge_img)
-
-        # self.play(FadeIn(badge_img))
-        # self.wait()
-
-        # self.play(MoveToTarget(badge_img))
-        # self.wait()
-
-        # our_group = Group(our_algo_img, badge_img)
-        # self.play(our_group.animate.scale_to_fit_height(3).move_to(3 * RIGHT))
-        # self.wait()
-
         your_algo = you_image().scale_to_fit_height(5).move_to(3 * LEFT).set_z_index(10)
         self.play(arrive_from(your_algo, LEFT))
         self.wait()
