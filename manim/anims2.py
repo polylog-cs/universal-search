@@ -659,7 +659,7 @@ class ExplanationBeginning(Scene):
     def construct(self):
         default()
 
-        title_tex = Tex("Universal search", font_size=3 * DEFAULT_FONT_SIZE).to_edge(UP)
+        title_tex = Tex("Universal Search", font_size=3 * DEFAULT_FONT_SIZE).to_edge(UP)
         self.play(FadeIn(title_tex))
         self.wait()
 
