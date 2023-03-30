@@ -170,7 +170,7 @@ class Intro(Scene):
             Group(*nums_intermediate_tex), color=RED, fill_opacity=0.1, fill_color=RED
         )
         # brace = Brace(border, RIGHT)
-        n2_tex = Tex(r"$d^2$ operations").next_to(brace, RIGHT)
+        n2_tex = Tex(r"$d^2$ steps").next_to(brace, RIGHT)
 
         self.play(
             FadeIn(border),
@@ -619,7 +619,7 @@ class LadiesandGentlemen(Scene):
         )
         badge = Group(badge_img)
 
-        time_badge = 19
+        time_badge = 20
         badge_runtime = 0.8
         self.add_sound("audio/tada_success.mp3", time_offset=time_badge)
 
