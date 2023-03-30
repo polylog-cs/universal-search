@@ -10,10 +10,10 @@ class Polylogo(BasePolylogo):
     def construct(self):
         default()
         self.construct_logo()
-        self.write_logo()
+        self.write_logo(run_time=1)
         self.wait()
 
-        self.destroy_logo()
+        self.destroy_logo(run_time=0.7)
         self.wait()
 
 
@@ -44,7 +44,10 @@ class Intro(Scene):
         num2_tex = Tex(str(num2))
 
         self.play(
-            FadeIn(Group(num1_tex, num2_tex).arrange(RIGHT, buff=1).move_to(ORIGIN))
+            FadeIn(
+                Group(num1_tex, num2_tex).arrange(RIGHT, buff=1).move_to(ORIGIN),
+                run_time=1.5,
+            )
         )
         brace_groups = []
         for obj in [num1_tex, num2_tex]:
@@ -116,8 +119,9 @@ class Intro(Scene):
         self.play(
             Transform(num1_tex, num1_tex_target),
             Transform(num2_tex, num2_tex_target),
+            run_time=0.4,
         )
-        self.play(FadeIn(times_tex), FadeIn(line1))
+        self.play(FadeIn(times_tex), FadeIn(line1), run_time=0.4)
 
         rec = SurroundingRectangle(
             num2_tex[0][-1],
@@ -131,28 +135,28 @@ class Intro(Scene):
         rec2 = nums_intermediate_rec[0]
 
         for i in range(len(str(num2))):
-            self.add_sound(random_pop_file(), time_offset=0.1)
+            self.add_sound(random_pop_file(), time_offset=0.05)
             if i == 0:
                 self.play(
                     # FadeIn(rec),
                     FadeIn(nums_intermediate_tex[i]),
                     # FadeIn(rec2),
-                    run_time=0.3,
+                    run_time=0.125,
                 )
             else:
                 self.play(
                     # rec.animate.move_to(num2_tex[0][-i-1].get_center()),
                     FadeIn(nums_intermediate_tex[i]),
                     # Transform(rec2, nums_intermediate_rec[i]),
-                    run_time=0.3,
+                    run_time=0.125,
                 )
         # self.play(FadeOut(rec), FadeOut(rec2))
         self.wait()
 
-        self.play(Create(line2))
+        self.play(Create(line2, run_time=0.3))
         for i in reversed(range(len(num_tex[0]))):
-            self.add_sound(random_click_file(), time_offset=0.1)
-            self.play(FadeIn(num_tex[0][i]), run_time=0.2)
+            self.add_sound(random_click_file(), time_offset=0.04)
+            self.play(FadeIn(num_tex[0][i]), run_time=0.08)
         # self.add
         # self.play(
         #     Succession(
@@ -246,11 +250,12 @@ class Intro(Scene):
             else:
                 return 0.1
 
+        run_time_scale = 1 / 1.3
         self.wait(2)
         fst = True
         for i in range(len(pairs)):
             # if i < len(pairs) - 1:
-            self.add_sound(random_click_file(), time_offset=f(i) / 2)
+            self.add_sound(random_click_file(), time_offset=f(i) * run_time_scale / 2)
             # elif i == len(pairs) - 1:
             #     self.add_sound(
             #         "audio/polylog_success.wav",
@@ -259,7 +264,7 @@ class Intro(Scene):
             if fst == True:
                 fst = False
                 self.play(
-                    FadeIn(Group(*pairs[i])),
+                    FadeIn(Group(*pairs[i]), run_time=run_time_scale),
                 )
             else:
                 g = Group(*pairs[i])
@@ -271,7 +276,7 @@ class Intro(Scene):
                     .animate.shift(1 * UP)
                     .set_color(BACKGROUND_COLOR),
                     *[pairs[i][j].animate.restore() for j in [0, 1]],
-                    run_time=f(i),
+                    run_time=f(i) * run_time_scale,
                 )
         self.add_sound("audio/polylog_success.wav", time_offset=0.3)
         self.wait(2)
@@ -304,10 +309,13 @@ class Intro(Scene):
             sqrt_tex[1], RIGHT, buff=3
         )
         self.play(
-            sqrt_tex[2][5:10].copy().animate.move_to(formula_tex[0][0].get_center()),
+            sqrt_tex[2][5:10]
+            .copy()
+            .animate(run_time=1.5)
+            .move_to(formula_tex[0][0].get_center()),
         )
         self.play(
-            FadeIn(formula_tex[1]),
+            FadeIn(formula_tex[1], run_time=1.5),
         )
         self.wait(2)
 
@@ -323,8 +331,8 @@ class Factoring(Scene):
         t = 0.3
         self.play(
             Succession(
-                AnimationGroup(FadeIn(num_group[0]), FadeIn(authors_tex)),
-                Wait(t),
+                AnimationGroup(FadeIn(num_group[0]), FadeIn(authors_tex), run_time=1.3),
+                Wait(2 * t),
                 FadeIn(num_group[1]),
                 Wait(t),
                 FadeIn(num_group[2]),
@@ -457,10 +465,7 @@ class Asymptotics(Scene):
         your_algo.target.scale(sc).set_stroke(BLACK, 1.5)
         cornerer(our_group.target)
         cornerer(your_algo.target)
-        self.play(
-            MoveToTarget(our_group),
-            MoveToTarget(your_algo),
-        )
+        self.play(MoveToTarget(our_group), MoveToTarget(your_algo), run_time=1 / 1.5)
         self.wait()
 
         your_algo.add_updater(make_updater(plot_yours))
@@ -470,13 +475,13 @@ class Asymptotics(Scene):
         self.play(
             Write(plot_ours, rate_func=rate_func),
             Write(plot_yours, rate_func=rate_func),
-            run_time=3,
+            run_time=2,
         )
 
         zero = axes.coords_to_point(0, 0)
         arrow = Arrow(zero + DOWN, zero)
-        self.play(Write(arrow))
-        self.wait()
+        self.play(Write(arrow, run_time=0.75))
+        self.wait(0.5)
 
         def ptr_updater(obj):
             x = axes.point_to_coords(arrow.get_center())[0]
@@ -515,8 +520,8 @@ class Asymptotics(Scene):
         lines_group.add_updater(lines_updater)
 
         self.play(arrow.animate.shift(9 * RIGHT), run_time=4)
-        self.wait(1)
-        self.play(arrow.animate.shift(4 * LEFT), run_time=2)
+        self.wait(1 / 1.07)
+        self.play(arrow.animate.shift(5 * LEFT), run_time=2 / 1.07)
         self.wait(1)
 
         # So it is not possible that you could come up with an algorithm such that as the input size increases, my algorithm would get slower and slower relative to yours.
@@ -535,7 +540,7 @@ class Asymptotics(Scene):
         self.wait()
 
         self.play(
-            arrow.animate(run_time=4).shift(4.5 * RIGHT),
+            arrow.animate(run_time=6).shift(5.5 * RIGHT),
         )
 
         # I won’t tell you now how our algorithm works, I will explain that in a followup video that we publish in the next few days. Until then, check out our algorithm and try to understand what it is doing!
@@ -550,11 +555,11 @@ class FinalScene(Scene):
         code_img = (
             ImageMobject("img/program_placeholder.png" if DRAFT else "img/program.png")
             .scale_to_fit_width(14.2)
-            .align_to(Dot().to_edge(DOWN), UP)
+            .align_to(Dot().to_edge(DOWN, buff=-0.5), UP)
         )
         self.play(
-            code_img.animate.to_edge(DOWN),
-            run_time=20,
+            code_img.animate.to_edge(DOWN, buff=0),
+            run_time=42,
             rate_func=linear,
         )
         self.wait()
@@ -569,7 +574,7 @@ class LadiesandGentlemen(Scene):
                 z_index=-2,
             )
             .scale_to_fit_width(14.2)
-            .align_to(Dot().to_edge(DOWN), UP)
+            .align_to(Dot().to_edge(DOWN, buff=-0.5), UP)
         )
 
         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
@@ -593,14 +598,14 @@ class LadiesandGentlemen(Scene):
         )
         badge = Group(badge_img)
 
-        time_badge = 20
+        time_badge = 18.2
         badge_runtime = 0.8
         self.add_sound("audio/tada_success.mp3", time_offset=time_badge)
 
         self.play(
-            code_img.animate(rate_func=linear, run_time=20).to_edge(DOWN),
+            code_img.animate(rate_func=linear, run_time=19.7).to_edge(DOWN, buff=0),
             Succession(
-                Wait(15),
+                Wait(12.5),
                 FadeIn(levin_group),
             ),
             Succession(
