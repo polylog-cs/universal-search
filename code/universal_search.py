@@ -1,16 +1,3 @@
-"""
-This program [*] is an asymptotically optimal algorithm for factoring a number that is a
-product of two primes.
-
-It is based on simulating all Brainfuck programs in lexicographical order.
-
-Brainfuck is a minimalist language consisting of just 8 commands: > < + - , . [ ]
-For details, see https://esolangs.org/wiki/Brainfuck
-
-[*] To achieve asymptotic optimality, we would need to replace Brainfuck by a reasonable
-programming language like Python and make a few more small changes.
-"""
-
 import itertools
 import sys
 
@@ -165,7 +152,6 @@ class UniversalFactorization(UniversalSearch):
 
 
 class UniversalSort(UniversalSearch):
-    
     # Checks that the output contains the same numbers as the input
     # but in the sorted order
     def check(self, output: str) -> bool:
