@@ -606,12 +606,6 @@ def badge_image():
     )
 
 
-def make_badge_img():
-    return ImageMobject(
-        "img/badge_text_small.png" if DRAFT else "img/badge_text.png"
-    ).scale_to_fit_width(6)
-
-
 def arrive_from(obj, dir, buff=0.5):
     pos = obj.get_center()
     obj.align_to(Point().to_edge(dir, buff=0), -dir).shift(buff * dir)
