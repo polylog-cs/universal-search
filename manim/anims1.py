@@ -119,9 +119,9 @@ class Intro(Scene):
         self.play(
             Transform(num1_tex, num1_tex_target),
             Transform(num2_tex, num2_tex_target),
-            run_time=0.4,
+            run_time=0.55,
         )
-        self.play(FadeIn(times_tex), FadeIn(line1), run_time=0.4)
+        self.play(FadeIn(times_tex), FadeIn(line1), run_time=0.25)
 
         rec = SurroundingRectangle(
             num2_tex[0][-1],
