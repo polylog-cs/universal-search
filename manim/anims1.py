@@ -351,10 +351,12 @@ class Asymptotics(Scene):
     def construct(self):
         default()
 
-        our_group = badge_image().shift(3 * RIGHT).set_z_index(10)
+        our_group = badge_image().shift(2.95 * RIGHT).set_z_index(10)
         self.add(our_group)
 
-        your_algo = you_image().scale_to_fit_height(5).move_to(3 * LEFT).set_z_index(10)
+        your_algo = (
+            you_image().scale_to_fit_height(5).move_to(2.95 * LEFT).set_z_index(10)
+        )
         self.play(arrive_from(your_algo, LEFT))
         self.wait()
         self.play(our_group.animate.scale(1.3), run_time=0.5)
@@ -586,9 +588,9 @@ class LadiesandGentlemen(Scene):
             z_index=-1,
             color=BACKGROUND_COLOR,
         )
-        levin_group = Group(levin_back, levin_img, name_txt).shift(3 * LEFT)
+        levin_group = Group(levin_back, levin_img, name_txt).shift(2.95 * LEFT)
 
-        badge_img = badge_image().shift(3 * RIGHT)
+        badge_img = badge_image().shift(2.95 * RIGHT)
         badge_back = SurroundingRectangle(
             badge_img,
             fill_color=BACKGROUND_COLOR,
