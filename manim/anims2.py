@@ -890,11 +890,17 @@ class TimeComplexityAnalysis(MovingCameraScene):
             sharpness=4 / ZOOM,
             **kwargs
         ):
+            orth = (-dir[1], dir[0], 0)
+            end1 = obj.get_corner(dir + orth)
+            end2 = obj.get_corner(dir - orth)
             brace = Brace(
                 obj, dir, buff, stroke_width=stroke_width, sharpness=sharpness, **kwargs
             )
+            brace = DoubleArrow(
+                end1 + dir * buff, end2 + dir * buff, stroke_width=stroke_width, buff=0
+            )
             text = MathTex(text, font_size=font_size)
-            brace.put_at_tip(text, buff=label_buff)
+            text.next_to(brace, dir, buff=label_buff)
             return VGroup(brace, text).set_color(kwargs["color"])
 
         color_l = RED
@@ -949,7 +955,10 @@ class TimeComplexityAnalysis(MovingCameraScene):
         last_wheel = our_prog.group[-1]
 
         fn_label_horiz = mkbrace(
-            Group(Point(first_wheel.get_bottom()), Point(last_wheel.get_bottom())),
+            Group(
+                Dot(first_wheel.get_left(), radius=0),
+                Dot(last_wheel.get_right(), radius=0),
+            ),
             "f(n)",
             DOWN,
             buff=0,
@@ -996,10 +1005,13 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
         our_prog.stdout_obj.fade(1)
         self.play(FadeOut(output), FadeOut(tick))
-        triangle = Polygon(
+        pts = [
             p[0].group[2].get_center(),
             p[-1].group[2].get_center(),
             p[0].group[-1].get_center() + dist,
+        ]
+        triangle = Polygon(
+            *pts,
             color=GREEN,
             stroke_width=4 * ZOOM,
         )
@@ -1016,10 +1028,12 @@ class TimeComplexityAnalysis(MovingCameraScene):
         #    -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
         # self.play(MoveToTarget(arrow_down))
         self.play(
-            Succession(
-                AnimationGroup(fn_label_horiz.animate.scale(1.2), run_time=0.5),
-                AnimationGroup(fn_label_horiz.animate.scale(1 / 1.2), run_time=0.5),
-            )
+            fn_label_horiz.animate.scale(1.2),
+            run_time=0.5,
+        )
+        self.play(
+            fn_label_horiz.animate.scale(1 / 1.2),
+            run_time=0.5,
         )
         self.wait()
 
@@ -1031,8 +1045,8 @@ class TimeComplexityAnalysis(MovingCameraScene):
         self.play(fn_label_horiz_copy.animate.become(fn_label))
         self.wait()
         fn_label = fn_label_horiz_copy
-        triangle_top = triangle.get_corner(UP + LEFT)
-        triangle_bot = triangle.get_corner(DOWN + LEFT)
+        triangle_top = pts[0]
+        triangle_bot = pts[1]
         alpha = L / (L + time)
         triangle_vmid = (1 - alpha) * triangle_top + alpha * triangle_bot
         l_relabel = mkbrace(
@@ -1049,14 +1063,14 @@ class TimeComplexityAnalysis(MovingCameraScene):
             FadeOut(behind),
             FadeOut(your_algo_small),
             FadeOut(your_algo_arrow),
-            triangle.animate.set_fill(GREEN, 1),
+            triangle.animate.set_fill(GREEN, 1).set_stroke_width(0),
         )
         self.wait()
 
         self.remove(p)
 
-        triangle_left = triangle.get_corner(UP + LEFT)
-        triangle_right = triangle.get_corner(UP + RIGHT)
+        triangle_left = pts[0]
+        triangle_right = pts[2]
         triangle_hmid = (1 - alpha) * triangle_left + alpha * triangle_right
         l_rehor = l_label.copy()
         l_rehor.target = mkbrace(
@@ -1145,7 +1159,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         c.shift(-shft)
 
         with_multiplication = MathTex(
-            r"{{\mathcal{O}\left(}}{{f(n)}}{{^2}}+{{f(n) \cdot T_\textit{mul}(n)}}{{\right)}}"
+            r"{{\mathcal{O}\left(}}{{f(n)}}{{^2}}+{{f(n) \cdot T_\textit{check}(n)}}{{\right)}}"
         ).scale(2)
 
         with_multiplication[1].set_color(color_fn)
