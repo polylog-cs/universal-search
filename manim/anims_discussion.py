@@ -61,7 +61,7 @@ class Discussion1(Scene):
         table = (
             Group(empirical_group, asymptotic_group, poly_group)
             .arrange(DOWN)
-            .shift(2 * LEFT)
+            .shift(2.5 * LEFT + 0.5*UP)
         )
 
         self.play(
@@ -234,7 +234,7 @@ class Discussion2(Scene):
 
         # Going back to the universal search, knowing a bunch of weird examples is often extremely useful if you are a researcher in the area, because it helps you to build intuition and quickly disprove some hypotheses.
 
-        shft = 1 * LEFT
+        shft = 2.5 * LEFT
         width = 6
         explanation_scale = 0.5
 
@@ -569,7 +569,7 @@ class Discussion3(Scene):
         self.wait()
         #self.add(vasek_head)
 
-        question_tex = Tex("Why don't we have algorithms with complexities")
+        question_tex = Tex("Why don't we see algorithms with complexities")
         faster_tex = Tex(
             r"{{$\mathcal{O}\left(2^n \right)$, }}{{$\mathcal{O}\left(2^{n/2} \right)$, }}{{$\mathcal{O}\left(2^{n/3} \right)$, }}{{$\dots$}}"
         )

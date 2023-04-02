@@ -385,8 +385,8 @@ def factor(n):
         ]
 
         chimp_img = (
-            ImageMobject("img/chimp.jpg", z_index=100)
-            .scale_to_fit_width(6)
+            ImageMobject("img/monkey.png", z_index=100)
+            .scale_to_fit_width(5)
             .to_corner(UR, buff=0.2)
         )
         self.play(FadeIn(chimp_img))
@@ -638,8 +638,6 @@ class ExplanationBeginning(Scene):
         default()
 
         title_tex = Tex("Universal Search", font_size=3 * DEFAULT_FONT_SIZE).to_edge(UP)
-        self.play(FadeIn(title_tex))
-        self.wait()
 
         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
         name_txt = Tex("Leonid Levin").scale(1).next_to(levin_img, DOWN)
@@ -648,6 +646,8 @@ class ExplanationBeginning(Scene):
         )
 
         self.play(FadeIn(levin_group))
+        self.wait()
+        self.play(FadeIn(title_tex))
         self.wait()
 
         prop1_tex = Tex(prop1_str)
@@ -1145,7 +1145,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         c.shift(-shft)
 
         with_multiplication = MathTex(
-            r"{{\mathcal{O}\left(}}{{f(n)}}{{^2}}+{{f(n) \cdot T_\textit{mul}(n)}}{{\right)}}"
+            r"{{\mathcal{O}\left(}}{{f(n)}}{{^2}}+{{f(n) \cdot T_\textit{check}(n)}}{{\right)}}"
         ).scale(2)
 
         with_multiplication[1].set_color(color_fn)
