@@ -17,13 +17,15 @@ class Intro(Scene):
 
         our_group = badge_image().scale(1.3)
         self.play(FadeIn(our_group))
-        self.wait()
+        self.wait(6.25)
         self.play(
             our_group.animate.scale(0.7)
             .scale_to_fit_height(3)
             .set_stroke(BLACK, 1.5)
-            .move_to(2 * UP)
+            .move_to(2 * UP),
+            run_time=1.5,
         )
+        self.wait()
 
         # statement_tex = Tex(r"Asymptotically optimal algorithm for factoring ").shift(
         #     3 * UP
@@ -32,8 +34,8 @@ class Intro(Scene):
             Tex(r"$\Downarrow ?$").scale(2).next_to(our_group, DOWN, buff=0.5)
         )
         prices_img = [
-            ImageMobject("img/turing.png").scale_to_fit_height(2.5),
             ImageMobject("img/fields.jpg").scale_to_fit_height(2.5),
+            ImageMobject("img/turing.png").scale_to_fit_height(2.5),
             ImageMobject("img/abacus.png").scale_to_fit_height(2.5),
         ]
         prices_group = (
@@ -42,9 +44,11 @@ class Intro(Scene):
             .next_to(downarrow_tex, DOWN)
             .shift(0.1 * DOWN)
         )
-        self.play(FadeIn(downarrow_tex))
+        self.play(FadeIn(downarrow_tex), run_time=1.5)
         self.wait()
-        self.play(Succession(*[FadeIn(price) for price in prices_group]))
+        for price in prices_group:
+            self.play(FadeIn(price, run_time=1.5))
+            self.wait()
         self.wait()
 
         # Before showing you our algorithm, let’s see how it can even be possible that we know such an algorithm and yet do not have Turing awards for finding out what the complexity of factoring is.
@@ -65,13 +69,7 @@ class Intro(Scene):
 
         # But even if we don’t know the complexity of our algorithm, why not just run it on real instances? If we can solve the factoring problem really fast, it means we can break a huge part of today's cryptography and that sounds interesting even without the math proof that the algorithm works.
 
-        mult_group = horrible_multiplication().scale(0.5).to_edge(DOWN)
-        # TODO misto tohohle tam hodit screenshot z předchozího videa
-
-        self.play(FadeIn(mult_group))
-        self.wait()
-        self.play(FadeOut(mult_group))
-        self.wait()
+        self.wait(5)
 
         # The only possible conclusion: Our algorithm is insanely slow [sound effect] in practice.
 
@@ -122,7 +120,11 @@ class Intro(Scene):
                 - table[3 * i + 2].target.immovable.get_center()
             )
 
-        self.play(AnimationGroup(*map(FadeIn, complexities[0:3]), lag_ratio=1.5))
+        self.play(
+            AnimationGroup(
+                *(FadeIn(c, run_time=0.55) for c in complexities[0:3]), lag_ratio=1.5
+            )
+        )
         self.wait()
 
         self.play(
@@ -166,7 +168,8 @@ class Intro(Scene):
                 FadeOut(o)
                 for o in self.mobjects
                 if o.get_center()[1] < line.get_center()[1]
-            ]
+            ],
+            run_time=1.5,
         )
 
         self.wait(3)
@@ -250,8 +253,8 @@ class Polylogo(BasePolylogo):
         Group(self.channel_name, self.logo_solarized).shift(2 * LEFT + 0.5 * UP)
         self.authors.scale(0.5).next_to(self.channel_name, DOWN)
 
-        self.write_logo()
-        self.wait()
+        self.write_logo(run_time=1)
+        self.wait(0.5)
 
         levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3).to_corner(DR)
         quote_txt = (
@@ -264,10 +267,10 @@ class Polylogo(BasePolylogo):
             .align_to(levin_img, DOWN)
         )
 
-        self.play(FadeIn(levin_img), FadeIn(quote_txt))
+        self.play(FadeIn(levin_img), FadeIn(quote_txt), run_time=0.7)
 
-        self.wait()
-        self.destroy_logo()
+        self.wait(5)
+        self.destroy_logo(run_time=0.7)
 
 
 class MonkeyTyping(Scene):
@@ -442,7 +445,7 @@ def factor(n):
         self.add(paragraphs)
         self.play(
             UpdateFromAlphaFunc(
-                paragraphs, updater, rate_func=linear, run_time=8 if DRAFT else 40
+                paragraphs, updater, rate_func=linear, run_time=8 if DRAFT else 35
             )
         )
         self.wait(3)
