@@ -843,7 +843,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
                 ):
                     if time >= last + min_interval:
                         last = time
-                        return "audio/pop/pop_0.wav"
+                        return step_sound(randomize=False)
 
             return inner
 
@@ -866,6 +866,8 @@ class TimeComplexityAnalysis(MovingCameraScene):
         your_algo_arrow = Arrow(
             our_prog.get_left() + 0.8 * ZOOM * LEFT,
             our_prog.get_left() + 0.2 * ZOOM * LEFT,
+            stroke_width=2 * ZOOM,
+            tip_length=DEFAULT_ARROW_TIP_LENGTH * ZOOM * 0.3,
         )
         your_algo_small = (
             your_algo.copy()
@@ -897,7 +899,11 @@ class TimeComplexityAnalysis(MovingCameraScene):
                 obj, dir, buff, stroke_width=stroke_width, sharpness=sharpness, **kwargs
             )
             brace = DoubleArrow(
-                end1 + dir * buff, end2 + dir * buff, stroke_width=stroke_width, buff=0
+                end1 + dir * buff,
+                end2 + dir * buff,
+                stroke_width=stroke_width,
+                buff=0,
+                tip_length=DEFAULT_ARROW_TIP_LENGTH * ZOOM * 0.5,
             )
             text = MathTex(text, font_size=font_size)
             text.next_to(brace, dir, buff=label_buff)
@@ -975,7 +981,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         anim_group = AnimationGroup(
             *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
         )
-        add_sounds_for_anims(self, anim_group, run_time2, add_sounds_debounced(0.01))
+        add_sounds_for_anims(self, anim_group, run_time2, add_sounds_debounced())
         self.play(
             anim_group,
             run_time=run_time2,

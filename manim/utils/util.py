@@ -266,6 +266,7 @@ class ProgramInvocation(VMobject):
             .set_sheen_direction((0, 0, 0))
             .set_sheen_factor(0)
         )
+        self.wheel = Square()
         self.add(self.group)
         if auto_arrange:
             self.add_updater(ProgramInvocation.arrange)
@@ -616,8 +617,11 @@ def arrive_from(obj, dir, buff=0.5):
     return obj.animate.move_to(pos)
 
 
-def step_sound():
-    return random_pop_file()
+def step_sound(randomize=True):
+    if randomize:
+        return random_pop_file()
+    else:
+        return "audio/pop/pop_0.wav"
 
 
 def add_sounds_for_anims(scene, anim_group, run_time, sound_fn):
