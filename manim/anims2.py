@@ -487,7 +487,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.add(p)  # To display the newly added programs
 
         self.play(
-            self.camera.frame.animate.align_to(banana.get_bottom() + 0.1 * DOWN, DOWN),
+            self.camera.frame.animate.set_y(banana.get_y()),
             run_time=3,
         )
         self.play(
@@ -500,22 +500,19 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.wait(2)
         self.play(FadeOut(checker))
         self.play(banana.show_verdict())
-        for q in post:
-            q.finish()
+        self.play(AnimationGroup(*(q.finish() for q in post), lag_ratio=0.2))
 
         # That’s the main idea. There are just a few small problems with this approach: the most important one is that at some point we encounter algorithms with infinite loops that do not terminate, like this one:
 
         p.add_dots(NUM_DOTS)
         _, (pre, infinite, post) = p.add_programs_around(
-            INFINITE_PROGRAM, "", NUM_AROUND, 0, fade=False
+            INFINITE_PROGRAM, "", NUM_AROUND, 5, fade=False
         )
         self.add(p)
         for q in pre:
             q.finish()
         self.play(
-            self.camera.frame.animate.align_to(
-                infinite.get_bottom() + 0.1 * DOWN, DOWN
-            ),
+            self.camera.frame.animate.set_y(infinite.get_y()),
             run_time=3,
         )
         self.wait(2)
@@ -529,9 +526,10 @@ class ProgramsWithoutStepping(MovingCameraScene):
 
         self.wait(5, frozen_frame=False)
         self.play(
-            FadeOut(p[:-1]),
+            *(FadeOut(p) for p in pre + post),
             infinite.animate.align_to(self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
+        self.wait(1, frozen_frame=False)
         self.play(FadeOut(waiting), FadeOut(infinite.stdout_obj))
         self.play(
             infinite.dumb_down(),
@@ -843,7 +841,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
                 ):
                     if time >= last + min_interval:
                         last = time
-                        return "audio/pop/pop_0.wav"
+                        return step_sound(randomize=False)
 
             return inner
 
@@ -866,6 +864,8 @@ class TimeComplexityAnalysis(MovingCameraScene):
         your_algo_arrow = Arrow(
             our_prog.get_left() + 0.8 * ZOOM * LEFT,
             our_prog.get_left() + 0.2 * ZOOM * LEFT,
+            stroke_width=2 * ZOOM,
+            tip_length=DEFAULT_ARROW_TIP_LENGTH * ZOOM * 0.3,
         )
         your_algo_small = (
             your_algo.copy()
@@ -890,11 +890,21 @@ class TimeComplexityAnalysis(MovingCameraScene):
             sharpness=4 / ZOOM,
             **kwargs
         ):
+            orth = (-dir[1], dir[0], 0)
+            end1 = obj.get_corner(dir + orth)
+            end2 = obj.get_corner(dir - orth)
             brace = Brace(
                 obj, dir, buff, stroke_width=stroke_width, sharpness=sharpness, **kwargs
             )
+            brace = DoubleArrow(
+                end1 + dir * buff,
+                end2 + dir * buff,
+                stroke_width=stroke_width,
+                buff=0,
+                tip_length=DEFAULT_ARROW_TIP_LENGTH * ZOOM * 0.5,
+            )
             text = MathTex(text, font_size=font_size)
-            brace.put_at_tip(text, buff=label_buff)
+            text.next_to(brace, dir, buff=label_buff)
             return VGroup(brace, text).set_color(kwargs["color"])
 
         color_l = RED
@@ -949,7 +959,10 @@ class TimeComplexityAnalysis(MovingCameraScene):
         last_wheel = our_prog.group[-1]
 
         fn_label_horiz = mkbrace(
-            Group(Point(first_wheel.get_bottom()), Point(last_wheel.get_bottom())),
+            Group(
+                Dot(first_wheel.get_left(), radius=0),
+                Dot(last_wheel.get_right(), radius=0),
+            ),
             "f(n)",
             DOWN,
             buff=0,
@@ -966,7 +979,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         anim_group = AnimationGroup(
             *anims, lag_ratio=0.5, rate_func=rate_functions.ease_in_out_quart
         )
-        add_sounds_for_anims(self, anim_group, run_time2, add_sounds_debounced(0.01))
+        add_sounds_for_anims(self, anim_group, run_time2, add_sounds_debounced())
         self.play(
             anim_group,
             run_time=run_time2,
@@ -996,10 +1009,13 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
         our_prog.stdout_obj.fade(1)
         self.play(FadeOut(output), FadeOut(tick))
-        triangle = Polygon(
+        pts = [
             p[0].group[2].get_center(),
             p[-1].group[2].get_center(),
             p[0].group[-1].get_center() + dist,
+        ]
+        triangle = Polygon(
+            *pts,
             color=GREEN,
             stroke_width=4 * ZOOM,
         )
@@ -1016,10 +1032,12 @@ class TimeComplexityAnalysis(MovingCameraScene):
         #    -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
         # self.play(MoveToTarget(arrow_down))
         self.play(
-            Succession(
-                AnimationGroup(fn_label_horiz.animate.scale(1.2), run_time=0.5),
-                AnimationGroup(fn_label_horiz.animate.scale(1 / 1.2), run_time=0.5),
-            )
+            fn_label_horiz.animate.scale(1.2),
+            run_time=0.5,
+        )
+        self.play(
+            fn_label_horiz.animate.scale(1 / 1.2),
+            run_time=0.5,
         )
         self.wait()
 
@@ -1031,8 +1049,8 @@ class TimeComplexityAnalysis(MovingCameraScene):
         self.play(fn_label_horiz_copy.animate.become(fn_label))
         self.wait()
         fn_label = fn_label_horiz_copy
-        triangle_top = triangle.get_corner(UP + LEFT)
-        triangle_bot = triangle.get_corner(DOWN + LEFT)
+        triangle_top = pts[0]
+        triangle_bot = pts[1]
         alpha = L / (L + time)
         triangle_vmid = (1 - alpha) * triangle_top + alpha * triangle_bot
         l_relabel = mkbrace(
@@ -1049,14 +1067,14 @@ class TimeComplexityAnalysis(MovingCameraScene):
             FadeOut(behind),
             FadeOut(your_algo_small),
             FadeOut(your_algo_arrow),
-            triangle.animate.set_fill(GREEN, 1),
+            triangle.animate.set_fill(GREEN, 1).set_stroke_width(0),
         )
         self.wait()
 
         self.remove(p)
 
-        triangle_left = triangle.get_corner(UP + LEFT)
-        triangle_right = triangle.get_corner(UP + RIGHT)
+        triangle_left = pts[0]
+        triangle_right = pts[2]
         triangle_hmid = (1 - alpha) * triangle_left + alpha * triangle_right
         l_rehor = l_label.copy()
         l_rehor.target = mkbrace(

@@ -33,6 +33,10 @@ def random_whoosh_file():
     return f"audio/whoosh/whoosh_{random.randint(0, 3)}.wav"
 
 
+def random_tick_file():
+    return f"audio/tick/tick_{random.randint(0, 7)}.wav"
+
+
 whoosh_gain = -8
 
 
