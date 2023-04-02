@@ -487,7 +487,7 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.add(p)  # To display the newly added programs
 
         self.play(
-            self.camera.frame.animate.align_to(banana.get_bottom() + 0.1 * DOWN, DOWN),
+            self.camera.frame.animate.set_y(banana.get_y()),
             run_time=3,
         )
         self.play(
@@ -500,22 +500,19 @@ class ProgramsWithoutStepping(MovingCameraScene):
         self.wait(2)
         self.play(FadeOut(checker))
         self.play(banana.show_verdict())
-        for q in post:
-            q.finish()
+        self.play(AnimationGroup(*(q.finish() for q in post), lag_ratio=0.2))
 
         # That’s the main idea. There are just a few small problems with this approach: the most important one is that at some point we encounter algorithms with infinite loops that do not terminate, like this one:
 
         p.add_dots(NUM_DOTS)
         _, (pre, infinite, post) = p.add_programs_around(
-            INFINITE_PROGRAM, "", NUM_AROUND, 0, fade=False
+            INFINITE_PROGRAM, "", NUM_AROUND, 5, fade=False
         )
         self.add(p)
         for q in pre:
             q.finish()
         self.play(
-            self.camera.frame.animate.align_to(
-                infinite.get_bottom() + 0.1 * DOWN, DOWN
-            ),
+            self.camera.frame.animate.set_y(infinite.get_y()),
             run_time=3,
         )
         self.wait(2)
@@ -529,9 +526,10 @@ class ProgramsWithoutStepping(MovingCameraScene):
 
         self.wait(5, frozen_frame=False)
         self.play(
-            FadeOut(p[:-1]),
+            *(FadeOut(p) for p in pre + post),
             infinite.animate.align_to(self.camera.frame.get_top() + 0.1 * DOWN, UP),
         )
+        self.wait(1, frozen_frame=False)
         self.play(FadeOut(waiting), FadeOut(infinite.stdout_obj))
         self.play(
             infinite.dumb_down(),
