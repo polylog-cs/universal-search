@@ -266,7 +266,7 @@ class ProgramInvocation(VMobject):
             .set_sheen_direction((0, 0, 0))
             .set_sheen_factor(0)
         )
-        self.wheel = Square()
+        self.wheel = Square().scale(0.3)
         self.add(self.group)
         if auto_arrange:
             self.add_updater(ProgramInvocation.arrange)
@@ -275,7 +275,7 @@ class ProgramInvocation(VMobject):
     def arrange(self):
         self.group.arrange(center=False)
 
-    def show_output(self, scale_result=1):
+    def show_output(self, scale_result=1, run_time=1):
         color = RED if "Error" in self.stdout else TEXT_COLOR
         self.stdout_obj = (
             VGroup(
@@ -287,21 +287,24 @@ class ProgramInvocation(VMobject):
         )
         self.stdout_obj.next_to(self.group)
         self.group.add(self.stdout_obj)
-        return FadeIn(self.stdout_obj)
+        return FadeIn(self.stdout_obj, run_time=run_time)
 
-    def show_verdict(self, scale_result=1):
+    def show_verdict(self, scale_result=1, run_time=1):
         if self.ok:
             verdict = Text("✓", color=GREEN, font_size=80, font="monospace")
         else:
             verdict = Text("×", color=RED, font_size=80)
         verdict.scale(scale_result).next_to(self.group)
         self.group.add(verdict)
-        return FadeIn(self.group[-1], scale=3)
+        return FadeIn(self.group[-1], scale=3, run_time=run_time)
 
-    def finish(self, lag_ratio=0.5, scale_result=None):
+    def finish(self, lag_ratio=0.5, scale_result=None, run_time=1):
         self.finished = True
         scale_result = scale_result or 1
-        anims = [self.show_output(scale_result), self.show_verdict(scale_result)]
+        anims = [
+            self.show_output(scale_result, run_time=run_time),
+            self.show_verdict(scale_result, run_time=run_time),
+        ]
         if lag_ratio is None:
             return anims
         return AnimationGroup(*anims, lag_ratio=lag_ratio)
@@ -315,7 +318,7 @@ class ProgramInvocation(VMobject):
 
         return updater
 
-    def step(self, finish=False, fade=True, scale_result=None):
+    def step(self, finish=False, fade=True, scale_result=None, run_time=0.5):
         if finish:
             return self.finish(lag_ratio=None, scale_result=scale_result)
         self.wheels += 1
@@ -338,7 +341,7 @@ class ProgramInvocation(VMobject):
             updater,
             rate_func=rate_functions.ease_in_out_quad,
             suspend_mobject_updating=True,
-            run_time=0.5,
+            run_time=run_time,
         )
 
     def dumb_down(self, animate=True):
@@ -408,13 +411,13 @@ def programs_around(code, before=0, after=0):
     return [nth_python_program(i) for i in range(num - before, num + after + 1)]
 
 
-def rotating_wheel():
+def rotating_wheel(rate=-120 * DEGREES):
     waiting_big = Circle(color=BASE0, stroke_width=8, radius=0.2)
     waiting_small = Arc(color=BASE02, stroke_width=8, radius=0.2).shift(
         waiting_big.get_center()
     )
     waiting = VGroup(waiting_big, waiting_small)
-    always_rotate(waiting, rate=-120 * DEGREES)
+    always_rotate(waiting, rate=rate)
     return waiting
 
 
@@ -450,7 +453,7 @@ class ProgramInvocationList(VGroup):
             program.align_to(prev, LEFT)
             prev = program
 
-    def add_program(self, program, fade=True, special_group=False):
+    def add_program(self, program, fade=True, special_group=False, run_time=None):
         if len(self) == 0:
             program.align_to(self.top_pos, UP)
             program.align_to(self.top_pos, LEFT)
@@ -465,10 +468,10 @@ class ProgramInvocationList(VGroup):
             program.code.fade(1)
         if special_group:
             group_class = SpecialAnimGroup
-            run_time = 0.5
+            run_time = 0.5 if run_time is None else run_time
         else:
             group_class = AnimationGroup
-            run_time = 1
+            run_time = 1 if run_time is None else run_time
         return group_class(
             program.stdin.animate(run_time=run_time).restore(),
             program.code.animate(run_time=run_time).restore(),
@@ -484,7 +487,14 @@ class ProgramInvocationList(VGroup):
         ]
 
     def add_programs_around(
-        self, code, code_stdout, before=0, after=0, fade=True, show_stdin=True
+        self,
+        code,
+        code_stdout,
+        before=0,
+        after=0,
+        fade=True,
+        show_stdin=True,
+        run_time=None,
     ):
         anims = []
         num = program_to_number(code)
@@ -507,6 +517,7 @@ class ProgramInvocationList(VGroup):
                         show_stdin=show_stdin,
                     ),
                     fade=fade,
+                    run_time=run_time,
                 )
             )
             if i < num:
@@ -517,11 +528,18 @@ class ProgramInvocationList(VGroup):
                 important_program = self[-1]
         return anims, (pre, important_program, post)
 
-    def point_arrow_at(self, i):
+    def point_arrow_at(self, i, run_time=1):
         target = self.arrow.copy().next_to(self[i], RIGHT).set_x(6)
-        return self.arrow.animate.move_to(target)
+        return self.arrow.animate(run_time=run_time).move_to(target)
 
-    def step(self, finish=False, scale_result=None, say_sound=False, move_arrow=True):
+    def step(
+        self,
+        finish=False,
+        scale_result=None,
+        say_sound=False,
+        move_arrow=True,
+        run_time=0.5,
+    ):
         anims = []
         oldlen = len(self)
 
@@ -537,15 +555,17 @@ class ProgramInvocationList(VGroup):
         if self.now_adding:
             anims_dummy = self.add_dummy()
             if move_arrow:
-                anims.append(self.point_arrow_at(oldlen))
+                anims.append(self.point_arrow_at(oldlen, run_time=2 * run_time))
             anims.append(*anims_dummy)
             oldlen += 1
             self.now_adding = False
         else:
             sound = True
-            step = self[self.ptr].step(finish, scale_result=scale_result)
+            step = self[self.ptr].step(
+                finish, scale_result=scale_result, run_time=run_time
+            )
             if move_arrow:
-                anims.append(self.point_arrow_at(self.ptr))
+                anims.append(self.point_arrow_at(self.ptr, run_time=2 * run_time))
             if type(step) != list:
                 step = [step]
             anims += step
@@ -619,9 +639,9 @@ def arrive_from(obj, dir, buff=0.5):
 
 def step_sound(randomize=True):
     if randomize:
-        return random_pop_file()
+        return random_tick_file()
     else:
-        return "audio/pop/pop_0.wav"
+        return "audio/tick/tick_0.wav"
 
 
 def add_sounds_for_anims(scene, anim_group, run_time, sound_fn):

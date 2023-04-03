@@ -473,37 +473,53 @@ class ProgramsWithoutStepping(MovingCameraScene):
         p = ProgramInvocationList(STDIN, STDOUT, 6.5 * LEFT + 3 * UP)
         self.play(
             AnimationGroup(
-                *p.add_programs_around("a", "SyntaxError", 0, 10, show_stdin=False)[0],
-                lag_ratio=0.1,
+                *p.add_programs_around(
+                    "a", "SyntaxError", 0, 10, show_stdin=False, run_time=1.5
+                )[0],
+                lag_ratio=0.2,
             )
         )
         for q in p:
             q.stdin.foo.move_to(q.stdin)
-        self.wait(1)
-        self.play(AnimationGroup(*(FadeIn(q.stdin.foo) for q in p), lag_ratio=0.2))
-        self.play(AnimationGroup(*(q.finish() for q in p[:3]), lag_ratio=0.8))
-        self.play(AnimationGroup(*(q.finish() for q in p[3:]), lag_ratio=0.2))
+        self.wait(8)
+        self.play(
+            AnimationGroup(*(FadeIn(q.stdin.foo, run_time=2) for q in p), lag_ratio=0.2)
+        )
+        self.play(
+            AnimationGroup(*(q.finish(run_time=1 / 1.22) for q in p[:3]), lag_ratio=0.8)
+        )
+        self.play(
+            AnimationGroup(*(q.finish(run_time=1 / 1.22) for q in p[3:]), lag_ratio=0.2)
+        )
         p.add_dots(NUM_DOTS),
         _, (pre, banana, post) = p.add_programs_around(
-            'print("banana")', "banana", NUM_AROUND, NUM_AROUND, fade=False
+            'print("banana")',
+            "banana",
+            NUM_AROUND,
+            NUM_AROUND,
+            fade=False,
         )
         self.add(p)  # To display the newly added programs
 
         self.play(
             self.camera.frame.animate.set_y(banana.get_y()),
-            run_time=3,
+            run_time=3 / 1.22,
         )
         self.play(
-            AnimationGroup(*(q.finish() for q in pre[-NUM_AROUND:]), lag_ratio=0.2)
+            AnimationGroup(
+                *(q.finish(run_time=1 / 1.22) for q in pre[-NUM_AROUND:]), lag_ratio=0.2
+            )
         )
 
         self.play(banana.show_output())
         checker = make_checking_code().move_to(self.camera.frame).shift(4.5 * RIGHT)
         self.play(FadeIn(checker, target_position=banana.get_right(), scale=0))
-        self.wait(2)
+        self.wait(6)
         self.play(FadeOut(checker))
         self.play(banana.show_verdict())
-        self.play(AnimationGroup(*(q.finish() for q in post), lag_ratio=0.2))
+        self.play(
+            AnimationGroup(*(q.finish(run_time=0.5) for q in post), lag_ratio=0.15)
+        )
 
         # That’s the main idea. There are just a few small problems with this approach: the most important one is that at some point we encounter algorithms with infinite loops that do not terminate, like this one:
 
@@ -516,18 +532,18 @@ class ProgramsWithoutStepping(MovingCameraScene):
             q.finish()
         self.play(
             self.camera.frame.animate.set_y(infinite.get_y()),
-            run_time=3,
+            run_time=4,
         )
         self.wait(2)
         self.play(infinite.show_output())
-        self.wait(2)
+        self.wait(0.5)
 
-        waiting = rotating_wheel().next_to(infinite.group, RIGHT)
+        waiting = rotating_wheel(rate=-180 * DEGREES).next_to(infinite.group, RIGHT)
 
         infinite.add(waiting)
         self.play(FadeIn(waiting))
 
-        self.wait(5, frozen_frame=False)
+        self.wait(2, frozen_frame=False)
         self.play(
             *(FadeOut(p) for p in pre + post),
             infinite.animate.align_to(self.camera.frame.get_top() + 0.1 * DOWN, UP),
@@ -554,45 +570,60 @@ class ProgramsWithStepping(MovingCameraScene):
         p.add_dummy(fade=False)
         self.add(p)
         self.camera.frame.align_to(p[0].stdin.get_top() + 0.5 * UP, UP)
-        self.wait(1)
+        self.wait(3)
         self.play(FadeIn(p.arrow))
-        for i in range(15):
-            anims, sound = p.step(say_sound=True)
-            self.play(AnimationGroup(*anims, lag_ratio=0.3))
-            if sound:
-                self.add_sound(step_sound(), time_offset=-0.25)
+
+        def steps(n, wait=0, lag_ratio=0.3, run_time=0.5):
+            for i in range(n):
+                anims, sound = p.step(say_sound=True, run_time=run_time)
+                self.play(AnimationGroup(*anims, lag_ratio=lag_ratio))
+                if sound:
+                    self.add_sound(step_sound(), time_offset=-0.5 * run_time)
+                if wait:
+                    self.wait(wait)
+
+        steps(4)
+        steps(1, lag_ratio=3)
+        self.wait(5)
+        steps(3)
+        self.wait(15)
+        steps(1, lag_ratio=3)
+        self.wait(1)
+        steps(6)
         # self.wait(5)
 
         # Of course, whenever some simulation of an algorithm finishes, either because the program returned some answer, or, more likely, it simply crashed, we check whether the output of the algorithm is, by chance, two numbers whose product is our input number.
         prog = p[p.ptr]
         arrow, stdout, tick = p.step(True)
         prog.group[-1].save_state().fade(1)
+        prog.group[-2].save_state().fade(1)
         checker = (
             make_checking_code()
             .move_to(self.camera.frame)
             .shift(1.5 * RIGHT + 1.5 * UP)
         )
-        self.play(arrow, stdout)
+        self.play(Succession(arrow, prog.group[-2].animate.restore()))
+        self.wait(5)
         self.play(FadeIn(checker))
-        self.wait(2)
+        self.wait(4.75)
         self.play(FadeOut(checker))
         prog.group[-1].restore()
         self.add_sound("audio/polylog_failure.wav", time_offset=0.5)
         self.play(tick)
         self.wait(2)
 
-        for i in range(11):
-            anims, sound = p.step(say_sound=True)
-            self.play(AnimationGroup(*anims, lag_ratio=0.2))
-            if sound:
-                self.add_sound(step_sound(), time_offset=-0.25)
+        steps(7, lag_ratio=0.2, run_time=0.17)
 
         prog = p[p.ptr]
         prog.stdout = STDOUT
         prog.ok = True
         arrow, stdout, tick = p.step(True)
         prog.group[-1].save_state().fade(1)
-        self.play(arrow, stdout)
+        prog.group[-2].save_state().fade(1)
+        self.play(
+            Succession(arrow, prog.group[-2].animate(run_time=2).restore()),
+            run_time=0.7,
+        )
         checker.shift(2 * DOWN + 1 * RIGHT)
         self.play(FadeIn(checker))
         self.wait(2)
@@ -600,7 +631,7 @@ class ProgramsWithStepping(MovingCameraScene):
         prog.group[-1].restore()
         self.add_sound("audio/polylog_success.wav", time_offset=0.5)
         self.play(tick)
-        self.wait(2)
+        self.wait(3.5)
 
         output = prog.stdout_obj[1]
         tick = prog.group[-1]
@@ -620,7 +651,7 @@ class ProgramsWithStepping(MovingCameraScene):
             output.animate.become(win_group[0]),
             tick.animate.become(win_group[1]),
         )
-        self.wait()
+        self.wait(3)
 
         self.play(
             Circumscribe(checker, color=HIGHLIGHT),
@@ -631,7 +662,7 @@ class ProgramsWithStepping(MovingCameraScene):
         # [zase pseudokód s if a*b == n → ✓, ten se pak zvětší a trojúhelník zmizí a highlightne se řádka “print(a, b); return”]
         # [A NEBO: tick vedle algoritmu co se zvetsi na celou obrazovku]
 
-        self.wait(5)
+        self.wait(8)
 
 
 class ExplanationBeginning(Scene):
@@ -640,16 +671,16 @@ class ExplanationBeginning(Scene):
 
         title_tex = Tex("Universal Search", font_size=3 * DEFAULT_FONT_SIZE).to_edge(UP)
 
-        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3)
+        levin_img = ImageMobject("img/levin.jpg").scale_to_fit_width(3.2)
         name_txt = Tex("Leonid Levin").scale(1).next_to(levin_img, DOWN)
         levin_group = (
-            Group(levin_img, name_txt).arrange(DOWN).to_edge(RIGHT).shift(0.3 * DOWN)
+            Group(levin_img, name_txt).arrange(DOWN).to_edge(RIGHT).shift(0.8 * DOWN)
         )
 
         self.play(FadeIn(levin_group))
         self.wait()
         self.play(FadeIn(title_tex))
-        self.wait()
+        self.wait(5)
 
         prop1_tex = Tex(prop1_str)
         prop2_tex = Tex(prop2_str)
@@ -662,19 +693,19 @@ class ExplanationBeginning(Scene):
             .to_edge(LEFT)
         )
 
-        self.play(FadeIn(props[0]), run_time=0.5)
-        self.wait(0.5)
-        self.play(FadeIn(props[1]), run_time=0.5)
-        self.wait(0.5)
+        self.play(FadeIn(props[0]), run_time=1)
+        self.wait(5.5)
+        self.play(FadeIn(props[1]), run_time=1)
+        self.wait(5.5)
         self.play(FadeOut(props), FadeOut(levin_group), FadeOut(title_tex))
-        self.wait()
+        self.wait(5)
 
         shft = 1 * DOWN
         your_algo_img = you_image().scale_to_fit_height(3.5)
         fn = Tex(r"$f(n)$")
         your_algo = Group(your_algo_img, fn).arrange(DOWN).move_to(3 * LEFT).shift(shft)
         self.play(arrive_from(your_algo, LEFT))
-        self.wait()
+        self.wait(5)
 
         our_algo_img = badge_image().scale_to_fit_height(3.5)
         fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}")
@@ -685,7 +716,7 @@ class ExplanationBeginning(Scene):
             .align_to(your_algo, DOWN)
         )
         self.play(arrive_from(our_algo, RIGHT))
-        self.wait()
+        self.wait(5)
 
         self.play(FadeOut(fn), FadeOut(fn2))
         self.wait()
@@ -696,6 +727,7 @@ class ExplanationBeginning(Scene):
                 AnimationGroup(your_algo_img.animate.scale(1 / 1.2), run_time=0.5),
             )
         )
+        self.wait()
         self.play(FadeIn(fn))
         self.wait()
 
@@ -712,6 +744,7 @@ class ExplanationBeginning(Scene):
                 fn2.get_center()
             )
         )
+        self.wait(2)
         self.play(FadeIn(fn2))
         self.wait()
 
@@ -764,13 +797,19 @@ class TimeComplexityAnalysis(MovingCameraScene):
         self.next_section(skip_animations=False)
         your_algo = you_image().scale_to_fit_height(2.5).shift(2 * LEFT)
         self.play(arrive_from(your_algo, LEFT))
+        self.wait(8)
         code = make_factoring_example_program()
         code.next_to(your_algo)
         self.play(FadeIn(code, target_position=your_algo, scale=0))
         self.wait(2)
         pos = 3 * RIGHT + 2.5 * DOWN
-        self.play(Group(code, your_algo).animate.move_to(self.camera.frame).shift(pos))
-        self.wait()
+        self.play(
+            Group(code, your_algo)
+            .animate(run_time=0.8)
+            .move_to(self.camera.frame)
+            .shift(pos)
+        )
+        self.wait(0.5)
         orig_width = self.camera.frame.width
 
         def your_updater(grp):
@@ -799,7 +838,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             L = 20
             time = 40
             ZOOM = 8
-            run_time1 = 10
+            run_time1 = 10 / 1.2
             run_time2 = 10
         total = L + time - 1
         steps_till_appearance = (L + 1) * L // 2
@@ -859,10 +898,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         # Group(code, your_algo).scale(ZOOM).move_to(self.camera.frame).shift(ZOOM * pos)
         # your_algo.set_stroke(BLACK, 3 * ZOOM)
 
-        self.add(
-            code, your_algo
-        )  # I hope the fact it is not there for a while can be solved in postprocessing
-        # self.play(FadeIn(your_algo))
+        self.add(code, your_algo)
 
         your_algo_arrow = Arrow(
             our_prog.get_left() + 0.8 * ZOOM * LEFT,
@@ -927,19 +963,17 @@ class TimeComplexityAnalysis(MovingCameraScene):
         )
         number = (
             Tex("\\hsize=7cm{}\\rightskip=0pt plus 1fill{}" + allow_breaks(str(num)))
-            .scale(0.7 * ZOOM)
+            .scale(0.8 * ZOOM)
             .next_to(iter_number, buff=0.1 * ZOOM)
         )
         iter_number[0][0].set_color(RED).scale(1.3)
 
-        self.play(Circumscribe(code, color=HIGHLIGHT))
         self.wait()
-
         self.play(FadeIn(number))
         self.wait()
 
         self.play(FadeIn(iter_number))
-        self.wait()
+        self.wait(10)
 
         self.play(
             FadeOut(iter_number[1], number),
@@ -947,8 +981,9 @@ class TimeComplexityAnalysis(MovingCameraScene):
             FadeOut(your_algo),
             FadeIn(l_label[0]),
             ReplacementTransform(iter_number[0], l_label[1]),
+            run_time=1.6,
         )
-        self.wait()
+        self.wait(6)
 
         anims = [
             anim
@@ -987,6 +1022,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             anim_group,
             run_time=run_time2,
         )
+        self.wait(1.75)
         self.play(*anim_last)
         self.add_sound(step_sound(), time_offset=-0.5)
         p.ptr += 1
@@ -1022,13 +1058,14 @@ class TimeComplexityAnalysis(MovingCameraScene):
             color=GREEN,
             stroke_width=4 * ZOOM,
         )
+        self.wait(11)
         self.play(FadeIn(triangle))
-        self.wait(3)
+        self.wait(6.3)
         jag = p.return_for_jagging(L - 1)
         self.play(*map(FadeOut, jag))
         self.wait(2)
         self.play(*map(FadeIn, jag))
-        self.wait(2)
+        self.wait(8)
         # arrow_down = arrow.copy()
         # arrow_down.generate_target()
         # arrow_down.target.rotate(
@@ -1042,7 +1079,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             fn_label_horiz.animate.scale(1 / 1.2),
             run_time=0.5,
         )
-        self.wait()
+        self.wait(4)
 
         fn_label_horiz_copy = fn_label_horiz.copy()
 
@@ -1050,7 +1087,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         fn_label = mkbrace(vg, "f(n)", LEFT, color=color_fn)
 
         self.play(fn_label_horiz_copy.animate.become(fn_label))
-        self.wait()
+        self.wait(2.75)
         fn_label = fn_label_horiz_copy
         triangle_top = pts[0]
         triangle_bot = pts[1]
@@ -1092,7 +1129,6 @@ class TimeComplexityAnalysis(MovingCameraScene):
             MoveToTarget(fn_rehor),
             MoveToTarget(l_rehor),
         )
-        self.wait()
 
         self.next_section(skip_animations=False)
         area = (
@@ -1109,12 +1145,13 @@ class TimeComplexityAnalysis(MovingCameraScene):
             *(FadeIn(area[i]) for i in (0, 1, 3, 5)),
             area[2].animate.move_to(pos2),
             area[4].animate.move_to(pos4),
+            run_time=0.7,
         )
-        self.wait()
+        self.wait(0.7)
 
         area2 = area[1:].copy()
-        self.play(area2.animate.shift(ZOOM * 1.5 * DOWN))
-        self.wait()
+        self.play(area2.animate(run_time=0.7).shift(ZOOM * 1.5 * DOWN))
+        self.wait(0.7)
         shift = -area2.get_center()
         for obj in [area, area2, triangle, fn_label, l_label, fn_rehor, l_rehor]:
             obj.shift(shift)
@@ -1142,13 +1179,14 @@ class TimeComplexityAnalysis(MovingCameraScene):
         c = MathTex(r"{{\mathcal{O}\left(}}{{f(n)}}{{^2}}{{\right)}}").scale(ZOOM)
         c[1].set_color(color_fn)
         c.shift(a[2][3].get_center() - c[1][0].get_center())
-        self.wait()
-        self.play(TransformMatchingTex(a, b))
-        self.wait()
+        self.wait(0.7)
+        self.play(TransformMatchingTex(a, b), run_time=0.7)
+        self.wait(0.7)
         self.remove(b)
         self.add(b_two)
-        self.wait()
-        self.play(TransformMatchingTex(b_two, c))
+        self.wait(0.7)
+        self.play(TransformMatchingTex(b_two, c), run_time=0.7)
+        self.wait(3.5)
         self.play(
             *(
                 map(
@@ -1157,6 +1195,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
                 )
             ),
             c.animate.scale(1.5).move_to(self.camera.frame),
+            run_time=1.5,
         )
 
         shft = DOWN
@@ -1172,20 +1211,16 @@ class TimeComplexityAnalysis(MovingCameraScene):
         with_multiplication[1].set_color(color_fn)
         with_multiplication[4].set_color(ORANGE2)
         without_multiplication = c.copy().shift(shft)
-        self.wait(2)
+        self.wait(5)
         checker = make_checking_code().scale(1.5).shift(-shft + 2 * UP)
-        self.play(FadeIn(checker), c.animate.shift(shft))
-        self.wait()
+        self.play(FadeIn(checker), c.animate.shift(shft), run_time=0.7)
+        self.wait(0.5)
         self.play(Circumscribe(checker, color=HIGHLIGHT))
-        self.wait()
+        self.wait(0.5)
         self.play(TransformMatchingTex(c, with_multiplication))
-        self.wait(2)
+        self.wait(8)
         self.play(TransformMatchingTex(with_multiplication, without_multiplication))
-        self.wait()
-        self.play(Circumscribe(without_multiplication[2], color=HIGHLIGHT))
-        self.wait()
-        self.play(FadeOut(checker), FadeOut(without_multiplication))
-        self.wait()
+        self.wait(10)
 
         # Ok, so what happens after the Lth iteration at which we start simulating our algorithm on the input? Well, since our algorithm finishes after f(n) steps on inputs with n digits, [needs f(n) steps] and in one iteration we simulate just one step of every algorithm in our growing list, it will take f(n) additional iterations before the simulation of this factoring algorithm finishes. When it finishes, it factors the numbers correctly, and the universal search terminates. Of course, maybe it terminates even earlier because of some other factoring algorithm that has already finished.
 
