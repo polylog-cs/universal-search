@@ -724,7 +724,7 @@ class ExplanationBeginning(Scene):
         self.play(
             Succession(
                 AnimationGroup(your_algo_img.animate.scale(1.2), run_time=0.5),
-                AnimationGroup(your_algo_img.animate.scale(1 / 1.2), run_time=0.5),
+                AnimationGroup(your_algo_img.animate.scale(1), run_time=0.5),
             )
         )
         self.wait()
@@ -734,7 +734,7 @@ class ExplanationBeginning(Scene):
         self.play(
             Succession(
                 AnimationGroup(our_algo_img.animate.scale(1.2), run_time=0.5),
-                AnimationGroup(our_algo_img.animate.scale(1 / 1.2), run_time=0.5),
+                AnimationGroup(our_algo_img.animate.scale(1), run_time=0.5),
             )
         )
 
@@ -901,7 +901,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
         self.add(code, your_algo)
 
         your_algo_arrow = Arrow(
-            our_prog.get_left() + 0.8 * ZOOM * LEFT,
+            our_prog.get_left() + 0.7 * ZOOM * LEFT,
             our_prog.get_left() + 0.2 * ZOOM * LEFT,
             stroke_width=2 * ZOOM,
             tip_length=DEFAULT_ARROW_TIP_LENGTH * ZOOM * 0.3,
@@ -932,15 +932,13 @@ class TimeComplexityAnalysis(MovingCameraScene):
             orth = (-dir[1], dir[0], 0)
             end1 = obj.get_corner(dir + orth)
             end2 = obj.get_corner(dir - orth)
-            brace = Brace(
-                obj, dir, buff, stroke_width=stroke_width, sharpness=sharpness, **kwargs
-            )
             brace = DoubleArrow(
                 end1 + dir * buff,
                 end2 + dir * buff,
                 stroke_width=stroke_width,
                 buff=0,
                 tip_length=DEFAULT_ARROW_TIP_LENGTH * ZOOM * 0.5,
+                **kwargs,
             )
             text = MathTex(text, font_size=font_size)
             text.next_to(brace, dir, buff=label_buff)
@@ -1049,6 +1047,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             output.animate.become(win_group[0]),
             tick.animate.become(win_group[1]),
         )
+        self.wait(1)
         our_prog.stdout_obj.fade(1)
         self.play(FadeOut(output), FadeOut(tick))
         pts = [
@@ -1061,7 +1060,7 @@ class TimeComplexityAnalysis(MovingCameraScene):
             color=GREEN,
             stroke_width=4 * ZOOM,
         )
-        self.wait(11)
+        self.wait(10)
         self.play(FadeIn(triangle))
         self.wait(6.3)
         jag = p.return_for_jagging(L - 1)
