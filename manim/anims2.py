@@ -1010,7 +1010,10 @@ class TimeComplexityAnalysis(MovingCameraScene):
         fn_tex = fn_label_horiz[1]
         fn_tex.set_z_index(100)
         behind = BackgroundRectangle(
-            fn_tex, z_index=99, buff=SMALL_BUFF * ZOOM, corner_radius=0.2 * ZOOM
+            fn_tex,
+            z_index=99,
+            buff=SMALL_BUFF * ZOOM,
+            corner_radius=0.2 * ZOOM,
         )
 
         self.play(FadeIn(fn_label_horiz), FadeIn(behind))
@@ -1071,12 +1074,13 @@ class TimeComplexityAnalysis(MovingCameraScene):
         # arrow_down.target.rotate(
         #    -90 * DEGREES).move_to(our_prog.group[2]).align_to(our_prog.group[2].get_center(), UP)
         # self.play(MoveToTarget(arrow_down))
+        fn_label_grp = VGroup(fn_label_horiz, behind)
         self.play(
-            fn_label_horiz.animate.scale(1.2),
+            fn_label_grp.animate.scale(1.2),
             run_time=0.5,
         )
         self.play(
-            fn_label_horiz.animate.scale(1 / 1.2),
+            fn_label_grp.animate.scale(1 / 1.2),
             run_time=0.5,
         )
         self.wait(4)
@@ -1118,11 +1122,19 @@ class TimeComplexityAnalysis(MovingCameraScene):
         triangle_hmid = (1 - alpha) * triangle_left + alpha * triangle_right
         l_rehor = l_label.copy()
         l_rehor.target = mkbrace(
-            Group(Line(triangle_left, triangle_hmid)), "L", UP, color=color_l
+            Group(Line(triangle_left, triangle_hmid)),
+            "L",
+            UP,
+            color=color_l,
+            label_buff=0.1 * ZOOM,
         )
         fn_rehor = fn_label.copy()
         fn_rehor.target = mkbrace(
-            Group(Line(triangle_hmid, triangle_right)), "f(n)", UP, color=color_fn
+            Group(Line(triangle_hmid, triangle_right)),
+            "f(n)",
+            UP,
+            color=color_fn,
+            label_buff=0.1 * ZOOM,
         )
         self.wait(2)
         self.play(
@@ -1264,7 +1276,7 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
         new_tex.shift(0.3 * DOWN)
 
         self.add(p, og_tex)
-        self.wait()
+        self.wait(7)
 
         self.play(
             *(
@@ -1280,11 +1292,11 @@ class TimeComplexityAfterthoughts(MovingCameraScene):
             )
         )
 
-        self.wait()
+        self.wait(4)
         self.play(
             FadeIn(new_tex[0:2]),
         )
-        self.wait()
+        self.wait(5)
         bigo_tex = Tex(r"$\mathcal{O}$").scale(10).next_to(new_tex, DOWN, buff=0.7)
         self.play(FadeIn(bigo_tex))
         self.wait()

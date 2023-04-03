@@ -266,7 +266,6 @@ class ProgramInvocation(VMobject):
             .set_sheen_direction((0, 0, 0))
             .set_sheen_factor(0)
         )
-        self.wheel = Square().scale(0.3)
         self.add(self.group)
         if auto_arrange:
             self.add_updater(ProgramInvocation.arrange)

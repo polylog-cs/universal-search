@@ -15,7 +15,7 @@ class Discussion1(Scene):
     def construct(self):
         default()
         self.wait()
-        #self.add(vasek_head)
+        # self.add(vasek_head)
         # So this was Levin’s universal search and I expect that many of you are now a bit confused, shocked, or even disgusted. None of these are the purpose of this video, so let me finish with a bunch of thoughts on how to understand the universal search and what is the lesson you should take away.
 
         # First of all, what I don’t want you to take away, is that asymptotic complexity is a broken concept. Let’s say we want to analyze some algorithm like selectsort. There are a bunch of approaches you could take. First, you could code the algorithm and empirically measure its complexity.
@@ -61,20 +61,20 @@ class Discussion1(Scene):
         table = (
             Group(empirical_group, asymptotic_group, poly_group)
             .arrange(DOWN)
-            .shift(2.5 * LEFT + 0.5*UP)
+            .shift(2.5 * LEFT + 0.5 * UP)
         )
 
         self.play(
             Succession(
-                Wait(),
+                Wait(10),
                 FadeIn(empirical_tex),
-                Wait(),
+                Wait(10),
                 FadeIn(asymptotic_tex),
-                Wait(),
+                Wait(10),
                 FadeIn(poly_tex),
+                Wait(10),
             )
         )
-        self.wait()
         # You can see how these options get increasingly abstract and as they are getting more abstract, they are also getting easier to work with. In one extreme, analyzing an algorithm empirically is pretty hard and even impossible to do for nontrivial values of n, because there are too many inputs to check. On the other hand, understanding whether an algorithm runs in polynomial time is often really easy.
 
         arrow1 = Arrow(
@@ -86,17 +86,17 @@ class Discussion1(Scene):
         arrow1.tip.set_color(rainbow[0])
         label1 = Tex(r"easy \\to use").next_to(arrow1, LEFT)
         self.play(Create(arrow1, run_time=3), Write(label1, run_time=1.5))
-        self.wait()
 
         highlight_rec = surrounding_rectangle(empirical_group)
+        self.wait(10)
         self.play(
             Succession(
                 FadeIn(highlight_rec),
-                Wait(),
+                Wait(10),
                 Transform(highlight_rec, surrounding_rectangle(asymptotic_group)),
-                Wait(),
+                Wait(10),
                 Transform(highlight_rec, surrounding_rectangle(poly_group)),
-                Wait(),
+                Wait(10),
             )
         )
 
@@ -110,36 +110,42 @@ class Discussion1(Scene):
 
         label2 = Tex(r"informative").next_to(arrow2, RIGHT)
         self.play(Create(arrow2, run_time=3), Write(label2, run_time=1.5))
-        self.wait()
 
         self.play(
             Succession(
+                Wait(10),
                 Transform(highlight_rec, surrounding_rectangle(asymptotic_group)),
-                Wait(),
+                Wait(10),
                 Transform(highlight_rec, surrounding_rectangle(empirical_group)),
-                Wait(),
+                Wait(10),
             )
         )
 
-        sl = 3.0
         self.play(
             Succession(
-                Transform(highlight_rec, surrounding_rectangle(asymptotic_group)),
-                Wait(),
                 Transform(
                     highlight_rec,
-                    surrounding_rectangle(Group(asymptotic_group, label1)),
+                    surrounding_rectangle(asymptotic_group.copy().scale((1, 0.7, 1))),
                 ),
-                Wait(),
+                Wait(10),
                 Transform(
                     highlight_rec,
-                    surrounding_rectangle(Group(asymptotic_group, label1, label2)),
+                    surrounding_rectangle(
+                        Group(asymptotic_group, label1).copy().scale((1, 0.7, 1))
+                    ),
                 ),
-                Wait(),
+                Wait(10),
+                Transform(
+                    highlight_rec,
+                    surrounding_rectangle(
+                        Group(asymptotic_group, label1, label2)
+                        .copy()
+                        .scale((1, 0.7, 1))
+                    ),
+                ),
+                Wait(10),
             )
         )
-
-        self.wait(3)
 
         return
 
@@ -229,7 +235,7 @@ class Discussion2(Scene):
     def construct(self):
         default()
         self.next_section(skip_animations=False)
-        #self.add(vasek_head)
+        # self.add(vasek_head)
         self.wait()
 
         # Going back to the universal search, knowing a bunch of weird examples is often extremely useful if you are a researcher in the area, because it helps you to build intuition and quickly disprove some hypotheses.
@@ -272,16 +278,11 @@ class Discussion2(Scene):
             ]
         ]
 
-        self.play(
-            anims[0][0],
-        )
-        self.wait()
+        self.play(anims[0][0], run_time=0.4)
+        self.wait(2)
 
-        self.play(
-            anims[0][1],
-            anims[1][0],
-        )
-        self.wait()
+        self.play(anims[0][1], anims[1][0], run_time=0.4)
+        self.wait(2)
 
         self.next_section(skip_animations=False)
         from hilbertcurve.hilbertcurve import HilbertCurve
@@ -328,23 +329,23 @@ class Discussion2(Scene):
             FadeIn(bounding_square),
             FadeIn(hilberttitle_tex),
             anims[1][1],
-            *[FadeIn(line) for line in curve1]
+            *[FadeIn(line) for line in curve1],
+            run_time=0.4
         )
-        self.wait()
-        self.wait()
+        self.wait(2)
 
         for i in range(2, 9):
             curve2 = create_curve(i)
-            self.play(Transform(curve1, curve2), run_time=0.5)
-            self.wait(0.5)
+            self.play(Transform(curve1, curve2), run_time=0.2)
+            self.wait(0.15)
 
         red_square = (
             Square(color=RED, fill_opacity=1, fill_color=RED)
             .scale_to_fit_width(side_length)
             .move_to(bounding_square.get_center())
         )
-        self.play(FadeIn(red_square))
-        self.wait()
+        self.play(FadeIn(red_square), run_time=0.5)
+        self.wait(3)
 
         return
         curves = (
@@ -567,7 +568,7 @@ class Discussion3(Scene):
     def construct(self):
         default()
         self.wait()
-        #self.add(vasek_head)
+        # self.add(vasek_head)
 
         question_tex = Tex("Why don't we see algorithms with complexities")
         faster_tex = Tex(
@@ -584,24 +585,27 @@ class Discussion3(Scene):
         self.play(
             Succession(
                 Write(question_tex),
-                Write(faster_tex[0]),
-                Write(faster_tex[1]),
-                Write(faster_tex[2]),
-                Write(faster_tex[3]),
+                AnimationGroup(
+                    Write(faster_tex[0]),
+                    Write(faster_tex[1]),
+                    Write(faster_tex[2]),
+                    Write(faster_tex[3]),
+                    lag_ratio=0.8,
+                ),
                 Write(question2_tex),
-            )
+            ),
+            run_time=7,
         )
-        self.wait()
+        self.wait(10)
 
         uni_tex = Tex("Universal search!", font_size=DEFAULT_FONT_SIZE * 1.4).shift(
-            2 * DOWN + 3 * LEFT / 2
+            2.2 * DOWN + 3 * LEFT
         )
         self.play(
-            Write(uni_tex),
+            Write(uni_tex, run_time=1),
         )
-        self.wait()
-        self.remove(vasek_head)
-        self.play(*[FadeOut(o) for o in self.mobjects if o not in [vasek_head]])
+        self.wait(10)
+        self.play(*[FadeOut(o) for o in self.mobjects])
         uni_tex = Tex(
             r"{{Universal search \\}}{{an explicit asymptotically optimal algorithm for many problems}}"
         )
@@ -610,7 +614,7 @@ class Discussion3(Scene):
         uni_tex.to_edge(UP).shift(1 * DOWN)
 
         self.play(
-            Write(uni_tex),
+            Write(uni_tex, run_time=3),
         )
 
-        self.wait(3)
+        self.wait(10)
