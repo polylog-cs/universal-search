@@ -638,7 +638,10 @@ class ProgramsWithStepping(MovingCameraScene):
         prog.group.remove(tick)
         prog.stdout_obj.remove(output)
         win_group = (
-            VGroup(Text(r"4 = 2 × 2").move_to(output.get_center()), tick.copy())
+            VGroup(
+                Text(r"4 = 2 × 2", font="monospace").move_to(output.get_center()),
+                tick.copy().scale(2),
+            )
             .arrange(RIGHT)
             .move_to(self.camera.frame)
             .scale_to_fit_width(self.camera.frame.width)
@@ -701,13 +704,13 @@ class ExplanationBeginning(Scene):
         self.wait(5)
 
         shft = 1 * DOWN
-        your_algo_img = you_image().scale_to_fit_height(3.5)
+        your_algo_img = you_image().scale_to_fit_height(3.5).set_stroke(BLACK, 2)
         fn = Tex(r"$f(n)$")
         your_algo = Group(your_algo_img, fn).arrange(DOWN).move_to(3 * LEFT).shift(shft)
         self.play(arrive_from(your_algo, LEFT))
         self.wait(5)
 
-        our_algo_img = badge_image().scale_to_fit_height(3.5)
+        our_algo_img = badge_image().scale_to_fit_height(3.5).set_stroke(BLACK, 2)
         fn2 = Tex(r"{{$\mathcal{O}\big( f(n$}}{{)}}{{$ \big)$}}")
         our_algo = (
             Group(our_algo_img, fn2)
@@ -795,7 +798,9 @@ class TimeComplexityAnalysis(MovingCameraScene):
         default()
 
         self.next_section(skip_animations=False)
-        your_algo = you_image().scale_to_fit_height(2.5).shift(2 * LEFT)
+        your_algo = (
+            you_image().scale_to_fit_height(2.5).shift(2 * LEFT).set_stroke(BLACK, 2)
+        )
         self.play(arrive_from(your_algo, LEFT))
         self.wait(8)
         code = make_factoring_example_program()
